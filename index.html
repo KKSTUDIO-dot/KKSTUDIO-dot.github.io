@@ -3,71 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>KKSTUDIO iOS 26</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>iOS 26 Stats</title>
     <style>
-        :root { --bg: #000; --card: #1c1c1e; --accent: #0a84ff; --text: #fff; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        .status { font-size: 12px; color: #32d74b; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .card { background: var(--card); width: 85%; border-radius: 25px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
-        .val { font-size: 42px; font-weight: 700; margin: 10px 0; }
-        .label { color: #8e8e93; font-size: 14px; text-transform: uppercase; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .stat-item { background: #2c2c2e; padding: 15px; border-radius: 18px; }
-        .update-btn { margin-top: 30px; width: 60px; height: 60px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; border: none; outline: none; }
-        .update-btn:active { transform: scale(0.9); opacity: 0.8; }
-        .loading { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        body { background: #000; color: #fff; font-family: -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .card { background: #1c1c1e; border-radius: 30px; padding: 25px; width: 260px; text-align: center; }
+        .money { font-size: 40px; font-weight: 800; margin: 10px 0; }
+        .label { color: #8e8e93; font-size: 12px; text-transform: uppercase; }
+        .btn { margin-top: 20px; padding: 15px 30px; background: #0a84ff; border: none; border-radius: 15px; color: white; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="status">● Система Активна</div>
     <div class="card">
         <div class="label">Наличные</div>
-        <div id="money" class="val">$0</div>
-        <div class="stats-grid">
-            <div class="stat-item">
-                <div class="label">Уровень</div>
-                <div id="score" style="font-size: 20px; font-weight: bold;">0</div>
-            </div>
-            <div class="stat-item">
-                <div class="label">Сессия</div>
-                <div id="session" style="font-size: 20px; font-weight: bold;">0m</div>
-            </div>
-        </div>
+        <div id="money" class="money">$0</div>
+        <div id="info" style="color: #8e8e93; font-size: 14px;">Загрузка...</div>
+        <button class="btn" onclick="loadData()">Обновить</button>
     </div>
 
-    <button id="updateBtn" class="update-btn" onclick="updateData()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-    </button>
-
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-
-        // ТВОЯ ССЫЛКА ИЗ GOOGLE APPS SCRIPT
+        // Твоя ссылка из Google
         const URL = "https://script.google.com/macros/s/AKfycbz1e9WPTLnKu2zQFledPKNae2KybiIjfi8VR_Oo9YkOwarUiQBzpHWFzKAkdo_8RiTN/exec";
 
-        async function updateData() {
-            const btn = document.getElementById('updateBtn');
-            btn.classList.add('loading');
-            tg.HapticFeedback.impactOccurred('medium');
-
+        async function loadData() {
             try {
-                const response = await fetch(URL);
+                // Добавляем параметр для обхода кэша
+                const response = await fetch(URL + "?t=" + Date.now());
                 const data = await response.json();
                 
-                document.getElementById('money').innerText = "$" + Number(data.money).toLocaleString();
-                document.getElementById('score').innerText = data.score;
-                document.getElementById('session').innerText = data.session + "m";
+                document.getElementById('money').innerText = "$" + data.money.toLocaleString();
+                document.getElementById('info').innerText = "LVL: " + data.score + " | " + data.session + "m";
             } catch (e) {
-                console.error("Ошибка:", e);
-            } finally {
-                setTimeout(() => btn.classList.remove('loading'), 800);
+                document.getElementById('info').innerText = "Ошибка сети";
             }
         }
-        // Авто-загрузка при старте
-        updateData();
+        loadData();
     </script>
 </body>
 </html>
