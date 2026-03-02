@@ -175,25 +175,28 @@
         </button>
     </div>
 
-    <script>
+<script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
         tg.setHeaderColor('#000000');
 
-        const BIN_ID = "ТВОЙ_BIN_ID";
-        const API_KEY = "ТВОЙ_КЛЮЧ";
+        // ТВОИ РЕАЛЬНЫЕ ДАННЫЕ
+        const BIN_ID = "69a5b90743b1c97be9ac7a9f"; 
+        const API_KEY = "$2a$10$80xOVp5OskWNxAfAlQtqEOPTjf.ms8.F.5ZRlPpFFwiTMGxthZYaK";
         const URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
 
         async function updateData() {
             const btn = document.getElementById('updateBtn');
             btn.classList.add('loading');
-            tg.HapticFeedback.notificationOccurred('success');
-
+            
             try {
+                tg.HapticFeedback.impactOccurred('medium'); // Легкий отклик при нажатии
+                
                 const response = await fetch(URL, {
                     headers: { "X-Master-Key": API_KEY }
                 });
+                
                 const res = await response.json();
                 const data = res.record;
 
@@ -203,7 +206,8 @@
                 document.getElementById('time').innerText = "Last sync: " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
             } catch (e) {
-                tg.showAlert("Connection lost");
+                console.error(e);
+                tg.showAlert("Data not found. Check your Lua script!");
             } finally {
                 setTimeout(() => btn.classList.remove('loading'), 600);
             }
@@ -211,5 +215,4 @@
 
         updateData();
     </script>
-</body>
 </html>
