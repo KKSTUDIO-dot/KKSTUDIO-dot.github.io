@@ -7,193 +7,121 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --tg-theme-bg: var(--tg-theme-bg-color, #1a1a1a);
-            --tg-theme-text: var(--tg-theme-text-color, #ffffff);
+            --bg: #000000;
+            --card: #121212;
             --accent: #3390ec;
-            --card-bg: rgba(255, 255, 255, 0.05);
+            --text: #ffffff;
+            --secondary: #888888;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--tg-theme-bg);
-            background: linear-gradient(180deg, var(--tg-theme-bg) 0%, #000 100%);
-            color: var(--tg-theme-text);
+            font-family: -apple-system, system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            overflow-x: hidden;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            animation: fadeInDown 0.8s ease;
-        }
-
-        .header h1 {
-            font-size: 24px;
-            margin: 0;
+        .title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--secondary);
             text-transform: uppercase;
-            letter-spacing: 2px;
-            background: linear-gradient(90deg, #3390ec, #00f2fe);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-align: center;
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            width: 100%;
-        }
-
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 20px;
+        .stat-card {
+            background: var(--card);
+            border: 1px solid #222;
+            border-radius: 24px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            justify-content: center;
+            transition: all 0.2s ease;
         }
 
-        .card:active {
-            transform: scale(0.95);
-            background: rgba(255, 255, 255, 0.1);
+        .stat-card:active { transform: scale(0.97); background: #1a1a1a; }
+
+        .label {
+            font-size: 13px;
+            color: var(--secondary);
+            margin-bottom: 8px;
         }
 
-        .card-wide { grid-column: span 2; }
+        .value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text);
+        }
 
-        .icon { font-size: 28px; margin-bottom: 10px; }
-        .label { font-size: 12px; color: #aaa; text-transform: uppercase; margin-bottom: 5px; }
-        .value { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+        .money-value { color: #4cd964; } /* Зеленый цвет для денег */
 
-        .status-badge {
-            display: flex;
-            align-items: center;
-            background: rgba(0,0,0,0.3);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 14px;
+        .session-info {
             margin-top: 10px;
+            text-align: center;
+            font-size: 12px;
+            color: #444;
         }
-
-        .dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            margin-right: 8px; background: #4cd964;
-            box-shadow: 0 0 10px #4cd964;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .main-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            background: linear-gradient(90deg, #3390ec, #007aff);
-            color: white;
-            border: none;
-            padding: 18px;
-            border-radius: 18px;
-            font-size: 16px;
-            font-weight: bold;
-            box-shadow: 0 10px 20px rgba(51, 144, 236, 0.3);
-        }
-
-        /* Адаптация под темную тему Telegram */
-        body.light { --card-bg: rgba(0, 0, 0, 0.05); --tg-theme-text: #000; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>KKSTUDIO Dashboard</h1>
-        <div class="status-badge">
-            <div id="status-dot" class="dot"></div>
-            <span id="status-text">ИГРОК В СЕТИ</span>
-        </div>
+    <div class="title">Игровая статистика</div>
+
+    <div class="stat-card">
+        <span class="label">Текущий баланс</span>
+        <span id="money" class="value money-value">$0</span>
     </div>
 
-    <div class="grid">
-        <div class="card" onclick="vibrate()">
-            <div class="icon">💰</div>
-            <div class="label">Наличные</div>
-            <div id="money" class="value">$0</div>
-        </div>
-
-        <div class="card" onclick="vibrate()">
-            <div class="icon">🏆</div>
-            <div class="label">Уровень</div>
-            <div id="score" class="value">0</div>
-        </div>
-
-        <div class="card card-wide" onclick="vibrate()">
-            <div class="icon">📍</div>
-            <div class="label">Район города</div>
-            <div id="location" class="value">Загрузка данных...</div>
-        </div>
-        
-        <div class="card card-wide" style="border: none; background: transparent; box-shadow: none;">
-             <div class="label">Последнее обновление</div>
-             <div id="time" style="font-size: 14px; color: #666;">--:--:--</div>
-        </div>
+    <div class="stat-card">
+        <span class="label">Ваш уровень (LVL)</span>
+        <span id="score" class="value">0</span>
     </div>
 
-    <button class="main-btn" onclick="updateData()">ОБНОВИТЬ СТАТИСТИКУ</button>
+    <div class="stat-card">
+        <span class="label">Минут в игре за сессию</span>
+        <span id="session" class="value">0</span>
+    </div>
+
+    <div class="session-info">Автоматическое обновление данных</div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
 
-        // --- ДАННЫЕ (ВСТАВЬ СВОИ) ---
+        // --- ВСТАВЬ СВОИ ДАННЫЕ ТУТ ---
         const BIN_ID = "ТВОЙ_BIN_ID";
         const API_KEY = "ТВОЙ_КЛЮЧ";
         const URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
 
-        function vibrate() {
-            tg.HapticFeedback.impactOccurred('medium');
-        }
-
         async function updateData() {
-            vibrate();
-            const btn = document.querySelector('.main-btn');
-            btn.innerText = "ЗАГРУЗКА...";
-            
             try {
                 const response = await fetch(URL, {
                     headers: { "X-Master-Key": API_KEY }
                 });
-                const data = (await response.json()).record;
+                const res = await response.json();
+                const data = res.record;
 
-                document.getElementById('money').innerText = "$" + data.money.toLocaleString();
+                // Обновляем текст на странице
+                document.getElementById('money').innerText = "$" + Number(data.money).toLocaleString();
                 document.getElementById('score').innerText = data.score;
-                document.getElementById('location').innerText = data.location || "San Andreas";
-                document.getElementById('time').innerText = new Date().toLocaleTimeString();
+                document.getElementById('session').innerText = data.session || 0;
 
             } catch (e) {
-                tg.showAlert("Ошибка связи с базой данных!");
-            } finally {
-                btn.innerText = "ОБНОВИТЬ СТАТИСТИКУ";
+                console.log("Ошибка загрузки");
             }
         }
 
-        // Автообновление раз в 30 секунд
-        setInterval(updateData, 30000);
+        // Обновление раз в 10 секунд
+        setInterval(updateData, 10000);
         updateData();
     </script>
 </body>
