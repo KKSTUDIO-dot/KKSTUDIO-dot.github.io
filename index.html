@@ -2,107 +2,194 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KKSTUDIO Stats</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>KKSTUDIO OS</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg: #000000;
-            --card: #121212;
-            --accent: #3390ec;
-            --text: #ffffff;
-            --secondary: #888888;
+            --ios-bg: #000000;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent: #ffffff;
+            --secondary: #636366;
+            --money: #34c759;
         }
+
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, system-ui, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            font-family: -apple-system, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+            background-color: var(--ios-bg);
+            color: #fff;
             margin: 0;
-            padding: 24px;
+            padding: 40px 20px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
+            min-height: 100vh;
+            letter-spacing: -0.02em;
         }
 
-        .title {
-            font-size: 14px;
-            font-weight: 600;
+        /* Заголовок в стиле iOS 26 */
+        .header {
+            margin-bottom: 20px;
+            padding-left: 10px;
+        }
+
+        .header h1 {
+            font-size: 34px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -1px;
+        }
+
+        .header p {
             color: var(--secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-            text-align: center;
+            margin: 5px 0 0 0;
+            font-size: 15px;
+            font-weight: 500;
         }
 
+        /* Карточки с эффектом объемного стекла */
         .stat-card {
-            background: var(--card);
-            border: 1px solid #222;
-            border-radius: 24px;
+            background: var(--glass);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
             padding: 24px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
 
-        .stat-card:active { transform: scale(0.97); background: #1a1a1a; }
+        .stat-card:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.06);
+        }
 
         .label {
             font-size: 13px;
+            font-weight: 600;
             color: var(--secondary);
-            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
         }
 
         .value {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--text);
+            font-size: 38px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
         }
 
-        .money-value { color: #4cd964; } /* Зеленый цвет для денег */
+        #money { color: var(--money); text-shadow: 0 0 20px rgba(52, 199, 89, 0.2); }
 
-        .session-info {
-            margin-top: 10px;
+        /* Футуристичная кнопка */
+        .action-area {
+            position: fixed;
+            bottom: 40px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .update-btn {
+            background: #fff;
+            color: #000;
+            border: none;
+            width: 70px;
+            height: 70px;
+            border-radius: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 35px rgba(255, 255, 255, 0.15);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .update-btn:active {
+            transform: scale(0.8) rotate(90deg);
+        }
+
+        .update-btn svg {
+            width: 28px;
+            height: 28px;
+            transition: transform 0.6s ease;
+        }
+
+        .loading svg {
+            animation: rotate 1s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Индикатор обновления */
+        .sync-time {
+            position: fixed;
+            bottom: 120px;
+            left: 0;
+            right: 0;
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             color: #444;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
 
-    <div class="title">Игровая статистика</div>
-
-    <div class="stat-card">
-        <span class="label">Текущий баланс</span>
-        <span id="money" class="value money-value">$0</span>
+    <div class="header">
+        <h1>Dashboard</h1>
+        <p id="player-name">Session Active</p>
     </div>
 
     <div class="stat-card">
-        <span class="label">Ваш уровень (LVL)</span>
+        <span class="label">Net Worth</span>
+        <span id="money" class="value">$0</span>
+    </div>
+
+    <div class="stat-card">
+        <span class="label">Level</span>
         <span id="score" class="value">0</span>
     </div>
 
     <div class="stat-card">
-        <span class="label">Минут в игре за сессию</span>
-        <span id="session" class="value">0</span>
+        <span class="label">Playtime</span>
+        <span id="session" class="value">0m</span>
     </div>
 
-    <div class="session-info">Автоматическое обновление данных</div>
+    <div class="sync-time" id="time">Last sync: --:--</div>
+
+    <div class="action-area">
+        <button id="updateBtn" class="update-btn" onclick="updateData()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+        </button>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
+        tg.setHeaderColor('#000000');
 
-        // --- ВСТАВЬ СВОИ ДАННЫЕ ТУТ ---
         const BIN_ID = "ТВОЙ_BIN_ID";
         const API_KEY = "ТВОЙ_КЛЮЧ";
         const URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
 
         async function updateData() {
+            const btn = document.getElementById('updateBtn');
+            btn.classList.add('loading');
+            tg.HapticFeedback.notificationOccurred('success');
+
             try {
                 const response = await fetch(URL, {
                     headers: { "X-Master-Key": API_KEY }
@@ -110,20 +197,19 @@
                 const res = await response.json();
                 const data = res.record;
 
-                // Обновляем текст на странице
                 document.getElementById('money').innerText = "$" + Number(data.money).toLocaleString();
                 document.getElementById('score').innerText = data.score;
-                document.getElementById('session').innerText = data.session || 0;
+                document.getElementById('session').innerText = (data.session || 0) + "m";
+                document.getElementById('time').innerText = "Last sync: " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
             } catch (e) {
-                console.log("Ошибка загрузки");
+                tg.showAlert("Connection lost");
+            } finally {
+                setTimeout(() => btn.classList.remove('loading'), 600);
             }
         }
 
-        // Обновление раз в 10 секунд
-        setInterval(updateData, 10000);
         updateData();
     </script>
 </body>
 </html>
-
