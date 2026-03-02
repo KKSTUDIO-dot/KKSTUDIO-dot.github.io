@@ -2,41 +2,247 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>iOS 26 Stats</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arizona Mobile Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #000; color: #fff; font-family: -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .card { background: #1c1c1e; border-radius: 30px; padding: 25px; width: 260px; text-align: center; }
-        .money { font-size: 40px; font-weight: 800; margin: 10px 0; }
-        .label { color: #8e8e93; font-size: 12px; text-transform: uppercase; }
-        .btn { margin-top: 20px; padding: 15px 30px; background: #0a84ff; border: none; border-radius: 15px; color: white; font-weight: bold; cursor: pointer; }
+        :root {
+            --arizona-orange: #ff8c00;
+            --bg-dark: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --text-gray: #aaaaaa;
+            --green: #2ecc71;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(180deg, #1e1e1e 0%, #121212 100%);
+            border-bottom: 2px solid var(--arizona-orange);
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 24px;
+            letter-spacing: 2px;
+        }
+
+        .logo span { color: var(--arizona-orange); }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            margin-top: 20px;
+        }
+
+        /* Форма входа */
+        .login-box {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #2b2b2b;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--arizona-orange);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:active { transform: scale(0.98); }
+
+        /* Карточка профиля */
+        .profile-card {
+            display: none; /* Скрыта до авторизации */
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+        }
+
+        .profile-header {
+            background: var(--arizona-orange);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .profile-header h2 { margin: 0; font-size: 20px; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 20px;
+        }
+
+        .stat-item {
+            background: #252525;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .stat-item label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .stat-item span {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .money { color: var(--green); }
+
+        .loader {
+            display: none;
+            margin: 10px 0;
+            color: var(--arizona-orange);
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="label">Наличные</div>
-        <div id="money" class="money">$0</div>
-        <div id="info" style="color: #8e8e93; font-size: 14px;">Загрузка...</div>
-        <button class="btn" onclick="loadData()">Обновить</button>
+
+    <header>
+        <div class="logo">ARIZONA <span>HUB</span></div>
+    </header>
+
+    <div class="container">
+        <div class="login-box" id="login-form">
+            <h3>Проверка профиля</h3>
+            <input type="text" id="nick" placeholder="Введите Nick_Name">
+            <select id="server">
+                <option value="1">Phoenix [01]</option>
+                <option value="2">Tucson [02]</option>
+                <option value="3">Scottdale [03]</option>
+                <option value="10">Surprise [10]</option>
+                <option value="20">Sun-City [20]</option>
+                <option value="30">Love [30]</option>
+            </select>
+            <button onclick="fetchProfile()">Синхронизировать</button>
+            <div id="loader" class="loader">Подключаемся к серверу Arizona RP...</div>
+        </div>
+
+        <div class="profile-card" id="profile-card">
+            <div class="profile-header">
+                <h2 id="ui-nick">NICKNAME</h2>
+                <small id="ui-server">Server Name</small>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <label>Уровень</label>
+                    <span id="ui-lvl">0</span>
+                </div>
+                <div class="stat-item">
+                    <label>Наличные</label>
+                    <span id="ui-cash" class="money">$0</span>
+                </div>
+                <div class="stat-item">
+                    <label>Организация</label>
+                    <span id="ui-org">Нет</span>
+                </div>
+                <div class="stat-item">
+                    <label>Статус</label>
+                    <span id="ui-job">Загрузка...</span>
+                </div>
+            </div>
+            <button style="border-radius: 0;" onclick="reset()">Выйти / Другой ник</button>
+        </div>
     </div>
 
     <script>
-        // Твоя ссылка из Google
-        const URL = "https://script.google.com/macros/s/AKfycbz1e9WPTLnKu2zQFledPKNae2KybiIjfi8VR_Oo9YkOwarUiQBzpHWFzKAkdo_8RiTN/exec";
+        async function fetchProfile() {
+            const nick = document.getElementById('nick').value;
+            const serverId = document.getElementById('server').value;
+            const serverName = document.getElementById('server').options[document.getElementById('server').selectedIndex].text;
+            
+            if (!nick.includes('_')) {
+                alert("Введите корректный ник в формате Nick_Name");
+                return;
+            }
 
-        async function loadData() {
+            // Показываем лоадер
+            document.getElementById('loader').style.display = 'block';
+
+            // Используем AllOrigins прокси для обхода CORS
+            const targetUrl = `https://arizona-rp.com/profile/${serverId}/${nick}`;
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+
             try {
-                // Добавляем параметр для обхода кэша
-                const response = await fetch(URL + "?t=" + Date.now());
+                const response = await fetch(proxyUrl);
                 const data = await response.json();
-                
-                document.getElementById('money').innerText = "$" + data.money.toLocaleString();
-                document.getElementById('info').innerText = "LVL: " + data.score + " | " + data.session + "m";
-            } catch (e) {
-                document.getElementById('info').innerText = "Ошибка сети";
+                const html = data.contents;
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                // Парсим статистику (ищем все элементы с классом profile-stats-item)
+                // Примечание: на сайте Аризоны структура может меняться, адаптируем под актуальную
+                const stats = doc.querySelectorAll('.profile-stats-item');
+
+                if (stats.length > 0) {
+                    // Наполняем UI данными
+                    document.getElementById('ui-nick').innerText = nick;
+                    document.getElementById('ui-server').innerText = serverName;
+                    
+                    // Обычно: 0-Уровень, 1-Наличные, 3-Работа/Орг
+                    document.getElementById('ui-lvl').innerText = stats[0]?.querySelector('p')?.innerText || "??";
+                    document.getElementById('ui-cash').innerText = stats[1]?.querySelector('p')?.innerText || "$0";
+                    document.getElementById('ui-org').innerText = stats[3]?.querySelector('p')?.innerText || "Не в орг.";
+                    document.getElementById('ui-job').innerText = "Активен";
+
+                    // Переключаем экраны
+                    document.getElementById('login-form').style.display = 'none';
+                    document.getElementById('profile-card').style.display = 'block';
+                } else {
+                    alert("Профиль не найден! Возможно, он скрыт в настройках /settings или вы ошиблись в нике.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Ошибка при получении данных. Попробуйте позже.");
+            } finally {
+                document.getElementById('loader').style.display = 'none';
             }
         }
-        loadData();
+
+        function reset() {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('profile-card').style.display = 'none';
+        }
     </script>
 </body>
 </html>
