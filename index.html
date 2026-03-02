@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAMP Stats Mobile</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        /* Стиль в темных тонах Telegram */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #1c1c1d;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 { font-size: 22px; margin-bottom: 20px; color: #3390ec; }
+        .container { width: 100%; max-width: 400px; }
+        .card {
+            background: #2b2b2c;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .label { color: #aaaaaa; font-size: 14px; }
+        .value { font-size: 18px; font-weight: bold; color: #ffffff; }
+        .status-online { color: #4cd964; }
+        .status-offline { color: #ff3b30; }
+        
+        button {
+            background-color: #3390ec;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Моя Статистика Game</h1>
+
+    <div class="container">
+        <div class="card">
+            <span class="label">Деньги:</span>
+            <span id="money" class="value">$0</span>
+        </div>
+        <div class="card">
+            <span class="label">Опыт (Score):</span>
+            <span id="score" class="value">0</span>
+        </div>
+        <div class="card">
+            <span class="label">Статус:</span>
+            <span id="status" class="value status-offline">Загрузка...</span>
+        </div>
+        
+        <button onclick="updateData()">Обновить вручную</button>
+    </div>
+
+    <script>
+        // --- НАСТРОЙКИ (Впиши свои данные из JSONBin) ---
+        const BIN_ID = "ВАШ_BIN_ID"; 
+        const API_KEY = "ВАШ_X_MASTER_KEY";
+        const URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
+
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Расширяем приложение на весь экран
+
+        async function updateData() {
+            try {
+                const response = await fetch(URL, {
+                    headers: { "X-Master-Key": API_KEY }
+                });
+                const res = await response.json();
+                const data = res.record;
+
+                // Обновляем текст на странице
+                document.getElementById('money').innerText = "$" + data.money.toLocaleString();
+                document.getElementById('score').innerText = data.score;
+                
+                const statusEl = document.getElementById('status');
+                statusEl.innerText = data.status;
+                statusEl.className = data.status === "Online" ? "value status-online" : "value status-offline";
+
+            } catch (e) {
+                console.error("Ошибка при получении данных:", e);
+                alert("Ошибка загрузки данных");
+            }
+        }
+
+        // Авто-обновление каждые 10 секунд
+        setInterval(updateData, 10000);
+        updateData();
+    </script>
+</body>
+</html>
