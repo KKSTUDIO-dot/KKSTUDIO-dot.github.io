@@ -16,7 +16,6 @@
         .auth-tab { flex: 1; padding: 10px; text-align: center; font-size: 14px; font-weight: bold; color: var(--dim); cursor: pointer; border-radius: 10px; }
         .auth-tab.active { background: var(--accent); color: #fff; }
         input { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: #000; color: #fff; outline: none; }
-        .remember { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 14px; color: var(--dim); }
         .primary-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--accent); color: #fff; font-weight: 700; cursor: pointer; }
 
         #app { height: 100vh; display: none; flex-direction: column; }
@@ -38,10 +37,8 @@
             </div>
             <input type="text" id="nick-input" placeholder="Никнейм">
             <input type="password" id="pass-input" placeholder="Пароль">
-            <label class="remember"><input type="checkbox" id="rem-check" checked> Запомнить меня</label>
-            <button class="primary-btn" id="auth-btn" onclick="handleAuth()">ВХОД</button>
+            <button class="primary-btn" id="auth-btn" onclick="handleAuth()">ВОЙТИ</button>
             <p id="msg" style="color:var(--accent); font-size:12px; text-align:center; margin-top:10px;"></p>
-            <p id="debug-id" style="color:var(--dim); font-size:9px; text-align:center; margin-top:15px;"></p>
         </div>
     </div>
 
@@ -53,9 +50,9 @@
                 <div style="font-size:12px;color:var(--dim)">БАЛАНС</div>
                 <div style="font-size:32px;font-weight:900;color:var(--success)">$ <span id="u-bal">0</span></div>
             </div>
-            <button class="primary-btn" style="margin-top:20px;background:#222" onclick="logout()">ВЫЙТИ</button>
+            <button class="primary-btn" style="margin-top:20px;background:#222" onclick="location.reload()">ВЫЙТИ</button>
         </div>
-        <div id="p-admin" class="page"><h2>Админ</h2><div id="user-list"></div></div>
+        <div id="p-admin" class="page"><h2>Админ-панель</h2><div id="user-list"></div></div>
         <nav class="nav" id="menu">
             <div class="nav-link active" onclick="tab('p-home', this)">Главная</div>
             <div class="nav-link" onclick="tab('p-profile', this)">Профиль</div>
@@ -79,14 +76,16 @@
         const fApp = initializeApp(firebaseConfig);
         const db = getDatabase(fApp);
         const tg = window.Telegram.WebApp;
-        const MY_ID = "8169971367"; 
+        
+        // ТВОЙ ID ИЗ СКРИНШОТА
+        const MY_ID = "7765615767"; 
         let mode = 'login';
 
         window.setAuthMode = (m) => {
             mode = m;
             document.getElementById('tab-login').classList.toggle('active', m === 'login');
             document.getElementById('tab-reg').classList.toggle('active', m === 'reg');
-            document.getElementById('auth-btn').innerText = m === 'login' ? 'ВХОД' : 'СОЗДАТЬ';
+            document.getElementById('auth-btn').innerText = m === 'login' ? 'ВОЙТИ' : 'СОЗДАТЬ АККАУНТ';
             document.getElementById('msg').innerText = "";
         };
 
@@ -94,42 +93,48 @@
             const nick = document.getElementById('nick-input').value.trim();
             const pass = document.getElementById('pass-input').value.trim();
             const uid = String(tg.initDataUnsafe?.user?.id || "dev_test");
-            if(!nick || !pass) return;
+            const msgBox = document.getElementById('msg');
+
+            if(!nick || !pass) { msgBox.innerText = "Заполните все поля"; return; }
 
             const uRef = ref(db, 'users/' + uid);
             const snap = await get(uRef);
 
             if(mode === 'login') {
                 if(snap.exists() && snap.val().password === pass) {
-                    save(uid, pass); runApp(snap.val());
-                } else { document.getElementById('msg').innerText = "Ошибка данных"; }
+                    runApp(snap.val());
+                } else {
+                    msgBox.innerText = "Неверный ник или пароль";
+                }
             } else {
-                if(snap.exists()) { document.getElementById('msg').innerText = "Аккаунт уже есть"; }
-                else {
-                    const user = { id: uid, nickname: nick, password: pass, balance: 100 };
-                    await set(uRef, user); save(uid, pass); runApp(user);
+                if(snap.exists()) {
+                    msgBox.innerText = "Аккаунт уже существует!";
+                } else {
+                    const newUser = { id: uid, nickname: nick, password: pass, balance: 100 };
+                    await set(uRef, newUser);
+                    runApp(newUser);
                 }
             }
         };
-
-        function save(uid, pass) {
-            if(document.getElementById('rem-check').checked) {
-                localStorage.setItem('ds_session', JSON.stringify({uid, pass}));
-            }
-        }
-
-        window.logout = () => { localStorage.removeItem('ds_session'); location.reload(); };
 
         function runApp(user) {
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
             document.getElementById('u-nick').innerText = user.nickname;
-            onValue(ref(db, 'users/' + user.id + '/balance'), s => document.getElementById('u-bal').innerText = s.val() || 0);
+            
+            onValue(ref(db, 'users/' + user.id + '/balance'), s => {
+                document.getElementById('u-bal').innerText = s.val() || 0;
+            });
 
             if(String(user.id) === MY_ID) {
+                const menu = document.getElementById('menu');
                 if(!document.getElementById('adm-btn')) {
-                    const btn = document.createElement('div'); btn.id="adm-btn"; btn.className='nav-link'; btn.innerText='Админ';
-                    btn.onclick = function(){ tab('p-admin', this) }; document.getElementById('menu').appendChild(btn);
+                    const btn = document.createElement('div');
+                    btn.id = "adm-btn";
+                    btn.className = 'nav-link';
+                    btn.innerText = 'Админ';
+                    btn.onclick = function() { tab('p-admin', this) };
+                    menu.appendChild(btn);
                     loadAdmin();
                 }
             }
@@ -137,13 +142,17 @@
 
         function loadAdmin() {
             onValue(ref(db, 'users'), snap => {
-                const list = document.getElementById('user-list'); list.innerHTML = "";
+                const list = document.getElementById('user-list');
+                list.innerHTML = "";
                 const data = snap.val();
                 for(let k in data) {
                     const u = data[k];
-                    const d = document.createElement('div'); d.className='admin-item';
-                    d.innerHTML = `<span>${u.nickname}</span><input type="number" style="width:60px" value="${u.balance}">`;
-                    d.querySelector('input').onchange = (e) => update(ref(db, 'users/'+u.id), {balance: parseInt(e.target.value)});
+                    const d = document.createElement('div');
+                    d.className = 'admin-item';
+                    d.innerHTML = `<span>${u.nickname}</span><input type="number" style="width:70px;background:#000;color:#4ade80;border:1px solid #333;text-align:center;padding:5px;border-radius:8px" value="${u.balance}">`;
+                    d.querySelector('input').onchange = (e) => {
+                        update(ref(db, 'users/'+u.id), {balance: parseInt(e.target.value)});
+                    };
                     list.appendChild(d);
                 }
             });
@@ -152,23 +161,10 @@
         window.tab = (id, el) => {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            document.getElementById(id).classList.add('active-page'); el.classList.add('active');
+            document.getElementById(id).classList.add('active-page');
+            el.classList.add('active');
         };
-
-        window.addEventListener('load', async () => {
-            const uid = String(tg.initDataUnsafe?.user?.id || "dev_test");
-            document.getElementById('debug-id').innerText = "Ваш Telegram ID: " + uid;
-            
-            const saved = localStorage.getItem('ds_session');
-            if(saved) {
-                try {
-                    const {uid, pass} = JSON.parse(saved);
-                    const snap = await get(ref(db, 'users/' + uid));
-                    if(snap.exists() && snap.val().password === pass) runApp(snap.val());
-                    else localStorage.removeItem('ds_session');
-                } catch(e) { localStorage.removeItem('ds_session'); }
-            }
-        });
     </script>
 </body>
 </html>
+
