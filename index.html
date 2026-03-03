@@ -3,246 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arizona Mobile Dashboard</title>
+    <title>Arizona Mobile | Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --arizona-orange: #ff8c00;
-            --bg-dark: #121212;
-            --card-bg: #1e1e1e;
-            --text-main: #ffffff;
-            --text-gray: #aaaaaa;
+            --bg-dark: #0f0f0f;
+            --card-bg: #1a1a1a;
             --green: #2ecc71;
+            --text-gray: #888;
         }
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
+            background: var(--bg-dark);
+            color: white;
             margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         header {
-            width: 100%;
-            padding: 20px;
             text-align: center;
-            background: linear-gradient(180deg, #1e1e1e 0%, #121212 100%);
+            padding: 30px 0;
             border-bottom: 2px solid var(--arizona-orange);
-        }
-
-        .logo {
-            font-weight: 700;
-            font-size: 24px;
-            letter-spacing: 2px;
-        }
-
-        .logo span { color: var(--arizona-orange); }
-
-        .container {
-            width: 90%;
-            max-width: 400px;
-            margin-top: 20px;
-        }
-
-        /* Форма входа */
-        .login-box {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            width: 100%;
+        }
+
+        .login-card, .profile-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         input, select {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
-            background: #2b2b2b;
-            border: 1px solid #444;
-            border-radius: 6px;
+            background: #252525;
+            border: 1px solid #333;
+            border-radius: 8px;
             color: white;
-            box-sizing: border-box;
+            font-size: 16px;
         }
 
         button {
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             background: var(--arizona-orange);
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             color: white;
             font-weight: 700;
             cursor: pointer;
-            transition: 0.3s;
+            margin-top: 10px;
         }
 
-        button:active { transform: scale(0.98); }
+        /* Виджет профиля */
+        .profile-card { display: none; text-align: center; }
 
-        /* Карточка профиля */
-        .profile-card {
-            display: none; /* Скрыта до авторизации */
-            background: var(--card-bg);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+        .skin-img {
+            width: 120px;
+            height: auto;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 5px 15px rgba(255,140,0,0.3));
         }
 
-        .profile-header {
-            background: var(--arizona-orange);
-            padding: 20px;
-            text-align: center;
-        }
-
-        .profile-header h2 { margin: 0; font-size: 20px; }
-
-        .stats-grid {
+        .stats-list {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            padding: 20px;
+            gap: 15px;
+            text-align: left;
+            margin-top: 20px;
         }
 
-        .stat-item {
-            background: #252525;
-            padding: 15px;
-            border-radius: 8px;
+        .stat-box {
+            background: #222;
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 3px solid var(--arizona-orange);
         }
 
-        .stat-item label {
-            display: block;
-            font-size: 11px;
-            color: var(--text-gray);
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        .stat-item span {
-            font-weight: 700;
-            font-size: 15px;
-        }
-
+        .stat-label { font-size: 10px; color: var(--text-gray); text-transform: uppercase; }
+        .stat-value { display: block; font-weight: 700; margin-top: 5px; }
         .money { color: var(--green); }
 
-        .loader {
-            display: none;
-            margin: 10px 0;
-            color: var(--arizona-orange);
-            font-size: 12px;
-        }
+        .loader { display: none; color: var(--arizona-orange); margin: 10px 0; font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo">ARIZONA <span>HUB</span></div>
-    </header>
+<header>
+    <div style="font-size: 24px; font-weight: 700;">ARIZONA <span style="color:var(--arizona-orange)">MOBILE</span></div>
+</header>
 
-    <div class="container">
-        <div class="login-box" id="login-form">
-            <h3>Проверка профиля</h3>
-            <input type="text" id="nick" placeholder="Введите Nick_Name">
-            <select id="server">
-                <option value="1">Phoenix [01]</option>
-                <option value="2">Tucson [02]</option>
-                <option value="3">Scottdale [03]</option>
-                <option value="10">Surprise [10]</option>
-                <option value="20">Sun-City [20]</option>
-                <option value="30">Love [30]</option>
-            </select>
-            <button onclick="fetchProfile()">Синхронизировать</button>
-            <div id="loader" class="loader">Подключаемся к серверу Arizona RP...</div>
-        </div>
-
-        <div class="profile-card" id="profile-card">
-            <div class="profile-header">
-                <h2 id="ui-nick">NICKNAME</h2>
-                <small id="ui-server">Server Name</small>
-            </div>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <label>Уровень</label>
-                    <span id="ui-lvl">0</span>
-                </div>
-                <div class="stat-item">
-                    <label>Наличные</label>
-                    <span id="ui-cash" class="money">$0</span>
-                </div>
-                <div class="stat-item">
-                    <label>Организация</label>
-                    <span id="ui-org">Нет</span>
-                </div>
-                <div class="stat-item">
-                    <label>Статус</label>
-                    <span id="ui-job">Загрузка...</span>
-                </div>
-            </div>
-            <button style="border-radius: 0;" onclick="reset()">Выйти / Другой ник</button>
-        </div>
+<div class="app-container">
+    <div class="login-card" id="login-screen">
+        <h3 style="margin-top:0">Вход в кабинет</h3>
+        <input type="text" id="nick" placeholder="Nick_Name" value="">
+        <select id="server">
+            <option value="1">Phoenix</option>
+            <option value="2">Tucson</option>
+            <option value="10">Surprise</option>
+            <option value="20">Sun-City</option>
+            <option value="30">Love</option>
+        </select>
+        <button onclick="loadPlayerData()">Загрузить данные</button>
+        <center><div id="loading" class="loader">Синхронизация с API...</div></center>
     </div>
 
-    <script>
-        async function fetchProfile() {
-            const nick = document.getElementById('nick').value;
-            const serverId = document.getElementById('server').value;
-            const serverName = document.getElementById('server').options[document.getElementById('server').selectedIndex].text;
+    <div class="profile-card" id="profile-screen">
+        <img id="ui-skin" src="https://arizona-rp.com/assets/img/skins/1.png" class="skin-img">
+        <h2 id="ui-nick" style="margin: 5px 0;">Nick_Name</h2>
+        <span id="ui-server-name" style="color: var(--text-gray); font-size: 14px;">Server</span>
+        
+        <div class="stats-list">
+            <div class="stat-box">
+                <span class="stat-label">Уровень</span>
+                <span id="ui-level" class="stat-value">0</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Наличные</span>
+                <span id="ui-cash" class="stat-value money">$ 0</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Организация</span>
+                <span id="ui-org" class="stat-value">Нет</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Банк</span>
+                <span id="ui-bank" class="stat-value">$ 0</span>
+            </div>
+        </div>
+        
+        <button style="background:#333; margin-top: 30px;" onclick="location.reload()">Выйти</button>
+    </div>
+</div>
+
+<script>
+    const API_KEY = 'BIj8OHrAlrhghiYkIjsWfRmNEJ8Ysth5';
+
+    async function loadPlayerData() {
+        const nick = document.getElementById('nick').value.trim();
+        const serverId = document.getElementById('server').value;
+        const loader = document.getElementById('loading');
+        
+        if (!nick) return alert("Введите ник!");
+
+        loader.style.display = 'block';
+
+        // URL API (замени на реальный эндпоинт, если он отличается)
+        const apiUrl = `https://arizona-rp.com/api/v1/profile?server=${serverId}&nick=${nick}`;
+        
+        // Настройка заголовков для передачи ключа
+        const myHeaders = new Headers();
+        myHeaders.append("X-API-Key", API_KEY);
+
+        const requestOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+        };
+
+        try {
+            // Используем прокси AllOrigins, чтобы избежать ошибки CORS на GitHub Pages
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
             
-            if (!nick.includes('_')) {
-                alert("Введите корректный ник в формате Nick_Name");
-                return;
-            }
+            const response = await fetch(proxyUrl);
+            const wrapper = await response.json();
+            
+            // Парсим содержимое, которое прислал прокси
+            const data = JSON.parse(wrapper.contents);
 
-            // Показываем лоадер
-            document.getElementById('loader').style.display = 'block';
+            if (data && data.success) {
+                const player = data.data;
 
-            // Используем AllOrigins прокси для обхода CORS
-            const targetUrl = `https://arizona-rp.com/profile/${serverId}/${nick}`;
-            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
-
-            try {
-                const response = await fetch(proxyUrl);
-                const data = await response.json();
-                const html = data.contents;
-
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-
-                // Парсим статистику (ищем все элементы с классом profile-stats-item)
-                // Примечание: на сайте Аризоны структура может меняться, адаптируем под актуальную
-                const stats = doc.querySelectorAll('.profile-stats-item');
-
-                if (stats.length > 0) {
-                    // Наполняем UI данными
-                    document.getElementById('ui-nick').innerText = nick;
-                    document.getElementById('ui-server').innerText = serverName;
-                    
-                    // Обычно: 0-Уровень, 1-Наличные, 3-Работа/Орг
-                    document.getElementById('ui-lvl').innerText = stats[0]?.querySelector('p')?.innerText || "??";
-                    document.getElementById('ui-cash').innerText = stats[1]?.querySelector('p')?.innerText || "$0";
-                    document.getElementById('ui-org').innerText = stats[3]?.querySelector('p')?.innerText || "Не в орг.";
-                    document.getElementById('ui-job').innerText = "Активен";
-
-                    // Переключаем экраны
-                    document.getElementById('login-form').style.display = 'none';
-                    document.getElementById('profile-card').style.display = 'block';
-                } else {
-                    alert("Профиль не найден! Возможно, он скрыт в настройках /settings или вы ошиблись в нике.");
+                // Заполняем UI
+                document.getElementById('ui-nick').innerText = player.username || nick;
+                document.getElementById('ui-level').innerText = player.level || "0";
+                document.getElementById('ui-cash').innerText = `$ ${new Intl.NumberFormat().format(player.money || 0)}`;
+                document.getElementById('ui-bank').innerText = `$ ${new Intl.NumberFormat().format(player.bank || 0)}`;
+                document.getElementById('ui-org').innerText = player.organization || "Нет";
+                
+                // Подгружаем скин (если API отдает skin_id)
+                if (player.skin_id) {
+                    document.getElementById('ui-skin').src = `https://arizona-rp.com/assets/img/skins/${player.skin_id}.png`;
                 }
-            } catch (error) {
-                console.error(error);
-                alert("Ошибка при получении данных. Попробуйте позже.");
-            } finally {
-                document.getElementById('loader').style.display = 'none';
-            }
-        }
 
-        function reset() {
-            document.getElementById('login-form').style.display = 'block';
-            document.getElementById('profile-card').style.display = 'none';
+                // Переключаем экраны
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('profile-screen').style.display = 'block';
+            } else {
+                alert("Ошибка: " + (data.message || "Игрок не найден"));
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Не удалось подключиться к API. Проверьте ключ или соединение.");
+        } finally {
+            loader.style.display = 'none';
         }
-    </script>
+    }
+</script>
+
 </body>
 </html>
