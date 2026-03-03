@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DS Studio | Scripts & Design</title>
+    <title>DS Studio | OS</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="active">
-    <div class="bg-gradient"></div>
-
+<body>
     <div id="app">
         <div class="home-wrapper" id="homeWrap">
             <div class="main-logo">
@@ -17,63 +15,52 @@
                 <div class="sub-logo">STUDIO</div>
             </div>
 
-            <div class="menu-area">
+            <div class="home-content">
                 <div class="category-grid">
-                    <div class="cat-btn" onclick="openPage('scripts')">
-                        <span>ARIZONA MOBILE SCRIPTS</span>
-                        <small>➔</small>
+                    <div class="cat-btn glass" onclick="openPage('scripts')">
+                        <span class="icon">🤖</span>
+                        <span class="name">SCRIPTS MOBILE</span>
                     </div>
-                    <div class="cat-btn" onclick="openPage('design')">
-                        <span>PREMIUM DESIGN</span>
-                        <small>➔</small>
+                    <div class="cat-btn glass" onclick="openPage('design')">
+                        <span class="icon">🎨</span>
+                        <span class="name">PREMIUM DESIGN</span>
                     </div>
-                    <div class="cat-btn" onclick="openPage('other')">
-                        <span>КОНТАКТЫ</span>
-                        <small>➔</small>
+                    <div class="cat-btn glass" onclick="openPage('info')">
+                        <span class="icon">✨</span>
+                        <span class="name">ИНФОРМАЦИЯ</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="scripts" class="overlay">
+    <div id="scripts" class="overlay glass-heavy">
         <div class="overlay-header">
             <button class="back-btn" onclick="closePage('scripts')">←</button>
-            <span class="overlay-title">Scripts Mobile</span>
+            <span class="title">ARIZONA MOBILE</span>
         </div>
         <div class="overlay-body">
-            <div class="card">
-                <b>Farm Bot [Mobile]</b>
-                <p>Полностью автоматическая работа на частных фермах.</p>
+            <div class="card glass">
+                <b class="accent-txt">Farm Bot</b>
+                <p>Автоматизация работы на частных фермах. Умный обход препятствий.</p>
             </div>
-            <div class="card">
-                <b>Central Market Helper</b>
-                <p>Удобный поиск и скупка товаров в один клик.</p>
+            <div class="card glass">
+                <b class="accent-txt">Helper Org</b>
+                <p>Универсальный помощник для гос. структур и гетто.</p>
             </div>
         </div>
     </div>
 
-    <div id="design" class="overlay">
+    <div id="design" class="overlay glass-heavy">
         <div class="overlay-header">
             <button class="back-btn" onclick="closePage('design')">←</button>
-            <span class="overlay-title">Premium Design</span>
+            <span class="title">DESIGN</span>
         </div>
         <div class="overlay-body">
-            <div class="card">
-                <b>Оформление форума</b>
-                <p>Анимированные подписи и баннеры для лидеров.</p>
+            <div class="card glass">
+                <b class="accent-txt">Форумная графика</b>
+                <p>Анимированные аватарки, подписи и баннеры тем.</p>
             </div>
-        </div>
-    </div>
-
-    <div id="other" class="overlay">
-        <div class="overlay-header">
-            <button class="back-btn" onclick="closePage('other')">←</button>
-            <span class="overlay-title">Контакты</span>
-        </div>
-        <div class="overlay-body" style="text-align: center;">
-            <p style="margin-bottom: 20px;">Свяжитесь с нами напрямую для заказа:</p>
-            <a href="https://t.me/ТВОЙ_НИК" class="contact-link">НАПИСАТЬ В TG</a>
         </div>
     </div>
 
