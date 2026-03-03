@@ -3,132 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DS Studio | Grey Edition</title>
+    <title>DS Studio | Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { 
-            --bg: #121212; 
-            --card: rgba(30, 30, 35, 0.7); 
-            --accent: #ffffff; /* Белый акцент на сером выглядит очень стильно */
-            --text: #ffffff; 
+            --bg: #0f0f0f; 
+            --card: rgba(35, 35, 40, 0.7); 
+            --accent: #ffffff; 
             --dim: #888888; 
             --success: #4ade80; 
             --danger: #ff4b2b; 
-            --info: #3b82f6; 
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* Анимированный серый фон */
         body { 
-            background: linear-gradient(135deg, #0f0f0f, #1e1e1e, #121212, #252525);
+            background: linear-gradient(135deg, #0a0a0a, #1a1a1a, #121212);
             background-size: 400% 400%;
-            animation: gradientBG 12s ease infinite;
-            color: var(--text); 
-            height: 100vh; 
-            overflow: hidden; 
-            position: fixed; 
-            width: 100%; 
+            animation: gradientBG 15s ease infinite;
+            color: #fff; height: 100vh; overflow: hidden; position: fixed; width: 100%; 
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        .glass {
-            background: var(--card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
+        .glass { background: var(--card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
 
-        #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
-        .spinner { width: 30px; height: 30px; border: 2px solid rgba(255,255,255,0.1); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        /* Loader */
+        #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
+        .spinner { width: 30px; height: 30px; border: 2px solid rgba(255,255,255,0.1); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* Auth */
         #auth-screen { position: fixed; inset: 0; z-index: 2000; display: none; align-items: center; justify-content: center; padding: 25px; }
         .auth-box { padding: 40px 30px; border-radius: 30px; width: 100%; max-width: 400px; text-align: center; }
-        
         input { width: 100%; padding: 16px; margin-bottom: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); color: #fff; outline: none; font-size: 16px; }
-        input:focus { border-color: rgba(255,255,255,0.2); }
-        
-        .primary-btn { width: 100%; padding: 16px; border-radius: 15px; border: none; background: #fff; color: #000; font-weight: 800; cursor: pointer; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
-        
-        #app { height: 100vh; display: none; flex-direction: column; position: relative; z-index: 10; }
-        .page { display: none; padding: 30px 20px; flex-grow: 1; overflow-y: auto; padding-bottom: 120px; }
-        .active-page { display: block; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .primary-btn { width: 100%; padding: 16px; border-radius: 15px; border: none; background: #fff; color: #000; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
 
-        .balance-card { padding: 30px; border-radius: 25px; margin-top: 20px; }
-        .msg-box { padding: 20px; border-radius: 20px; margin-bottom: 15px; border-left: 4px solid #fff; }
-        .user-card { padding: 20px; border-radius: 20px; margin-bottom: 15px; }
+        /* App Structure */
+        #app { height: 100vh; display: none; flex-direction: column; }
+        .page { display: none; padding: 20px; flex-grow: 1; overflow-y: auto; padding-bottom: 100px; }
+        .active-page { display: block; }
 
+        /* --- ГЛАВНАЯ СТРАНИЦА И АНИМАЦИИ --- */
+        .home-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; transition: all 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .active-page .home-wrapper { justify-content: flex-start; padding-top: 20px; }
+
+        .main-logo { text-align: center; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .active-page .main-logo { transform: scale(0.55) translateY(-20px); margin-bottom: -40px; }
+
+        .main-logo .letters { font-size: 90px; font-weight: 900; letter-spacing: -5px; line-height: 1; }
+        .letter { display: inline-block; opacity: 0; transform: translateY(30px); }
+        .active-page .letter { animation: letterUp 0.6s ease forwards; }
+        .active-page .letter:nth-child(2) { animation-delay: 0.15s; }
+
+        .sub-logo { font-size: 14px; letter-spacing: 8px; color: var(--dim); margin-top: 5px; opacity: 0; }
+        .active-page .sub-logo { animation: fadeIn 0.8s ease forwards 0.5s; }
+
+        @keyframes letterUp { to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        /* Контент под логотипом */
+        .home-content { opacity: 0; width: 100%; margin-top: 0; transition: 0.5s; }
+        .active-page .home-content { animation: fadeIn 0.8s ease forwards 1.2s; }
+
+        .category-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; }
+        .cat-btn { border: none; padding: 18px 5px; border-radius: 20px; color: #fff; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: 0.3s; }
+        .cat-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.1); }
+        .cat-icon { font-size: 22px; }
+        .cat-name { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+
+        .sub-content-area { min-height: 100px; border-radius: 25px; padding: 25px; display: none; }
+        .sub-pane { display: none; font-size: 14px; color: #ccc; line-height: 1.6; animation: fadeIn 0.4s ease; }
+
+        /* Профиль и прочее */
+        .balance-card { padding: 30px; border-radius: 30px; margin-top: 15px; }
         .nav { position: fixed; bottom: 25px; left: 20px; right: 20px; border-radius: 25px; display: flex; padding: 8px; z-index: 1000; }
-        .nav-link { flex: 1; padding: 12px; text-align: center; color: var(--dim); font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        .nav-link { flex: 1; padding: 12px; text-align: center; color: var(--dim); font-size: 10px; font-weight: 900; text-transform: uppercase; }
         .nav-link.active { color: #fff; }
 
-        .badge { font-size: 9px; padding: 4px 10px; border-radius: 8px; font-weight: 900; margin-left: 8px; background: #fff; color: #000; }
     </style>
 </head>
 <body>
 
-    <div id="loader"><div class="spinner"></div><b style="letter-spacing:4px; font-size:12px; color:#fff">DS STUDIO</b></div>
+    <div id="loader"><div class="spinner"></div></div>
 
     <div id="auth-screen">
         <div class="auth-box glass">
-            <h2 style="margin-bottom:25px; font-size:24px; letter-spacing:2px; font-weight:900;">DS STUDIO</h2>
-            <div style="display:flex; background:rgba(255,255,255,0.03); padding:5px; border-radius:12px; margin-bottom:25px;">
-                <div id="t-login" style="flex:1; padding:10px; cursor:pointer; border-radius:10px; font-weight:800; font-size:10px; transition:0.3s;" onclick="setMode('login')">ВХОД</div>
-                <div id="t-reg" style="flex:1; padding:10px; cursor:pointer; border-radius:10px; font-weight:800; font-size:10px; transition:0.3s;" onclick="setMode('reg')">РЕГИСТРАЦИЯ</div>
-            </div>
-            <input type="text" id="nick" placeholder="Никнейм" autocomplete="off">
+            <h2 style="margin-bottom:25px; letter-spacing:2px;">DS STUDIO</h2>
+            <input type="text" id="nick" placeholder="Никнейм">
             <input type="password" id="pass" placeholder="Пароль">
-            <button class="primary-btn" id="auth-submit-btn" onclick="handleAuth()">ПРОДОЛЖИТЬ</button>
-            <p id="err" style="color:var(--danger); font-size:11px; margin-top:15px; min-height:15px;"></p>
+            <button class="primary-btn" onclick="handleAuth()">ВОЙТИ</button>
+            <p id="err" style="color:var(--danger); font-size:11px; margin-top:15px;"></p>
         </div>
     </div>
 
     <div id="app">
         <div id="p-home" class="page active-page">
-            <div style="margin-top:40%; text-align:center; opacity:0.1">
-                <h1 style="font-size:70px; line-height:0.8; font-weight:900;">DS<br>STUDIO</h1>
+            <div class="home-wrapper">
+                <div class="main-logo">
+                    <div class="letters">
+                        <span class="letter">D</span><span class="letter">S</span>
+                    </div>
+                    <div class="sub-logo">STUDIO</div>
+                </div>
+
+                <div class="home-content">
+                    <div class="category-grid">
+                        <div class="cat-btn glass" onclick="showSub('design')">
+                            <span class="cat-icon">🎨</span><span class="cat-name">Дизайн</span>
+                        </div>
+                        <div class="cat-btn glass" onclick="showSub('social')">
+                            <span class="cat-icon">📱</span><span class="cat-name">Медиа</span>
+                        </div>
+                        <div class="cat-btn glass" onclick="showSub('info')">
+                            <span class="cat-icon">✨</span><span class="cat-name">О нас</span>
+                        </div>
+                    </div>
+
+                    <div id="sub-box" class="sub-content-area glass">
+                        <div id="c-design" class="sub-pane">
+                            <b style="color:#fff">Наши услуги:</b><br>
+                            - Оформление тем форума<br>- Создание уникальных логотипов<br>- Баннеры любой сложности
+                        </div>
+                        <div id="c-social" class="sub-pane">
+                            <b style="color:#fff">Для соц. сетей:</b><br>
+                            - Оформление VK групп<br>- Шапки для YouTube<br>- Аватарки для Discord
+                        </div>
+                        <div id="c-info" class="sub-pane">
+                            <b style="color:#fff">DS STUDIO</b><br>
+                            Создаем качественный визуальный контент для игроков и проектов Arizona RP с 2024 года.
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div id="p-profile" class="page">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-                <div>
-                    <h2 id="u-nick-disp" style="font-size:28px; font-weight:900;">User</h2>
-                    <div id="u-role-disp" style="margin-top:5px"></div>
-                </div>
-                <div onclick="tab('p-messages')" style="font-size:24px; cursor:pointer; position:relative; padding:10px; background:rgba(255,255,255,0.05); border-radius:15px;">
-                    🔔<div id="notif-dot" style="position:absolute; top:8px; right:8px; width:8px; height:8px; background:var(--success); border-radius:50%; display:none;"></div>
-                </div>
-            </div>
-            
+            <h2 id="u-nick-disp" style="font-size:32px; font-weight:900;">User</h2>
             <div class="balance-card glass">
-                <span style="color:var(--dim); font-size:11px; font-weight:800; letter-spacing:2px;">ЛИЧНЫЙ СЧЕТ</span>
-                <h1 style="color:#fff; font-size:42px; margin-top:10px; font-weight:900;">$ <span id="u-bal-disp">0</span></h1>
+                <span style="color:var(--dim); font-size:11px; font-weight:800;">БАЛАНС</span>
+                <h1 style="font-size:42px; margin-top:5px;">$ <span id="u-bal-disp">0</span></h1>
             </div>
-            
-            <button class="primary-btn" style="margin-top:40px; background:rgba(255,255,255,0.03); color:var(--danger); border:1px solid rgba(255,75,43,0.1)" onclick="logout()">ВЫЙТИ</button>
+            <button class="primary-btn" style="margin-top:30px; background:rgba(255,255,255,0.05); color:var(--danger);" onclick="logout()">ВЫЙТИ</button>
         </div>
 
-        <div id="p-messages" class="page">
-            <h2 style="font-weight:900; margin-bottom:25px;">Уведомления</h2>
-            <div id="messages-list"></div>
-        </div>
-
-        <div id="p-admin" class="page">
-            <h2 style="margin-bottom:25px; font-weight:900;">Управление</h2>
-            <input type="text" id="a-search" class="glass" placeholder="Поиск..." oninput="renderAdminList()">
-            <div id="admin-list"></div>
-        </div>
-
-        <nav class="nav glass" id="menu">
+        <nav class="nav glass">
             <div class="nav-link active" onclick="tab('p-home', this)">Главная</div>
             <div class="nav-link" onclick="tab('p-profile', this)">Профиль</div>
         </nav>
@@ -136,7 +155,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, get, onValue, update, remove, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAQECyI2wLqHF0BzletUPiG3ryOqWROPOE",
@@ -153,102 +172,56 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let me = null;
-        let mode = 'login';
-        let usersCache = {};
-
         async function init() {
             const sn = localStorage.getItem('ds_nick'), sp = localStorage.getItem('ds_pass');
             if (sn && sp) {
-                try {
-                    const snap = await get(ref(db, 'users/' + sn));
-                    if (snap.exists() && snap.val().password === sp) runApp(snap.val()); 
-                    else showAuth();
-                } catch(e) { showAuth(); }
+                const s = await get(ref(db, 'users/' + sn));
+                if (s.exists() && s.val().password === sp) runApp(s.val()); else showAuth();
             } else showAuth();
-            document.getElementById('loader').style.opacity = '0';
-            setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
+            document.getElementById('loader').style.display = 'none';
         }
 
         function showAuth() { document.getElementById('auth-screen').style.display = 'flex'; }
 
-        window.setMode = (m) => {
-            mode = m;
-            document.getElementById('t-login').style.background = m === 'login' ? '#fff' : 'transparent';
-            document.getElementById('t-login').style.color = m === 'login' ? '#000' : '#888';
-            document.getElementById('t-reg').style.background = m === 'reg' ? '#fff' : 'transparent';
-            document.getElementById('t-reg').style.color = m === 'reg' ? '#000' : '#888';
-        };
-        setMode('login');
-
         window.handleAuth = async () => {
-            const btn = document.getElementById('auth-submit-btn'), nick = document.getElementById('nick').value.trim(), pass = document.getElementById('pass').value.trim();
-            if(!nick || !pass) return;
-            btn.disabled = true; btn.innerText = "ОБРАБОТКА...";
-            try {
-                const uRef = ref(db, 'users/' + nick), snap = await get(uRef);
-                if (mode === 'login') {
-                    if (snap.exists() && snap.val().password === pass) saveAndRun(nick, pass, snap.val()); 
-                    else throw new Error("Ошибка входа");
-                } else {
-                    if (snap.exists()) throw new Error("Ник занят");
-                    else {
-                        const data = { nickname: nick, password: pass, balance: 100, adminLvl: (nick.toLowerCase() === 'derrick' ? 5 : 0) };
-                        await set(uRef, data); saveAndRun(nick, pass, data);
-                    }
-                }
-            } catch (e) { document.getElementById('err').innerText = e.message; btn.disabled = false; btn.innerText = "ПРОДОЛЖИТЬ"; }
+            const n = document.getElementById('nick').value.trim(), p = document.getElementById('pass').value.trim();
+            if(!n || !p) return;
+            const r = ref(db, 'users/' + n), s = await get(r);
+            if(s.exists()) {
+                if(s.val().password === p) { localStorage.setItem('ds_nick', n); localStorage.setItem('ds_pass', p); runApp(s.val()); }
+                else document.getElementById('err').innerText = "Неверный пароль";
+            } else {
+                const d = { nickname: n, password: p, balance: 100, adminLvl: (n.toLowerCase() === 'derrick' ? 5 : 0) };
+                await set(r, d); localStorage.setItem('ds_nick', n); localStorage.setItem('ds_pass', p); runApp(d);
+            }
         };
-
-        function saveAndRun(n, p, d) { localStorage.setItem('ds_nick', n); localStorage.setItem('ds_pass', p); runApp(d); }
 
         function runApp(user) {
-            me = user; document.getElementById('auth-screen').style.display = 'none'; document.getElementById('app').style.display = 'flex';
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('app').style.display = 'flex';
             document.getElementById('u-nick-disp').innerText = user.nickname;
             onValue(ref(db, 'users/' + user.nickname), s => {
-                const d = s.val(); if(!d) return;
-                document.getElementById('u-bal-disp').innerText = (d.balance || 0).toLocaleString();
-                document.getElementById('u-role-disp').innerHTML = d.adminLvl === 5 ? `<span class="badge">OWNER</span>` : d.adminLvl > 0 ? `<span class="badge" style="background:#333; color:#fff;">STAFF</span>` : '';
+                if(s.exists()) document.getElementById('u-bal-disp').innerText = (s.val().balance || 0).toLocaleString();
             });
-            onValue(ref(db, 'messages/' + user.nickname), snap => {
-                const list = document.getElementById('messages-list'), dot = document.getElementById('notif-dot');
-                list.innerHTML = ""; const msgs = snap.val();
-                if(msgs) { dot.style.display = 'block'; Object.values(msgs).reverse().forEach(m => {
-                    const box = document.createElement('div'); box.className = 'msg-box glass';
-                    box.innerHTML = `<small style="color:var(--dim); font-size:9px; font-weight:800;">${new Date(m.date).toLocaleString()}</small><p style="margin-top:8px; font-size:14px; line-height:1.4;">${m.text}</p>`;
-                    list.appendChild(box);
-                }); } else { dot.style.display = 'none'; list.innerHTML = `<p style="text-align:center; color:var(--dim); margin-top:60px;">Уведомлений нет</p>`; }
-            });
-            if (user.adminLvl > 0) {
-                if (!document.getElementById('adm-btn-nav')) {
-                    const btn = document.createElement('div'); btn.id = 'adm-btn-nav'; btn.className = 'nav-link'; btn.innerText = 'Админ';
-                    btn.onclick = function() { tab('p-admin', this) }; document.getElementById('menu').appendChild(btn);
-                }
-                onValue(ref(db, 'users'), s => { usersCache = s.val() || {}; renderAdminList(); });
-            }
         }
 
-        window.renderAdminList = () => {
-            const list = document.getElementById('admin-list'), search = document.getElementById('a-search').value.toLowerCase();
-            if(!list) return; list.innerHTML = "";
-            for (let n in usersCache) {
-                if (!n.toLowerCase().includes(search)) continue;
-                const u = usersCache[n], card = document.createElement('div'); card.className = 'user-card glass';
-                card.innerHTML = `<b>${u.nickname}</b> <span style="color:var(--success)">$${u.balance}</span>
-                    <div style="display:flex; gap:10px; margin-top:15px"><input type="text" id="msg-${n}" style="margin:0; padding:10px; background:rgba(0,0,0,0.2); font-size:12px;" placeholder="Сообщение..."><button onclick="sendMsg('${n}')" style="background:#fff; color:#000; border:none; padding:0 15px; border-radius:10px; font-weight:900; font-size:10px;">ОК</button></div>
-                    <div style="margin-top:10px;"><input type="number" style="width:100px; padding:8px; background:rgba(0,0,0,0.2);" value="${u.balance}" onchange="setBal('${n}', this.value)"></div>`;
-                list.appendChild(card);
-            }
+        window.showSub = (id) => {
+            document.getElementById('sub-box').style.display = 'block';
+            document.querySelectorAll('.sub-pane').forEach(p => p.style.display = 'none');
+            document.getElementById('c-' + id).style.display = 'block';
+            tg.HapticFeedback.impactOccurred('light');
         };
 
-        window.sendMsg = async (n) => { const i = document.getElementById('msg-'+n); if(!i.value.trim()) return; await push(ref(db, 'messages/'+n), { text: i.value, date: Date.now() }); i.value = ""; tg.HapticFeedback.notificationOccurred('success'); };
-        window.setBal = (n, v) => update(ref(db, 'users/'+n), { balance: parseInt(v) || 0 });
-        window.logout = () => { if(confirm("Выйти?")) { localStorage.clear(); location.reload(); } };
         window.tab = (id, el) => {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-            if(el) { document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active')); el.classList.add('active'); }
-            document.getElementById(id).classList.add('active-page'); tg.HapticFeedback.impactOccurred('light');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById(id).classList.add('active-page');
+            tg.HapticFeedback.impactOccurred('medium');
         };
+
+        window.logout = () => { localStorage.clear(); location.reload(); };
+
         init();
     </script>
 </body>
