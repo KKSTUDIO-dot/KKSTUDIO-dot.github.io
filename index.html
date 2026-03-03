@@ -3,37 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arizona Player Finder</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        :root { --orange: #ff8c00; --bg: #0f0f0f; --card: #1a1a1a; }
-        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 15px; display: flex; justify-content: center; }
-        .app { width: 100%; max-width: 420px; }
-        .card { background: var(--card); border-radius: 24px; padding: 25px; border: 1px solid #222; box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
-        h2 span { color: var(--orange); }
-        label { font-size: 11px; color: var(--orange); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 15px; margin-bottom: 20px; background: #222; border: 1px solid #333; border-radius: 12px; color: #fff; font-size: 16px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 16px; background: var(--orange); border: none; border-radius: 12px; color: #fff; font-weight: 700; cursor: pointer; font-size: 16px; transition: 0.2s; }
-        .btn:active { transform: scale(0.98); }
-        
-        /* Profile Layout */
-        #profile-view { display: none; }
-        .profile-header { text-align: center; margin-bottom: 20px; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 15px; border: 1px solid #252525; }
-        .box small { display: block; font-size: 10px; color: #777; margin-bottom: 4px; }
-        .box b { font-size: 14px; color: #eee; }
-        .money-green { color: #2ecc71 !important; }
-        .loader { display: none; text-align: center; color: var(--orange); margin-top: 10px; font-weight: bold; }
-    </style>
+    <title>Arizona Media App</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 
-<div class="app">
-    <div id="login-view" class="card">
-        <header style="text-align:center"><h2>ARIZONA <span>FINDER</span></h2></header>
-        
-        <label>Никнейм</label>
+    <div id="splash">
+        <div class="loader-container">
+            <div class="progress-bar"><div id="fill"></div></div>
+            <div class="logo">ARIZONA <span>MEDIA</span></div>
+        </div>
+    </div>
+
+    <div id="app" class="hidden">
+        <header>
+            <div class="user-info">
+                <div class="avatar" id="user-avatar">F</div>
+                <div class="user-text">
+                    <h2 id="user-greeting">Привет, F!</h2>
+                    <p>Добро пожаловать в Arizona Media.</p>
+                </div>
+            </div>
+        </header>
+
+        <section class="balance-card">
+            <div class="card-header">
+                <span>МОЙ БАЛАНС</span>
+                <button class="refresh-btn">↻</button>
+            </div>
+            <div class="account-type">
+                <span class="icon">👛</span> ОзП счет
+            </div>
+            <div class="balance-grid">
+                <div class="col">
+                    <span class="label">ДОСТУПНО</span>
+                    <div class="amount">0 <span>₽</span></div>
+                </div>
+                <div class="col">
+                    <span class="label">В ОБРАБОТКЕ</span>
+                    <div class="amount gray">0 <span>₽</span></div>
+                </div>
+            </div>
+        </section>
+
+        <nav class="main-grid">
+            <div class="grid-item active">
+                <div class="icon green">$</div>
+                <span>ОПЛАТА ЗА ПРОСМОТРЫ</span>
+            </div>
+            <div class="grid-item">
+                <div class="icon blue">🏛️</div>
+                <span>ВЫПЛАТЫ</span>
+            </div>
+            <div class="grid-item">
+                <div class="icon purple">📋</div>
+                <span>РЕКВИЗИТЫ</span>
+            </div>
+            <div class="grid-item">
+                <div class="icon orange">🤝</div>
+                <span>СОТРУДНИЧЕСТВО</span>
+            </div>
+            <div class="grid-item full-width">
+                <div class="icon pink">📊</div>
+                <span>СТАТИСТИКА</span>
+                <mark>НОВОЕ</mark>
+            </div>
+        </nav>
+
+        <div class="bottom-nav">
+            <button class="nav-btn active">🏠 <span>Главная</span></button>
+            <button class="nav-btn">👤 <span>Профиль</span></button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
         <input type="text" id="nick" placeholder="Sam_Mason">
         
         <label>Сервер</label>
