@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DS Studio OS Premium</title>
+    <title>DS Studio | Grey Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { 
-            --bg: #050505; 
-            --card: rgba(20, 20, 23, 0.7); 
-            --accent: #e91e63; 
+            --bg: #121212; 
+            --card: rgba(30, 30, 35, 0.7); 
+            --accent: #ffffff; /* Белый акцент на сером выглядит очень стильно */
             --text: #ffffff; 
-            --dim: #a1a1aa; 
+            --dim: #888888; 
             --success: #4ade80; 
             --danger: #ff4b2b; 
-            --gold: #facc15; 
             --info: #3b82f6; 
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
         
+        /* Анимированный серый фон */
         body { 
-            background: linear-gradient(135deg, #050505, #1a0b1a, #050505, #0a0a12);
+            background: linear-gradient(135deg, #0f0f0f, #1e1e1e, #121212, #252525);
             background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            animation: gradientBG 12s ease infinite;
             color: var(--text); 
             height: 100vh; 
             overflow: hidden; 
@@ -39,95 +39,92 @@
 
         .glass {
             background: var(--card);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
-        .spinner { width: 40px; height: 40px; border: 3px solid rgba(233,30,99,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite; margin-bottom: 20px; }
+        .spinner { width: 30px; height: 30px; border: 2px solid rgba(255,255,255,0.1); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         #auth-screen { position: fixed; inset: 0; z-index: 2000; display: none; align-items: center; justify-content: center; padding: 25px; }
-        .auth-box { padding: 40px 30px; border-radius: 35px; width: 100%; max-width: 400px; text-align: center; }
+        .auth-box { padding: 40px 30px; border-radius: 30px; width: 100%; max-width: 400px; text-align: center; }
         
-        input { width: 100%; padding: 18px; margin-bottom: 15px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); color: #fff; outline: none; font-size: 16px; transition: border 0.3s; }
-        input:focus { border-color: var(--accent); }
+        input { width: 100%; padding: 16px; margin-bottom: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); color: #fff; outline: none; font-size: 16px; }
+        input:focus { border-color: rgba(255,255,255,0.2); }
         
-        .primary-btn { width: 100%; padding: 18px; border-radius: 18px; border: none; background: var(--accent); color: #fff; font-weight: 800; cursor: pointer; font-size: 15px; letter-spacing: 0.5px; }
+        .primary-btn { width: 100%; padding: 16px; border-radius: 15px; border: none; background: #fff; color: #000; font-weight: 800; cursor: pointer; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
         
         #app { height: 100vh; display: none; flex-direction: column; position: relative; z-index: 10; }
         .page { display: none; padding: 30px 20px; flex-grow: 1; overflow-y: auto; padding-bottom: 120px; }
-        .active-page { display: block; animation: pageIn 0.4s ease-out; }
-        @keyframes pageIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .active-page { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .balance-card { padding: 30px; border-radius: 30px; margin-top: 20px; text-align: left; }
-        .msg-box { padding: 20px; border-radius: 22px; margin-bottom: 15px; border-left: 5px solid var(--info); }
-        .user-card { padding: 20px; border-radius: 25px; margin-bottom: 15px; }
+        .balance-card { padding: 30px; border-radius: 25px; margin-top: 20px; }
+        .msg-box { padding: 20px; border-radius: 20px; margin-bottom: 15px; border-left: 4px solid #fff; }
+        .user-card { padding: 20px; border-radius: 20px; margin-bottom: 15px; }
 
-        .nav { position: fixed; bottom: 25px; left: 20px; right: 20px; border-radius: 30px; display: flex; padding: 10px; z-index: 1000; }
+        .nav { position: fixed; bottom: 25px; left: 20px; right: 20px; border-radius: 25px; display: flex; padding: 8px; z-index: 1000; }
         .nav-link { flex: 1; padding: 12px; text-align: center; color: var(--dim); font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
-        .nav-link.active { color: var(--accent); transform: translateY(-2px); }
+        .nav-link.active { color: #fff; }
 
-        .badge { font-size: 10px; padding: 4px 10px; border-radius: 10px; font-weight: 900; margin-left: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .badge { font-size: 9px; padding: 4px 10px; border-radius: 8px; font-weight: 900; margin-left: 8px; background: #fff; color: #000; }
     </style>
 </head>
 <body>
 
-    <div id="loader"><div class="spinner"></div><b style="letter-spacing:4px; font-size:14px; color:var(--accent)">DS STUDIO</b></div>
+    <div id="loader"><div class="spinner"></div><b style="letter-spacing:4px; font-size:12px; color:#fff">DS STUDIO</b></div>
 
     <div id="auth-screen">
         <div class="auth-box glass">
-            <h2 style="margin-bottom:25px; font-size:28px; letter-spacing:-1px;">DS STUDIO</h2>
-            <div style="display:flex; background:rgba(0,0,0,0.3); padding:5px; border-radius:16px; margin-bottom:25px; border: 1px solid rgba(255,255,255,0.05)">
-                <div id="t-login" style="flex:1; padding:12px; cursor:pointer; border-radius:12px; font-weight:800; font-size:11px;" onclick="setMode('login')">ВХОД</div>
-                <div id="t-reg" style="flex:1; padding:12px; cursor:pointer; border-radius:12px; font-weight:800; font-size:11px;" onclick="setMode('reg')">РЕГИСТРАЦИЯ</div>
+            <h2 style="margin-bottom:25px; font-size:24px; letter-spacing:2px; font-weight:900;">DS STUDIO</h2>
+            <div style="display:flex; background:rgba(255,255,255,0.03); padding:5px; border-radius:12px; margin-bottom:25px;">
+                <div id="t-login" style="flex:1; padding:10px; cursor:pointer; border-radius:10px; font-weight:800; font-size:10px; transition:0.3s;" onclick="setMode('login')">ВХОД</div>
+                <div id="t-reg" style="flex:1; padding:10px; cursor:pointer; border-radius:10px; font-weight:800; font-size:10px; transition:0.3s;" onclick="setMode('reg')">РЕГИСТРАЦИЯ</div>
             </div>
             <input type="text" id="nick" placeholder="Никнейм" autocomplete="off">
             <input type="password" id="pass" placeholder="Пароль">
             <button class="primary-btn" id="auth-submit-btn" onclick="handleAuth()">ПРОДОЛЖИТЬ</button>
-            <p id="err" style="color:var(--accent); font-size:12px; margin-top:15px; min-height:15px; font-weight:600;"></p>
+            <p id="err" style="color:var(--danger); font-size:11px; margin-top:15px; min-height:15px;"></p>
         </div>
     </div>
 
     <div id="app">
         <div id="p-home" class="page active-page">
-            <div style="margin-top:40%; text-align:center; opacity:0.05">
-                <h1 style="font-size:60px; line-height:0.8;">DS<br>STUDIO</h1>
+            <div style="margin-top:40%; text-align:center; opacity:0.1">
+                <h1 style="font-size:70px; line-height:0.8; font-weight:900;">DS<br>STUDIO</h1>
             </div>
         </div>
 
         <div id="p-profile" class="page">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:30px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
                 <div>
-                    <h2 id="u-nick-disp" style="font-size:32px; font-weight:900;">User</h2>
-                    <div id="u-role-disp" style="margin-top:8px"></div>
+                    <h2 id="u-nick-disp" style="font-size:28px; font-weight:900;">User</h2>
+                    <div id="u-role-disp" style="margin-top:5px"></div>
                 </div>
-                <div onclick="tab('p-messages')" style="font-size:26px; cursor:pointer; position:relative; padding:10px; background:rgba(255,255,255,0.03); border-radius:18px;">
-                    🔔<div id="notif-dot" style="position:absolute; top:12px; right:12px; width:10px; height:10px; background:var(--accent); border-radius:50%; border:2px solid #000; display:none;"></div>
+                <div onclick="tab('p-messages')" style="font-size:24px; cursor:pointer; position:relative; padding:10px; background:rgba(255,255,255,0.05); border-radius:15px;">
+                    🔔<div id="notif-dot" style="position:absolute; top:8px; right:8px; width:8px; height:8px; background:var(--success); border-radius:50%; display:none;"></div>
                 </div>
             </div>
             
             <div class="balance-card glass">
-                <span style="color:var(--dim); font-size:12px; font-weight:800; letter-spacing:1px;">ТЕКУЩИЙ БАЛАНС</span>
-                <h1 style="color:var(--success); font-size:48px; margin-top:10px; font-weight:900;">$ <span id="u-bal-disp">0</span></h1>
+                <span style="color:var(--dim); font-size:11px; font-weight:800; letter-spacing:2px;">ЛИЧНЫЙ СЧЕТ</span>
+                <h1 style="color:#fff; font-size:42px; margin-top:10px; font-weight:900;">$ <span id="u-bal-disp">0</span></h1>
             </div>
             
-            <button class="primary-btn" style="margin-top:40px; background:rgba(255,75,43,0.1); color:var(--danger); border:1px solid rgba(255,75,43,0.2)" onclick="logout()">ВЫЙТИ ИЗ АККАУНТА</button>
+            <button class="primary-btn" style="margin-top:40px; background:rgba(255,255,255,0.03); color:var(--danger); border:1px solid rgba(255,75,43,0.1)" onclick="logout()">ВЫЙТИ</button>
         </div>
 
         <div id="p-messages" class="page">
-            <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px;">
-                <button onclick="tab('p-profile')" style="background:rgba(255,255,255,0.05); border:none; color:var(--text); width:45px; height:45px; border-radius:15px; font-size:20px; display:flex; align-items:center; justify-content:center;">←</button>
-                <h2 style="font-weight:900;">Уведомления</h2>
-            </div>
+            <h2 style="font-weight:900; margin-bottom:25px;">Уведомления</h2>
             <div id="messages-list"></div>
         </div>
 
         <div id="p-admin" class="page">
-            <h2 style="margin-bottom:25px; font-weight:900;">Админ-панель</h2>
-            <input type="text" id="a-search" class="glass" placeholder="Поиск пользователя..." oninput="renderAdminList()" style="background:rgba(0,0,0,0.2)">
+            <h2 style="margin-bottom:25px; font-weight:900;">Управление</h2>
+            <input type="text" id="a-search" class="glass" placeholder="Поиск..." oninput="renderAdminList()">
             <div id="admin-list"></div>
         </div>
 
@@ -155,171 +152,103 @@
         const db = getDatabase(fApp);
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.headerColor = '#050505';
 
         let me = null;
         let mode = 'login';
         let usersCache = {};
 
         async function init() {
-            const sn = localStorage.getItem('ds_nick');
-            const sp = localStorage.getItem('ds_pass');
+            const sn = localStorage.getItem('ds_nick'), sp = localStorage.getItem('ds_pass');
             if (sn && sp) {
                 try {
                     const snap = await get(ref(db, 'users/' + sn));
-                    if (snap.exists() && snap.val().password === sp) { runApp(snap.val()); } 
-                    else { showAuth(); }
+                    if (snap.exists() && snap.val().password === sp) runApp(snap.val()); 
+                    else showAuth();
                 } catch(e) { showAuth(); }
-            } else { showAuth(); }
+            } else showAuth();
             document.getElementById('loader').style.opacity = '0';
             setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
         }
 
-        function showAuth() {
-            document.getElementById('auth-screen').style.display = 'flex';
-            document.getElementById('app').style.display = 'none';
-        }
+        function showAuth() { document.getElementById('auth-screen').style.display = 'flex'; }
 
         window.setMode = (m) => {
             mode = m;
-            document.getElementById('t-login').style.background = m === 'login' ? 'var(--accent)' : 'transparent';
-            document.getElementById('t-reg').style.background = m === 'reg' ? 'var(--accent)' : 'transparent';
+            document.getElementById('t-login').style.background = m === 'login' ? '#fff' : 'transparent';
+            document.getElementById('t-login').style.color = m === 'login' ? '#000' : '#888';
+            document.getElementById('t-reg').style.background = m === 'reg' ? '#fff' : 'transparent';
+            document.getElementById('t-reg').style.color = m === 'reg' ? '#000' : '#888';
         };
         setMode('login');
 
         window.handleAuth = async () => {
-            const btn = document.getElementById('auth-submit-btn');
-            const nick = document.getElementById('nick').value.trim();
-            const pass = document.getElementById('pass').value.trim();
+            const btn = document.getElementById('auth-submit-btn'), nick = document.getElementById('nick').value.trim(), pass = document.getElementById('pass').value.trim();
             if(!nick || !pass) return;
-            
-            btn.disabled = true;
-            btn.innerText = "ЗАГРУЗКА...";
-
+            btn.disabled = true; btn.innerText = "ОБРАБОТКА...";
             try {
-                const uRef = ref(db, 'users/' + nick);
-                const snap = await get(uRef);
+                const uRef = ref(db, 'users/' + nick), snap = await get(uRef);
                 if (mode === 'login') {
-                    if (snap.exists() && snap.val().password === pass) { saveAndRun(nick, pass, snap.val()); } 
-                    else { throw new Error("Ошибка входа"); }
+                    if (snap.exists() && snap.val().password === pass) saveAndRun(nick, pass, snap.val()); 
+                    else throw new Error("Ошибка входа");
                 } else {
-                    if (snap.exists()) { throw new Error("Ник занят"); }
+                    if (snap.exists()) throw new Error("Ник занят");
                     else {
                         const data = { nickname: nick, password: pass, balance: 100, adminLvl: (nick.toLowerCase() === 'derrick' ? 5 : 0) };
-                        await set(uRef, data);
-                        saveAndRun(nick, pass, data);
+                        await set(uRef, data); saveAndRun(nick, pass, data);
                     }
                 }
-            } catch (e) {
-                document.getElementById('err').innerText = e.message;
-                btn.disabled = false;
-                btn.innerText = "ПРОДОЛЖИТЬ";
-            }
+            } catch (e) { document.getElementById('err').innerText = e.message; btn.disabled = false; btn.innerText = "ПРОДОЛЖИТЬ"; }
         };
 
-        function saveAndRun(n, p, data) {
-            localStorage.setItem('ds_nick', n);
-            localStorage.setItem('ds_pass', p);
-            runApp(data);
-        }
+        function saveAndRun(n, p, d) { localStorage.setItem('ds_nick', n); localStorage.setItem('ds_pass', p); runApp(d); }
 
         function runApp(user) {
-            me = user;
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('app').style.display = 'flex';
+            me = user; document.getElementById('auth-screen').style.display = 'none'; document.getElementById('app').style.display = 'flex';
             document.getElementById('u-nick-disp').innerText = user.nickname;
-            
             onValue(ref(db, 'users/' + user.nickname), s => {
                 const d = s.val(); if(!d) return;
-                document.getElementById('u-bal-disp').innerText = d.balance || 0;
-                let rt = d.adminLvl > 0 ? `<span class="badge" style="background:var(--gold); color:#000;">LVL ${d.adminLvl}</span>` : '';
-                if(d.adminLvl === 5) rt = `<span class="badge" style="background:var(--accent); color:#fff;">OWNER</span>`;
-                document.getElementById('u-role-disp').innerHTML = rt;
+                document.getElementById('u-bal-disp').innerText = (d.balance || 0).toLocaleString();
+                document.getElementById('u-role-disp').innerHTML = d.adminLvl === 5 ? `<span class="badge">OWNER</span>` : d.adminLvl > 0 ? `<span class="badge" style="background:#333; color:#fff;">STAFF</span>` : '';
             });
-
             onValue(ref(db, 'messages/' + user.nickname), snap => {
-                const list = document.getElementById('messages-list');
-                const dot = document.getElementById('notif-dot');
-                list.innerHTML = "";
-                const msgs = snap.val();
-                if(msgs) {
-                    dot.style.display = 'block';
-                    Object.values(msgs).reverse().forEach(m => {
-                        const box = document.createElement('div');
-                        box.className = 'msg-box glass';
-                        box.innerHTML = `<small style="color:var(--dim); font-size:10px; font-weight:700;">${new Date(m.date).toLocaleString()}</small><p style="margin-top:8px; font-size:15px; line-height:1.4;">${m.text}</p>`;
-                        list.appendChild(box);
-                    });
-                } else {
-                    dot.style.display = 'none';
-                    list.innerHTML = `<p style="text-align:center; color:var(--dim); margin-top:60px;">Здесь будет история ваших уведомлений</p>`;
-                }
+                const list = document.getElementById('messages-list'), dot = document.getElementById('notif-dot');
+                list.innerHTML = ""; const msgs = snap.val();
+                if(msgs) { dot.style.display = 'block'; Object.values(msgs).reverse().forEach(m => {
+                    const box = document.createElement('div'); box.className = 'msg-box glass';
+                    box.innerHTML = `<small style="color:var(--dim); font-size:9px; font-weight:800;">${new Date(m.date).toLocaleString()}</small><p style="margin-top:8px; font-size:14px; line-height:1.4;">${m.text}</p>`;
+                    list.appendChild(box);
+                }); } else { dot.style.display = 'none'; list.innerHTML = `<p style="text-align:center; color:var(--dim); margin-top:60px;">Уведомлений нет</p>`; }
             });
-
             if (user.adminLvl > 0) {
                 if (!document.getElementById('adm-btn-nav')) {
-                    const btn = document.createElement('div');
-                    btn.id = 'adm-btn-nav'; btn.className = 'nav-link'; btn.innerText = 'Админ';
-                    btn.onclick = function() { tab('p-admin', this) };
-                    document.getElementById('menu').appendChild(btn);
+                    const btn = document.createElement('div'); btn.id = 'adm-btn-nav'; btn.className = 'nav-link'; btn.innerText = 'Админ';
+                    btn.onclick = function() { tab('p-admin', this) }; document.getElementById('menu').appendChild(btn);
                 }
                 onValue(ref(db, 'users'), s => { usersCache = s.val() || {}; renderAdminList(); });
             }
         }
 
         window.renderAdminList = () => {
-            const list = document.getElementById('admin-list');
-            if(!list) return;
-            const search = document.getElementById('a-search').value.toLowerCase();
-            list.innerHTML = "";
+            const list = document.getElementById('admin-list'), search = document.getElementById('a-search').value.toLowerCase();
+            if(!list) return; list.innerHTML = "";
             for (let n in usersCache) {
                 if (!n.toLowerCase().includes(search)) continue;
-                const u = usersCache[n];
-                const card = document.createElement('div');
-                card.className = 'user-card glass';
-                card.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center">
-                        <b style="font-size:16px;">${u.nickname}</b> 
-                        <span style="color:var(--success); font-weight:900">$${u.balance}</span>
-                    </div>
-                    <div style="display:flex; gap:10px; margin-top:20px">
-                        <input type="text" id="msg-to-${n}" style="margin:0; padding:12px; height:45px; background:rgba(0,0,0,0.3); font-size:14px;" placeholder="Текст...">
-                        <button onclick="sendMsg('${n}')" style="background:var(--info); border:none; padding:0 18px; border-radius:15px; color:#fff; font-weight:900; font-size:11px;">ОК</button>
-                    </div>
-                    <div style="margin-top:15px; display:flex; align-items:center; gap:12px">
-                        ${u.adminLvl < 5 ? `
-                            <input type="number" style="width:80px; padding:10px; margin:0; background:rgba(0,0,0,0.3);" value="${u.balance}" onchange="setBal('${n}', this.value)">
-                            <button onclick="delUser('${n}')" style="background:none; border:none; color:var(--danger); font-size:11px; font-weight:800; margin-left:auto;">УДАЛИТЬ</button>
-                        ` : '<small style="color:var(--dim); font-weight:700;">СИСТЕМНЫЙ АККАУНТ</small>'}
-                    </div>
-                `;
+                const u = usersCache[n], card = document.createElement('div'); card.className = 'user-card glass';
+                card.innerHTML = `<b>${u.nickname}</b> <span style="color:var(--success)">$${u.balance}</span>
+                    <div style="display:flex; gap:10px; margin-top:15px"><input type="text" id="msg-${n}" style="margin:0; padding:10px; background:rgba(0,0,0,0.2); font-size:12px;" placeholder="Сообщение..."><button onclick="sendMsg('${n}')" style="background:#fff; color:#000; border:none; padding:0 15px; border-radius:10px; font-weight:900; font-size:10px;">ОК</button></div>
+                    <div style="margin-top:10px;"><input type="number" style="width:100px; padding:8px; background:rgba(0,0,0,0.2);" value="${u.balance}" onchange="setBal('${n}', this.value)"></div>`;
                 list.appendChild(card);
             }
         };
 
-        window.sendMsg = async (n) => {
-            const i = document.getElementById('msg-to-' + n);
-            if(!i.value.trim()) return;
-            await push(ref(db, 'messages/' + n), { text: i.value, date: Date.now() });
-            i.value = ""; i.blur();
-            tg.HapticFeedback.notificationOccurred('success');
-        };
-
-        window.setBal = (n, v) => update(ref(db, 'users/' + n), { balance: parseInt(v) || 0 });
-        window.delUser = (n) => { if(confirm('Удалить?')) { remove(ref(db, 'users/' + n)); remove(ref(db, 'messages/' + n)); }};
-
+        window.sendMsg = async (n) => { const i = document.getElementById('msg-'+n); if(!i.value.trim()) return; await push(ref(db, 'messages/'+n), { text: i.value, date: Date.now() }); i.value = ""; tg.HapticFeedback.notificationOccurred('success'); };
+        window.setBal = (n, v) => update(ref(db, 'users/'+n), { balance: parseInt(v) || 0 });
         window.logout = () => { if(confirm("Выйти?")) { localStorage.clear(); location.reload(); } };
-
         window.tab = (id, el) => {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-            if(el) {
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                el.classList.add('active');
-            }
-            document.getElementById(id).classList.add('active-page');
-            tg.HapticFeedback.impactOccurred('medium');
+            if(el) { document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active')); el.classList.add('active'); }
+            document.getElementById(id).classList.add('active-page'); tg.HapticFeedback.impactOccurred('light');
         };
-
         init();
     </script>
 </body>
