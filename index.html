@@ -3,133 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DS Studio | Showcase</title>
+    <title>DS Studio | Scripts & Design</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root { 
-            --bg: #0f0f0f; 
-            --card: rgba(35, 35, 40, 0.7); 
-            --accent: #ffffff; 
-            --dim: #888888; 
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            background: linear-gradient(135deg, #0a0a0a, #1a1a1a, #121212);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            color: #fff; height: 100vh; overflow: hidden; position: fixed; width: 100%; 
-        }
-
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        .glass { background: var(--card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
-
-        #app { height: 100vh; display: flex; flex-direction: column; padding: 20px; }
-
-        /* HOME ANIMATION */
-        .home-wrapper { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            min-height: 80vh; 
-            animation: moveUp 1s cubic-bezier(0.4, 0, 0.2, 1) forwards 1s;
-        }
-
-        .main-logo { text-align: center; transition: all 0.8s ease; }
-        .main-logo { animation: scaleDown 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards 1s; }
-
-        .main-logo .letters { font-size: 90px; font-weight: 900; letter-spacing: -5px; line-height: 1; }
-        .letter { display: inline-block; opacity: 0; transform: translateY(30px); animation: letterUp 0.6s ease forwards; }
-        .letter:nth-child(2) { animation-delay: 0.15s; }
-
-        .sub-logo { font-size: 14px; letter-spacing: 8px; color: var(--dim); margin-top: 5px; opacity: 0; animation: fadeIn 0.8s ease forwards 0.5s; }
-
-        /* CONTENT APPEARANCE */
-        .home-content { opacity: 0; width: 100%; animation: fadeIn 0.8s ease forwards 1.5s; }
-
-        .category-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; }
-        .cat-btn { 
-            border: none; padding: 18px 5px; border-radius: 20px; color: #fff; 
-            cursor: pointer; display: flex; flex-direction: column; 
-            align-items: center; gap: 8px; transition: 0.3s;
-        }
-        .cat-btn:active { background: rgba(255,255,255,0.1); transform: scale(0.95); }
-
-        .sub-content-area { border-radius: 25px; padding: 20px; display: none; margin-top: 10px; }
-        .sub-pane { display: none; font-size: 14px; line-height: 1.6; color: #ccc; animation: fadeIn 0.4s ease; }
-
-        /* KEYFRAMES */
-        @keyframes letterUp { to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { to { opacity: 1; } }
-        @keyframes scaleDown { to { transform: scale(0.6) translateY(-20px); } }
-        @keyframes moveUp { to { justify-content: flex-start; padding-top: 20px; } }
-
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="active">
+    <div class="bg-gradient"></div>
 
     <div id="app">
-        <div class="home-wrapper">
+        <div class="home-wrapper" id="homeWrap">
             <div class="main-logo">
                 <div class="letters"><span class="letter">D</span><span class="letter">S</span></div>
                 <div class="sub-logo">STUDIO</div>
             </div>
 
-            <div class="home-content">
+            <div class="menu-area">
                 <div class="category-grid">
-                    <div class="cat-btn glass" onclick="showSub('design')">
-                        <span style="font-size:22px">🎨</span>
-                        <span style="font-size:9px; font-weight:800; letter-spacing:1px;">ДИЗАЙН</span>
+                    <div class="cat-btn" onclick="openPage('scripts')">
+                        <span>ARIZONA MOBILE SCRIPTS</span>
+                        <small>➔</small>
                     </div>
-                    <div class="cat-btn glass" onclick="showSub('media')">
-                        <span style="font-size:22px">📱</span>
-                        <span style="font-size:9px; font-weight:800; letter-spacing:1px;">МЕДИА</span>
+                    <div class="cat-btn" onclick="openPage('design')">
+                        <span>PREMIUM DESIGN</span>
+                        <small>➔</small>
                     </div>
-                    <div class="cat-btn glass" onclick="showSub('info')">
-                        <span style="font-size:22px">✨</span>
-                        <span style="font-size:9px; font-weight:800; letter-spacing:1px;">О НАС</span>
-                    </div>
-                </div>
-
-                <div id="sub-box" class="sub-content-area glass">
-                    <div id="c-design" class="sub-pane">
-                        <b style="color:#fff">Графика для проектов:</b><br>
-                        - Оформление тем форума<br>- Уникальные логотипы<br>- Анимированные баннеры
-                    </div>
-                    <div id="c-media" class="sub-pane">
-                        <b style="color:#fff">Социальные сети:</b><br>
-                        - Дизайн групп VK<br>- Оформление YouTube<br>- Наборы для Discord
-                    </div>
-                    <div id="c-info" class="sub-pane">
-                        <b style="color:#fff">DS STUDIO</b><br>
-                        Профессиональный дизайн для комьюнити Arizona RP. Качество, проверенное временем.
+                    <div class="cat-btn" onclick="openPage('other')">
+                        <span>КОНТАКТЫ</span>
+                        <small>➔</small>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
+    <div id="scripts" class="overlay">
+        <div class="overlay-header">
+            <button class="back-btn" onclick="closePage('scripts')">←</button>
+            <span class="overlay-title">Scripts Mobile</span>
+        </div>
+        <div class="overlay-body">
+            <div class="card">
+                <b>Farm Bot [Mobile]</b>
+                <p>Полностью автоматическая работа на частных фермах.</p>
+            </div>
+            <div class="card">
+                <b>Central Market Helper</b>
+                <p>Удобный поиск и скупка товаров в один клик.</p>
+            </div>
+        </div>
+    </div>
 
-        // Функция показа вкладок
-        window.showSub = (id) => {
-            const box = document.getElementById('sub-box');
-            const panes = document.querySelectorAll('.sub-pane');
-            
-            box.style.display = 'block';
-            panes.forEach(p => p.style.display = 'none');
-            document.getElementById('c-' + id).style.display = 'block';
-            
-            if (tg.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred('light');
-            }
-        };
-    </script>
+    <div id="design" class="overlay">
+        <div class="overlay-header">
+            <button class="back-btn" onclick="closePage('design')">←</button>
+            <span class="overlay-title">Premium Design</span>
+        </div>
+        <div class="overlay-body">
+            <div class="card">
+                <b>Оформление форума</b>
+                <p>Анимированные подписи и баннеры для лидеров.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="other" class="overlay">
+        <div class="overlay-header">
+            <button class="back-btn" onclick="closePage('other')">←</button>
+            <span class="overlay-title">Контакты</span>
+        </div>
+        <div class="overlay-body" style="text-align: center;">
+            <p style="margin-bottom: 20px;">Свяжитесь с нами напрямую для заказа:</p>
+            <a href="https://t.me/ТВОЙ_НИК" class="contact-link">НАПИСАТЬ В TG</a>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
