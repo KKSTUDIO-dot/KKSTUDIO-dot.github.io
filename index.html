@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DS Studio | Premium</title>
+    <title>DS Studio | Showcase</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { 
@@ -11,8 +11,6 @@
             --card: rgba(35, 35, 40, 0.7); 
             --accent: #ffffff; 
             --dim: #888888; 
-            --success: #4ade80; 
-            --danger: #ff4b2b; 
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -28,201 +26,110 @@
 
         .glass { background: var(--card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
 
-        /* Loader */
-        #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
-        .spinner { width: 30px; height: 30px; border: 2px solid rgba(255,255,255,0.1); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        #app { height: 100vh; display: flex; flex-direction: column; padding: 20px; }
 
-        /* Auth */
-        #auth-screen { position: fixed; inset: 0; z-index: 2000; display: none; align-items: center; justify-content: center; padding: 25px; }
-        .auth-box { padding: 40px 30px; border-radius: 30px; width: 100%; max-width: 400px; text-align: center; }
-        input { width: 100%; padding: 16px; margin-bottom: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); color: #fff; outline: none; font-size: 16px; }
-        .primary-btn { width: 100%; padding: 16px; border-radius: 15px; border: none; background: #fff; color: #000; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        /* HOME ANIMATION */
+        .home-wrapper { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 80vh; 
+            animation: moveUp 1s cubic-bezier(0.4, 0, 0.2, 1) forwards 1s;
+        }
 
-        /* App Structure */
-        #app { height: 100vh; display: none; flex-direction: column; }
-        .page { display: none; padding: 20px; flex-grow: 1; overflow-y: auto; padding-bottom: 100px; }
-        .active-page { display: block; }
-
-        /* --- ГЛАВНАЯ СТРАНИЦА И АНИМАЦИИ --- */
-        .home-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; transition: all 1s cubic-bezier(0.4, 0, 0.2, 1); }
-        .active-page .home-wrapper { justify-content: flex-start; padding-top: 20px; }
-
-        .main-logo { text-align: center; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-        .active-page .main-logo { transform: scale(0.55) translateY(-20px); margin-bottom: -40px; }
+        .main-logo { text-align: center; transition: all 0.8s ease; }
+        .main-logo { animation: scaleDown 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards 1s; }
 
         .main-logo .letters { font-size: 90px; font-weight: 900; letter-spacing: -5px; line-height: 1; }
-        .letter { display: inline-block; opacity: 0; transform: translateY(30px); }
-        .active-page .letter { animation: letterUp 0.6s ease forwards; }
-        .active-page .letter:nth-child(2) { animation-delay: 0.15s; }
+        .letter { display: inline-block; opacity: 0; transform: translateY(30px); animation: letterUp 0.6s ease forwards; }
+        .letter:nth-child(2) { animation-delay: 0.15s; }
 
-        .sub-logo { font-size: 14px; letter-spacing: 8px; color: var(--dim); margin-top: 5px; opacity: 0; }
-        .active-page .sub-logo { animation: fadeIn 0.8s ease forwards 0.5s; }
+        .sub-logo { font-size: 14px; letter-spacing: 8px; color: var(--dim); margin-top: 5px; opacity: 0; animation: fadeIn 0.8s ease forwards 0.5s; }
 
-        @keyframes letterUp { to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { to { opacity: 1; } }
-
-        /* Контент под логотипом */
-        .home-content { opacity: 0; width: 100%; margin-top: 0; transition: 0.5s; }
-        .active-page .home-content { animation: fadeIn 0.8s ease forwards 1.2s; }
+        /* CONTENT APPEARANCE */
+        .home-content { opacity: 0; width: 100%; animation: fadeIn 0.8s ease forwards 1.5s; }
 
         .category-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; }
-        .cat-btn { border: none; padding: 18px 5px; border-radius: 20px; color: #fff; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: 0.3s; }
-        .cat-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.1); }
-        .cat-icon { font-size: 22px; }
-        .cat-name { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .cat-btn { 
+            border: none; padding: 18px 5px; border-radius: 20px; color: #fff; 
+            cursor: pointer; display: flex; flex-direction: column; 
+            align-items: center; gap: 8px; transition: 0.3s;
+        }
+        .cat-btn:active { background: rgba(255,255,255,0.1); transform: scale(0.95); }
 
-        .sub-content-area { min-height: 100px; border-radius: 25px; padding: 25px; display: none; }
-        .sub-pane { display: none; font-size: 14px; color: #ccc; line-height: 1.6; animation: fadeIn 0.4s ease; }
+        .sub-content-area { border-radius: 25px; padding: 20px; display: none; margin-top: 10px; }
+        .sub-pane { display: none; font-size: 14px; line-height: 1.6; color: #ccc; animation: fadeIn 0.4s ease; }
 
-        /* Профиль и прочее */
-        .balance-card { padding: 30px; border-radius: 30px; margin-top: 15px; }
-        .nav { position: fixed; bottom: 25px; left: 20px; right: 20px; border-radius: 25px; display: flex; padding: 8px; z-index: 1000; }
-        .nav-link { flex: 1; padding: 12px; text-align: center; color: var(--dim); font-size: 10px; font-weight: 900; text-transform: uppercase; }
-        .nav-link.active { color: #fff; }
+        /* KEYFRAMES */
+        @keyframes letterUp { to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { to { opacity: 1; } }
+        @keyframes scaleDown { to { transform: scale(0.6) translateY(-20px); } }
+        @keyframes moveUp { to { justify-content: flex-start; padding-top: 20px; } }
 
     </style>
 </head>
 <body>
 
-    <div id="loader"><div class="spinner"></div></div>
-
-    <div id="auth-screen">
-        <div class="auth-box glass">
-            <h2 style="margin-bottom:25px; letter-spacing:2px;">DS STUDIO</h2>
-            <input type="text" id="nick" placeholder="Никнейм">
-            <input type="password" id="pass" placeholder="Пароль">
-            <button class="primary-btn" onclick="handleAuth()">ВОЙТИ</button>
-            <p id="err" style="color:var(--danger); font-size:11px; margin-top:15px;"></p>
-        </div>
-    </div>
-
     <div id="app">
-        <div id="p-home" class="page active-page">
-            <div class="home-wrapper">
-                <div class="main-logo">
-                    <div class="letters">
-                        <span class="letter">D</span><span class="letter">S</span>
+        <div class="home-wrapper">
+            <div class="main-logo">
+                <div class="letters"><span class="letter">D</span><span class="letter">S</span></div>
+                <div class="sub-logo">STUDIO</div>
+            </div>
+
+            <div class="home-content">
+                <div class="category-grid">
+                    <div class="cat-btn glass" onclick="showSub('design')">
+                        <span style="font-size:22px">🎨</span>
+                        <span style="font-size:9px; font-weight:800; letter-spacing:1px;">ДИЗАЙН</span>
                     </div>
-                    <div class="sub-logo">STUDIO</div>
+                    <div class="cat-btn glass" onclick="showSub('media')">
+                        <span style="font-size:22px">📱</span>
+                        <span style="font-size:9px; font-weight:800; letter-spacing:1px;">МЕДИА</span>
+                    </div>
+                    <div class="cat-btn glass" onclick="showSub('info')">
+                        <span style="font-size:22px">✨</span>
+                        <span style="font-size:9px; font-weight:800; letter-spacing:1px;">О НАС</span>
+                    </div>
                 </div>
 
-                <div class="home-content">
-                    <div class="category-grid">
-                        <div class="cat-btn glass" onclick="showSub('design')">
-                            <span class="cat-icon">🎨</span><span class="cat-name">Дизайн</span>
-                        </div>
-                        <div class="cat-btn glass" onclick="showSub('social')">
-                            <span class="cat-icon">📱</span><span class="cat-name">Медиа</span>
-                        </div>
-                        <div class="cat-btn glass" onclick="showSub('info')">
-                            <span class="cat-icon">✨</span><span class="cat-name">О нас</span>
-                        </div>
+                <div id="sub-box" class="sub-content-area glass">
+                    <div id="c-design" class="sub-pane">
+                        <b style="color:#fff">Графика для проектов:</b><br>
+                        - Оформление тем форума<br>- Уникальные логотипы<br>- Анимированные баннеры
                     </div>
-
-                    <div id="sub-box" class="sub-content-area glass">
-                        <div id="c-design" class="sub-pane">
-                            <b style="color:#fff">Наши услуги:</b><br>
-                            - Оформление тем форума<br>- Создание уникальных логотипов<br>- Баннеры любой сложности
-                        </div>
-                        <div id="c-social" class="sub-pane">
-                            <b style="color:#fff">Для соц. сетей:</b><br>
-                            - Оформление VK групп<br>- Шапки для YouTube<br>- Аватарки для Discord
-                        </div>
-                        <div id="c-info" class="sub-pane">
-                            <b style="color:#fff">DS STUDIO</b><br>
-                            Создаем качественный визуальный контент для игроков и проектов Arizona RP с 2024 года.
-                        </div>
+                    <div id="c-media" class="sub-pane">
+                        <b style="color:#fff">Социальные сети:</b><br>
+                        - Дизайн групп VK<br>- Оформление YouTube<br>- Наборы для Discord
+                    </div>
+                    <div id="c-info" class="sub-pane">
+                        <b style="color:#fff">DS STUDIO</b><br>
+                        Профессиональный дизайн для комьюнити Arizona RP. Качество, проверенное временем.
                     </div>
                 </div>
             </div>
         </div>
-
-        <div id="p-profile" class="page">
-            <h2 id="u-nick-disp" style="font-size:32px; font-weight:900;">User</h2>
-            <div class="balance-card glass">
-                <span style="color:var(--dim); font-size:11px; font-weight:800;">БАЛАНС</span>
-                <h1 style="font-size:42px; margin-top:5px;">$ <span id="u-bal-disp">0</span></h1>
-            </div>
-            <button class="primary-btn" style="margin-top:30px; background:rgba(255,255,255,0.05); color:var(--danger);" onclick="logout()">ВЫЙТИ</button>
-        </div>
-
-        <nav class="nav glass">
-            <div class="nav-link active" onclick="tab('p-home', this)">Главная</div>
-            <div class="nav-link" onclick="tab('p-profile', this)">Профиль</div>
-        </nav>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAQECyI2wLqHF0BzletUPiG3ryOqWROPOE",
-            authDomain: "ds-studio-app.firebaseapp.com",
-            databaseURL: "https://ds-studio-app-default-rtdb.firebaseio.com",
-            projectId: "ds-studio-app",
-            storageBucket: "ds-studio-app.firebasestorage.app",
-            messagingSenderId: "456035914456",
-            appId: "1:456035914456:web:e2cdbc7e77563a9c7d7dad"
-        };
-
-        const fApp = initializeApp(firebaseConfig);
-        const db = getDatabase(fApp);
+    <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.ready();
 
-        async function init() {
-            const sn = localStorage.getItem('ds_nick'), sp = localStorage.getItem('ds_pass');
-            if (sn && sp) {
-                const s = await get(ref(db, 'users/' + sn));
-                if (s.exists() && s.val().password === sp) runApp(s.val()); else showAuth();
-            } else showAuth();
-            document.getElementById('loader').style.display = 'none';
-        }
-
-        function showAuth() { document.getElementById('auth-screen').style.display = 'flex'; }
-
-        window.handleAuth = async () => {
-            const n = document.getElementById('nick').value.trim(), p = document.getElementById('pass').value.trim();
-            if(!n || !p) return;
-            const r = ref(db, 'users/' + n), s = await get(r);
-            if(s.exists()) {
-                if(s.val().password === p) { localStorage.setItem('ds_nick', n); localStorage.setItem('ds_pass', p); runApp(s.val()); }
-                else document.getElementById('err').innerText = "Неверный пароль";
-            } else {
-                const d = { nickname: n, password: p, balance: 100, adminLvl: (n.toLowerCase() === 'derrick' ? 5 : 0) };
-                await set(r, d); localStorage.setItem('ds_nick', n); localStorage.setItem('ds_pass', p); runApp(d);
+        // Функция показа вкладок
+        window.showSub = (id) => {
+            const box = document.getElementById('sub-box');
+            const panes = document.querySelectorAll('.sub-pane');
+            
+            box.style.display = 'block';
+            panes.forEach(p => p.style.display = 'none');
+            document.getElementById('c-' + id).style.display = 'block';
+            
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
             }
         };
-
-        function runApp(user) {
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('app').style.display = 'flex';
-            document.getElementById('u-nick-disp').innerText = user.nickname;
-            onValue(ref(db, 'users/' + user.nickname), s => {
-                if(s.exists()) document.getElementById('u-bal-disp').innerText = (s.val().balance || 0).toLocaleString();
-            });
-        }
-
-        window.showSub = (id) => {
-            document.getElementById('sub-box').style.display = 'block';
-            document.querySelectorAll('.sub-pane').forEach(p => p.style.display = 'none');
-            document.getElementById('c-' + id).style.display = 'block';
-            tg.HapticFeedback.impactOccurred('light');
-        };
-
-        window.tab = (id, el) => {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById(id).classList.add('active-page');
-            tg.HapticFeedback.impactOccurred('medium');
-        };
-
-        window.logout = () => { localStorage.clear(); location.reload(); };
-
-        init();
     </script>
 </body>
 </html>
