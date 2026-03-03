@@ -3,54 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DS Studio OS Persistent</title>
+    <title>DS Studio OS Stable</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --bg: #050505; --card: #111113; --accent: #e91e63; --text: #ffffff; --dim: #71717a; --success: #4ade80; --danger: #ff4b2b; --gold: #facc15; --info: #3b82f6; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
-        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; position: fixed; width: 100%; }
 
-        /* Auth UI */
-        #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        /* Status Screens */
+        #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s; }
+        .spinner { width: 30px; height: 30px; border: 3px solid rgba(233,30,99,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
         .auth-box { background: var(--card); padding: 30px; border-radius: 32px; width: 100%; max-width: 400px; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
-        input { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); background: #000; color: #fff; outline: none; font-size: 14px; }
-        .primary-btn { width: 100%; padding: 16px; border-radius: 16px; border: none; background: var(--accent); color: #fff; font-weight: 700; cursor: pointer; }
         
+        input { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); background: #000; color: #fff; outline: none; font-size: 16px; }
+        .primary-btn { width: 100%; padding: 16px; border-radius: 16px; border: none; background: var(--accent); color: #fff; font-weight: 700; cursor: pointer; transition: transform 0.1s; }
+        .primary-btn:active { transform: scale(0.98); }
+
         #app { height: 100vh; display: none; flex-direction: column; }
         .page { display: none; padding: 25px 20px; flex-grow: 1; overflow-y: auto; padding-bottom: 110px; }
-        .active-page { display: block; }
+        .active-page { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* UI Elements */
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .notif-btn { position: relative; width: 48px; height: 48px; background: var(--card); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .notif-dot { position: absolute; top: 12px; right: 12px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%; border: 2px solid var(--card); display: none; }
-        .msg-box { background: var(--card); padding: 18px; border-radius: 22px; margin-bottom: 12px; border-left: 4px solid var(--info); }
-        .user-card { background: #18181b; padding: 18px; border-radius: 24px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.03); }
-        
-        .nav { position: fixed; bottom: 20px; left: 20px; right: 20px; background: rgba(17,17,19,0.9); backdrop-filter: blur(20px); border-radius: 28px; display: flex; padding: 8px; border: 1px solid rgba(255,255,255,0.08); z-index: 1000; }
+        /* UI */
+        .user-card { background: #18181b; padding: 20px; border-radius: 24px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.03); }
+        .nav { position: fixed; bottom: 20px; left: 20px; right: 20px; background: rgba(17,17,19,0.95); backdrop-filter: blur(20px); border-radius: 28px; display: flex; padding: 8px; border: 1px solid rgba(255,255,255,0.08); z-index: 1000; }
         .nav-link { flex: 1; padding: 14px; text-align: center; color: var(--dim); font-size: 10px; font-weight: 800; text-transform: uppercase; }
         .nav-link.active { color: var(--accent); }
-        .badge { font-size: 9px; padding: 3px 8px; border-radius: 8px; font-weight: 900; margin-left: 5px; }
-        
-        /* Loader */
-        #loader { position: fixed; inset: 0; background: #000; z-index: 3000; display: flex; align-items: center; justify-content: center; }
+        .badge { font-size: 9px; padding: 3px 8px; border-radius: 8px; font-weight: 900; margin-left: 5px; vertical-align: middle; }
     </style>
 </head>
 <body>
 
-    <div id="loader"><b>ЗАГРУЗКА...</b></div>
+    <div id="loader"><div class="spinner"></div><b style="letter-spacing:2px; font-size:12px;">DS STUDIO</b></div>
 
-    <div id="auth-screen" style="display:none">
+    <div id="auth-screen">
         <div class="auth-box">
-            <h1 style="margin-bottom:20px;">DS STUDIO</h1>
+            <h2 style="margin-bottom:20px; letter-spacing:-1px;">DS STUDIO</h2>
             <div style="display:flex; background:#000; padding:4px; border-radius:14px; margin-bottom:20px">
-                <div id="t-login" style="flex:1; padding:12px; cursor:pointer; border-radius:10px; font-weight:800; font-size:12px;" onclick="setMode('login')">ВХОД</div>
-                <div id="t-reg" style="flex:1; padding:12px; cursor:pointer; border-radius:10px; font-weight:800; font-size:12px;" onclick="setMode('reg')">РЕГ</div>
+                <div id="t-login" style="flex:1; padding:12px; cursor:pointer; border-radius:10px; font-weight:800; font-size:11px;" onclick="setMode('login')">ВХОД</div>
+                <div id="t-reg" style="flex:1; padding:12px; cursor:pointer; border-radius:10px; font-weight:800; font-size:11px;" onclick="setMode('reg')">РЕГИСТРАЦИЯ</div>
             </div>
-            <input type="text" id="nick" placeholder="Никнейм">
+            <input type="text" id="nick" placeholder="Никнейм" autocomplete="off">
             <input type="password" id="pass" placeholder="Пароль">
-            <button class="primary-btn" onclick="handleAuth()">ПРОДОЛЖИТЬ</button>
-            <p id="err" style="color:var(--accent); font-size:12px; margin-top:15px;"></p>
+            <button class="primary-btn" id="auth-submit-btn" onclick="handleAuth()">ПРОДОЛЖИТЬ</button>
+            <p id="err" style="color:var(--accent); font-size:12px; margin-top:15px; min-height:15px;"></p>
         </div>
     </div>
 
@@ -60,25 +59,28 @@
         </div>
 
         <div id="p-profile" class="page">
-            <div class="top-bar">
-                <div><h2 id="u-nick-disp" style="font-size:28px;">User</h2><div id="u-role-disp" style="margin-top:5px"></div></div>
-                <div class="notif-btn" onclick="tab('p-messages')">🔔 <div id="notif-dot" class="notif-dot"></div></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+                <div><h2 id="u-nick-disp" style="font-size:26px;">User</h2><div id="u-role-disp" style="margin-top:5px"></div></div>
+                <div onclick="tab('p-messages')" style="font-size:22px; cursor:pointer; position:relative;">🔔<div id="notif-dot" style="position:absolute; top:0; right:0; width:8px; height:8px; background:var(--danger); border-radius:50%; display:none;"></div></div>
             </div>
             <div style="background:var(--card); padding:25px; border-radius:28px; border:1px solid rgba(255,255,255,0.03)">
                 <span style="color:var(--dim); font-size:11px; font-weight:800;">БАЛАНС</span>
-                <h1 style="color:var(--success); font-size:40px; margin-top:5px; font-weight:900;">$ <span id="u-bal-disp">0</span></h1>
+                <h1 style="color:var(--success); font-size:36px; margin-top:5px; font-weight:900;">$ <span id="u-bal-disp">0</span></h1>
             </div>
-            <button class="primary-btn" style="margin-top:30px; background:#1a1a1c; color:var(--danger)" onclick="logout()">ВЫЙТИ ИЗ АККАУНТА</button>
+            <button class="primary-btn" style="margin-top:30px; background:#1a1a1c; color:var(--danger); font-size:13px;" onclick="logout()">ВЫЙТИ ИЗ АККАУНТА</button>
         </div>
 
         <div id="p-messages" class="page">
-            <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;"><button onclick="tab('p-profile')" style="background:none; border:none; color:var(--accent); font-size:24px;">←</button><h2>Уведомления</h2></div>
+            <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                <button onclick="tab('p-profile')" style="background:none; border:none; color:var(--accent); font-size:24px;">←</button>
+                <h2>Сообщения</h2>
+            </div>
             <div id="messages-list"></div>
         </div>
 
         <div id="p-admin" class="page">
-            <h2 style="margin-bottom:20px;">Админ-центр</h2>
-            <input type="text" id="a-search" placeholder="Поиск ника..." oninput="renderAdminList()">
+            <h2 style="margin-bottom:20px;">Админ-панель</h2>
+            <input type="text" id="a-search" placeholder="Поиск пользователя..." oninput="renderAdminList()">
             <div id="admin-list"></div>
         </div>
 
@@ -105,26 +107,29 @@
         const fApp = initializeApp(firebaseConfig);
         const db = getDatabase(fApp);
         const tg = window.Telegram.WebApp;
-        let mode = 'login';
+        tg.expand();
+
         let me = null;
+        let mode = 'login';
+        let usersCache = {};
 
-        // --- Инициализация при запуске ---
-        window.addEventListener('load', async () => {
-            const savedNick = localStorage.getItem('ds_nick');
-            const savedPass = localStorage.getItem('ds_pass');
+        // --- Инициализация ---
+        async function init() {
+            const sn = localStorage.getItem('ds_nick');
+            const sp = localStorage.getItem('ds_pass');
 
-            if(savedNick && savedPass) {
-                const snap = await get(ref(db, 'users/' + savedNick));
-                if(snap.exists() && snap.val().password === savedPass) {
-                    runApp(snap.val());
-                } else {
-                    showAuth();
-                }
-            } else {
-                showAuth();
-            }
-            document.getElementById('loader').style.display = 'none';
-        });
+            if (sn && sp) {
+                try {
+                    const snap = await get(ref(db, 'users/' + sn));
+                    if (snap.exists() && snap.val().password === sp) {
+                        runApp(snap.val());
+                    } else { showAuth(); }
+                } catch(e) { showAuth(); }
+            } else { showAuth(); }
+            
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(() => document.getElementById('loader').style.display = 'none', 400);
+        }
 
         function showAuth() {
             document.getElementById('auth-screen').style.display = 'flex';
@@ -135,35 +140,53 @@
             mode = m;
             document.getElementById('t-login').style.background = m === 'login' ? '#e91e63' : 'transparent';
             document.getElementById('t-reg').style.background = m === 'reg' ? '#e91e63' : 'transparent';
+            document.getElementById('err').innerText = "";
         };
         setMode('login');
 
         window.handleAuth = async () => {
+            const btn = document.getElementById('auth-submit-btn');
             const nick = document.getElementById('nick').value.trim();
             const pass = document.getElementById('pass').value.trim();
-            if(!nick || !pass) return;
+            
+            if(!nick || !pass) { document.getElementById('err').innerText = "Заполните все поля"; return; }
+            
+            btn.disabled = true;
+            btn.innerText = "ПОДОЖДИТЕ...";
 
-            const uRef = ref(db, 'users/' + nick);
-            if(mode === 'login') {
+            try {
+                const uRef = ref(db, 'users/' + nick);
                 const snap = await get(uRef);
-                if(snap.exists() && snap.val().password === pass) {
-                    localStorage.setItem('ds_nick', nick);
-                    localStorage.setItem('ds_pass', pass);
-                    runApp(snap.val());
-                } else { document.getElementById('err').innerText = "Ошибка входа"; }
-            } else {
-                const snap = await get(uRef);
-                if(snap.exists()) { document.getElementById('err').innerText = "Ник занят"; }
-                else {
-                    const data = { nickname: nick, password: pass, balance: 100, adminLvl: 0 };
-                    if(nick.toLowerCase() === 'derrick') data.adminLvl = 5;
-                    await set(uRef, data);
-                    localStorage.setItem('ds_nick', nick);
-                    localStorage.setItem('ds_pass', pass);
-                    runApp(data);
+
+                if (mode === 'login') {
+                    if (snap.exists() && snap.val().password === pass) {
+                        saveAndRun(nick, pass, snap.val());
+                    } else { throw new Error("Неверный логин или пароль"); }
+                } else {
+                    if (snap.exists()) { throw new Error("Этот ник уже занят"); }
+                    else {
+                        const data = { 
+                            nickname: nick, 
+                            password: pass, 
+                            balance: 100, 
+                            adminLvl: (nick.toLowerCase() === 'derrick' ? 5 : 0) 
+                        };
+                        await set(uRef, data);
+                        saveAndRun(nick, pass, data);
+                    }
                 }
+            } catch (e) {
+                document.getElementById('err').innerText = e.message;
+                btn.disabled = false;
+                btn.innerText = "ПРОДОЛЖИТЬ";
             }
         };
+
+        function saveAndRun(n, p, data) {
+            localStorage.setItem('ds_nick', n);
+            localStorage.setItem('ds_pass', p);
+            runApp(data);
+        }
 
         function runApp(user) {
             me = user;
@@ -171,15 +194,17 @@
             document.getElementById('app').style.display = 'flex';
             document.getElementById('u-nick-disp').innerText = user.nickname;
             
-            // Слушатели (onValue)
+            // Подписка на свои данные
             onValue(ref(db, 'users/' + user.nickname), s => {
-                const d = s.val() || {};
+                const d = s.val();
+                if(!d) return;
                 document.getElementById('u-bal-disp').innerText = d.balance || 0;
-                let roleTag = d.adminLvl > 0 ? `<span class="badge" style="background:var(--gold); color:#000;">LVL ${d.adminLvl}</span>` : '';
-                if(d.adminLvl === 5) roleTag = `<span class="badge" style="background:var(--accent); color:#fff;">OWNER</span>`;
-                document.getElementById('u-role-disp').innerHTML = roleTag;
+                let rt = d.adminLvl > 0 ? `<span class="badge" style="background:var(--gold); color:#000;">LVL ${d.adminLvl}</span>` : '';
+                if(d.adminLvl === 5) rt = `<span class="badge" style="background:var(--accent); color:#fff;">OWNER</span>`;
+                document.getElementById('u-role-disp').innerHTML = rt;
             });
 
+            // Подписка на уведомления
             onValue(ref(db, 'messages/' + user.nickname), snap => {
                 const list = document.getElementById('messages-list');
                 const dot = document.getElementById('notif-dot');
@@ -189,68 +214,80 @@
                     dot.style.display = 'block';
                     Object.values(msgs).reverse().forEach(m => {
                         const box = document.createElement('div');
-                        box.className = 'msg-box';
-                        box.innerHTML = `<span style="font-size:10px; color:var(--dim);">${new Date(m.date).toLocaleString()}</span><p style="margin-top:5px;">${m.text}</p>`;
+                        box.style = "background:var(--card); padding:15px; border-radius:20px; margin-bottom:10px; border-left:3px solid var(--info)";
+                        box.innerHTML = `<small style="color:var(--dim); font-size:10px;">${new Date(m.date).toLocaleString()}</small><p style="margin-top:5px; font-size:14px;">${m.text}</p>`;
                         list.appendChild(box);
                     });
                 } else {
                     dot.style.display = 'none';
-                    list.innerHTML = `<p style="color:var(--dim); text-align:center; margin-top:50px;">Сообщений нет</p>`;
+                    list.innerHTML = `<p style="text-align:center; color:var(--dim); margin-top:50px; font-size:13px;">Уведомлений нет</p>`;
                 }
             });
 
-            if(user.adminLvl > 0 && !document.getElementById('adm-btn-nav')) {
-                const btn = document.createElement('div');
-                btn.id = 'adm-btn-nav'; btn.className = 'nav-link'; btn.innerText = 'Админ';
-                btn.onclick = function() { tab('p-admin', this) };
-                document.getElementById('menu').appendChild(btn);
-                onValue(ref(db, 'users'), s => { renderAdminList(s.val()); });
+            // Для админов
+            if (user.adminLvl > 0) {
+                if (!document.getElementById('adm-btn-nav')) {
+                    const btn = document.createElement('div');
+                    btn.id = 'adm-btn-nav'; btn.className = 'nav-link'; btn.innerText = 'Админ';
+                    btn.onclick = function() { tab('p-admin', this) };
+                    document.getElementById('menu').appendChild(btn);
+                }
+                onValue(ref(db, 'users'), s => {
+                    usersCache = s.val() || {};
+                    renderAdminList();
+                });
             }
         }
 
-        window.logout = () => {
-            if(confirm("Выйти из аккаунта?")) {
-                off(ref(db, 'users/' + me.nickname));
-                off(ref(db, 'messages/' + me.nickname));
-                localStorage.clear();
-                location.reload();
-            }
-        };
-
-        window.renderAdminList = (users) => {
-            if(!users) return;
+        window.renderAdminList = () => {
             const list = document.getElementById('admin-list');
+            if(!list) return;
             const search = document.getElementById('a-search').value.toLowerCase();
             list.innerHTML = "";
-            for(let n in users) {
-                if(!n.toLowerCase().includes(search)) continue;
-                const u = users[n];
+
+            for (let n in usersCache) {
+                if (!n.toLowerCase().includes(search)) continue;
+                const u = usersCache[n];
                 const card = document.createElement('div');
                 card.className = 'user-card';
                 card.innerHTML = `
-                    <div style="display:flex; justify-content:space-between">
-                        <b>${u.nickname}</b> <span style="color:var(--success)">$${u.balance}</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center">
+                        <b style="font-size:15px;">${u.nickname}</b> 
+                        <span style="color:var(--success); font-weight:800">$${u.balance}</span>
                     </div>
-                    <div style="display:flex; gap:8px; margin-top:12px">
-                        <input type="text" id="msg-${n}" style="margin:0; padding:10px; height:40px;" placeholder="Сообщение...">
-                        <button onclick="send('${n}')" style="background:var(--info); border:none; border-radius:12px; padding:0 15px; font-weight:800; font-size:10px;">OK</button>
+                    <div style="display:flex; gap:8px; margin-top:15px">
+                        <input type="text" id="msg-to-${n}" style="margin:0; padding:12px; height:42px; font-size:13px;" placeholder="Текст сообщения...">
+                        <button onclick="sendMsg('${n}')" style="background:var(--info); border:none; padding:0 15px; border-radius:14px; color:#fff; font-weight:800; font-size:11px;">ОК</button>
                     </div>
-                    <div style="display:flex; gap:10px; margin-top:10px">
-                        ${u.adminLvl < 5 ? `<input type="number" style="width:70px; margin:0; padding:5px;" value="${u.balance}" onchange="updateBal('${n}', this.value)">` : ''}
+                    <div style="margin-top:12px; display:flex; align-items:center; gap:10px">
+                        ${u.adminLvl < 5 ? `
+                            <input type="number" style="width:70px; padding:8px; margin:0;" value="${u.balance}" onchange="setBal('${n}', this.value)">
+                            <button onclick="delUser('${n}')" style="background:none; border:none; color:var(--danger); font-size:10px; font-weight:800; margin-left:auto;">УДАЛИТЬ</button>
+                        ` : '<small style="color:var(--dim); font-size:10px;">АККАУНТ ЗАЩИЩЕН</small>'}
                     </div>
                 `;
                 list.appendChild(card);
             }
         };
 
-        window.send = async (n) => {
-            const inp = document.getElementById('msg-'+n);
-            if(!inp.value) return;
-            await push(ref(db, 'messages/'+n), { text: inp.value, date: Date.now() });
-            inp.value = ""; inp.blur();
+        window.sendMsg = async (n) => {
+            const i = document.getElementById('msg-to-' + n);
+            const val = i.value.trim();
+            if(!val) return;
+            await push(ref(db, 'messages/' + n), { text: val, date: Date.now() });
+            i.value = ""; i.blur();
+            tg.HapticFeedback.notificationOccurred('success');
         };
 
-        window.updateBal = (n, v) => update(ref(db, 'users/'+n), {balance: parseInt(v) || 0});
+        window.setBal = (n, v) => update(ref(db, 'users/' + n), { balance: parseInt(v) || 0 });
+        window.delUser = (n) => { if(confirm('Удалить пользователя ' + n + '?')) { remove(ref(db, 'users/' + n)); remove(ref(db, 'messages/' + n)); }};
+
+        window.logout = () => {
+            if(confirm("Выйти из аккаунта?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        };
 
         window.tab = (id, el) => {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
@@ -259,7 +296,11 @@
                 el.classList.add('active');
             }
             document.getElementById(id).classList.add('active-page');
+            tg.HapticFeedback.impactOccurred('light');
         };
+
+        init();
     </script>
 </body>
 </html>
+
