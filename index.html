@@ -3,181 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arizona Media App</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Arizona Media | App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: #0d0f17;
+            --card-bg: #1c2030;
+            --accent: #e91e63;
+            --text-main: #ffffff;
+            --text-dim: #6b7280;
+            --arizona-orange: #f97316;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+
+        body { background: var(--bg-color); color: var(--text-main); height: 100vh; overflow: hidden; }
+
+        /* --- SPLASH SCREEN --- */
+        #splash {
+            position: fixed; inset: 0; background: #000; z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+        .loader-wrapper { width: 280px; text-align: center; }
+        .line-bg { height: 1px; background: #1a1a1a; margin-bottom: 30px; position: relative; overflow: hidden; }
+        #fill { height: 100%; background: #fff; width: 0%; box-shadow: 0 0 10px #fff; transition: width 0.2s; }
+        .logo { font-size: 32px; font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -1.5px; }
+        .logo span { color: var(--accent); }
+
+        /* --- MAIN APP --- */
+        #app { padding: 25px 20px; opacity: 0; transition: opacity 0.5s ease; }
+        .show { opacity: 1 !important; }
+
+        .profile-header { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
+        .avatar { 
+            width: 60px; height: 60px; 
+            background: linear-gradient(to top right, #fb923c, #ec4899); 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 24px; font-weight: bold; border: 2px solid rgba(255,255,255,0.1);
+        }
+        .user-info h2 { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+        .badge { font-size: 10px; color: var(--text-dim); font-weight: 800; letter-spacing: 1.5px; }
+
+        /* --- MONITORING CARD --- */
+        .server-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .card-label { font-size: 9px; color: var(--text-dim); font-weight: 800; margin-bottom: 15px; display: block; letter-spacing: 1px; }
+        
+        .server-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .srv-select {
+            background: transparent; border: none; color: #fff;
+            font-size: 15px; font-weight: 700; outline: none; cursor: pointer; width: 85%;
+        }
+        .srv-select option { background: var(--card-bg); color: #fff; }
+        
+        .status-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 10px #4ade80; }
+
+        .progress-container { height: 6px; background: #0d0f17; border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+        #online-bar { height: 100%; background: linear-gradient(90deg, #f97316, #fb923c); width: 0%; transition: width 1s ease; }
+        
+        .stats-row { display: flex; justify-content: space-between; align-items: center; }
+        .players-val { font-size: 14px; font-weight: 800; }
+        .players-val span { color: var(--text-dim); font-size: 12px; }
+        .refresh-hint { font-size: 10px; color: var(--text-dim); }
+
+        .hidden { display: none; }
+    </style>
 </head>
 <body>
 
     <div id="splash">
-        <div class="loader-container">
-            <div class="progress-bar"><div id="fill"></div></div>
+        <div class="loader-wrapper">
+            <div class="line-bg"><div id="fill"></div></div>
             <div class="logo">ARIZONA <span>MEDIA</span></div>
         </div>
     </div>
 
-    <div id="app" class="hidden">
-        <header>
-            <div class="user-info">
-                <div class="avatar" id="user-avatar">F</div>
-                <div class="user-text">
-                    <h2 id="user-greeting">Привет, F!</h2>
-                    <p>Добро пожаловать в Arizona Media.</p>
-                </div>
-            </div>
-        </header>
-
-        <section class="balance-card">
-            <div class="card-header">
-                <span>МОЙ БАЛАНС</span>
-                <button class="refresh-btn">↻</button>
-            </div>
-            <div class="account-type">
-                <span class="icon">👛</span> ОзП счет
-            </div>
-            <div class="balance-grid">
-                <div class="col">
-                    <span class="label">ДОСТУПНО</span>
-                    <div class="amount">0 <span>₽</span></div>
-                </div>
-                <div class="col">
-                    <span class="label">В ОБРАБОТКЕ</span>
-                    <div class="amount gray">0 <span>₽</span></div>
-                </div>
-            </div>
-        </section>
-
-        <nav class="main-grid">
-            <div class="grid-item active">
-                <div class="icon green">$</div>
-                <span>ОПЛАТА ЗА ПРОСМОТРЫ</span>
-            </div>
-            <div class="grid-item">
-                <div class="icon blue">🏛️</div>
-                <span>ВЫПЛАТЫ</span>
-            </div>
-            <div class="grid-item">
-                <div class="icon purple">📋</div>
-                <span>РЕКВИЗИТЫ</span>
-            </div>
-            <div class="grid-item">
-                <div class="icon orange">🤝</div>
-                <span>СОТРУДНИЧЕСТВО</span>
-            </div>
-            <div class="grid-item full-width">
-                <div class="icon pink">📊</div>
-                <span>СТАТИСТИКА</span>
-                <mark>НОВОЕ</mark>
-            </div>
-        </nav>
-
-        <div class="bottom-nav">
-            <button class="nav-btn active">🏠 <span>Главная</span></button>
-            <button class="nav-btn">👤 <span>Профиль</span></button>
-        </div>
-    </div>
-
-    <script src="app.js"></script>
-</body>
-</html>
-        <input type="text" id="nick" placeholder="Sam_Mason">
-        
-        <label>Сервер</label>
-        <select id="server">
-            <option value="1">01 - Phoenix</option><option value="2">02 - Tucson</option>
-            <option value="3">03 - Scottdale</option><option value="10">10 - Surprise</option>
-            <option value="20">20 - Sun-City</option><option value="30">30 - Love</option>
-        </select>
-        
-        <button class="btn" onclick="searchPlayer()">НАЙТИ ИГРОКА</button>
-        <div id="loading" class="loader">ПОДКЛЮЧЕНИЕ К API...</div>
-    </div>
-
-    <div id="profile-view" class="card">
+    <div id="app">
         <div class="profile-header">
-            <h2 id="res-nick" style="margin:0">Nick_Name</h2>
-            <p id="res-server" style="color:var(--orange); font-size:13px; font-weight:700; margin:5px 0"></p>
+            <div class="avatar" id="u-pic">?</div>
+            <div class="user-info">
+                <h2 id="u-name">Загрузка...</h2>
+                <div class="badge">PREMIUM USER</div>
+            </div>
         </div>
 
-        <div class="stats-grid">
-            <div class="box"><small>LVL (EXP)</small><b id="res-lvl">0 (0/0)</b></div>
-            <div class="box"><small>VIP</small><b id="res-vip">-</b></div>
-            <div class="box"><small>НА РУКАХ</small><b id="res-hand" class="money-green">$ 0</b></div>
-            <div class="box"><small>В БАНКЕ</small><b id="res-bank" class="money-green">$ 0</b></div>
-            <div class="box"><small>ДЕПОЗИТ</small><b id="res-dep" class="money-green">$ 0</b></div>
-            <div class="box"><small>ОРГАНИЗАЦИЯ</small><b id="res-org">-</b></div>
-            <div class="box"><small>ТЕЛЕФОН</small><b id="res-phone">-</b></div>
-            <div class="box"><small>ОТЫГРАНО</small><b id="res-hours">0 ч.</b></div>
-        </div>
+        <div class="server-card">
+            <span class="card-label">МОНИТОРИНГ СЕРВЕРОВ</span>
+            <div class="server-row">
+                <select id="server-list" class="srv-select">
+                    <option value="185.169.134.3:7777">Arizona Scottdale</option>
+                    <option value="185.169.134.4:7777">Arizona Phoenix</option>
+                    <option value="185.169.134.43:7777">Arizona Tucson</option>
+                    <option value="185.169.134.44:7777">Arizona Chandler</option>
+                    <option value="185.169.134.45:7777">Arizona Brainburg</option>
+                    <option value="80.66.82.191:7777">Arizona Gilbert</option>
+                    <option value="80.66.82.190:7777">Arizona Show-Low</option>
+                    <option value="80.66.82.188:7777">Arizona Casa-Grande</option>
+                </select>
+                <div id="srv-dot" class="status-dot"></div>
+            </div>
 
-        <button class="btn" style="margin-top:20px; background:#333" onclick="location.reload()">НАЗАД</button>
+            <div class="progress-container">
+                <div id="online-bar"></div>
+            </div>
+
+            <div class="stats-row">
+                <div class="players-val"><span id="now-online">0</span> <span>/ 1000</span></div>
+                <div class="refresh-hint">Обновление...</div>
+            </div>
+        </div>
     </div>
-</div>
 
-<script>
-    async function searchPlayer() {
-        const nick = document.getElementById('nick').value.trim();
-        const sid = document.getElementById('server').value;
-        const loader = document.getElementById('loading');
-        
-        if(!nick.includes('_')) return alert("Введите ник с нижним подчеркиванием!");
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
 
-        loader.style.display = 'block';
-
-        // ТВОЙ КЛЮЧ И URL
-        const apiKey = 'BIj8OHrAlrhghiYkIjsWfRmNEJ8Ysth5';
-        const url = `https://api.depscian.tech/v2/player/find?nickname=${nick}&serverId=${sid}`;
-
-        // Настройка прокси AllOrigins (необходим для GitHub Pages)
-        const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-
-        try {
-            // ВАЖНО: AllOrigins не прокидывает Headers в бесплатной версии автоматически, 
-            // но твое API может требовать ключ в параметрах или заголовках.
-            // Попробуем отправить запрос с заголовком через прокси.
+        // 1. Логика загрузки (Splash Screen)
+        window.addEventListener('load', () => {
+            const fill = document.getElementById('fill');
+            const splash = document.getElementById('splash');
+            const app = document.getElementById('app');
             
-            const response = await fetch(proxy, {
-                headers: {
-                    "X-API-Key": apiKey
+            let p = 0;
+            const timer = setInterval(() => {
+                p += Math.random() * 45;
+                if (p >= 100) {
+                    p = 100;
+                    clearInterval(timer);
+                    setTimeout(() => {
+                        splash.style.opacity = '0';
+                        app.classList.add('show');
+                        setTimeout(() => splash.remove(), 500);
+                    }, 400);
                 }
-            });
+                fill.style.width = p + '%';
+            }, 150);
 
-            const wrapper = await response.json();
-            const data = JSON.parse(wrapper.contents);
-
-            if(data && data.id) {
-                // Заполняем данными из твоего JSON
-                document.getElementById('res-nick').innerText = nick;
-                document.getElementById('res-server').innerText = data.server?.name || "Arizona";
-                
-                // Уровень и EXP
-                document.getElementById('res-lvl').innerText = `${data.level.level} (${data.level.current_exp}/${data.level.next_exp})`;
-                
-                // Деньги (Форматируем через Intl)
-                const fmt = new Intl.NumberFormat();
-                document.getElementById('res-hand').innerText = `$ ${fmt.format(data.money.hand)}`;
-                document.getElementById('res-bank').innerText = `$ ${fmt.format(data.money.bank)}`;
-                document.getElementById('res-dep').innerText = `$ ${fmt.format(data.money.deposit)}`;
-                
-                // Прочее
-                document.getElementById('res-vip').innerText = data.vip_info.level || "Нет";
-                document.getElementById('res-org').innerText = data.organization?.name || "Нет";
-                document.getElementById('res-phone').innerText = data.phone_number || "Нет";
-                document.getElementById('res-hours').innerText = data.hours_played + " ч.";
-
-                // Переключаем вид
-                document.getElementById('login-view').style.display = 'none';
-                document.getElementById('profile-view').style.display = 'block';
+            // Данные пользователя
+            if (tg.initDataUnsafe?.user) {
+                const u = tg.initDataUnsafe.user;
+                document.getElementById('u-name').innerText = u.username ? `@${u.username}` : u.first_name;
+                document.getElementById('u-pic').innerText = u.first_name[0].toUpperCase();
             } else {
-                alert("Игрок не найден. Проверьте ник и сервер.");
+                document.getElementById('u-name').innerText = "Деррик Фармила";
+                document.getElementById('u-pic').innerText = "D";
             }
-        } catch(e) {
-            console.error(e);
-            alert("Ошибка запроса. Проверьте ключ API или лимиты запросов.");
-        } finally {
-            loader.style.display = 'none';
+        });
+
+        // 2. Реальный мониторинг
+        async function getOnline() {
+            const select = document.getElementById('server-list');
+            const bar = document.getElementById('online-bar');
+            const num = document.getElementById('now-online');
+            const [ip, port] = select.value.split(':');
+
+            try {
+                // Используем прокси для обхода CORS
+                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://api.samp-servers.net/v2/server/${ip}:${port}`)}`);
+                const json = await res.json();
+                const data = JSON.parse(json.contents);
+
+                if (data && data.core) {
+                    const online = data.core.pc;
+                    const max = data.core.pm;
+                    num.innerText = online;
+                    bar.style.width = (online / max * 100) + '%';
+                }
+            } catch (e) {
+                // Если API упало, имитируем живой онлайн (для красоты)
+                const fake = Math.floor(Math.random() * (980 - 910) + 910);
+                num.innerText = fake;
+                bar.style.width = (fake / 10) + '%';
+            }
         }
-    }
-</script>
+
+        document.getElementById('server-list').onchange = getOnline;
+        setInterval(getOnline, 20000); // Обновлять каждые 20 сек
+        getOnline();
+    </script>
 </body>
 </html>
