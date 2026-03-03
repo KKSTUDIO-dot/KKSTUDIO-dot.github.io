@@ -1,0 +1,59 @@
+:root {
+    --bg-color: #0d0f17;
+    --card-bg: #1c2030;
+    --accent: #e91e63;
+    --text-main: #ffffff;
+    --text-dim: #6b7280;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+
+body { background: var(--bg-color); color: var(--text-main); overflow: hidden; }
+
+/* Splash Screen */
+#splash {
+    position: fixed; inset: 0; background: #000; z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.5s ease;
+}
+.loader-container { width: 70%; text-align: center; }
+.progress-bar { height: 1px; background: #222; margin-bottom: 30px; position: relative; }
+#fill { height: 100%; background: #fff; width: 0%; transition: width 0.2s; box-shadow: 0 0 10px #fff; }
+.logo { font-size: 28px; font-weight: 900; font-style: italic; letter-spacing: -1px; }
+.logo span { color: var(--accent); }
+
+/* Main App */
+#app { padding: 20px; height: 100vh; overflow-y: auto; }
+.hidden { display: none; }
+
+.user-info { display: flex; align-items: center; margin-bottom: 25px; }
+.avatar { width: 45px; height: 45px; background: linear-gradient(to top right, #fb923c, #ec4899); 
+          border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+.user-text { margin-left: 12px; }
+.user-text h2 { font-size: 18px; }
+.user-text p { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+.balance-card { background: var(--card-bg); border-radius: 25px; padding: 20px; margin-bottom: 15px; border: 1px solid #ffffff0a; }
+.card-header { display: flex; justify-content: space-between; font-size: 10px; font-weight: bold; color: var(--text-dim); letter-spacing: 1px; }
+.account-type { margin: 15px 0; font-size: 14px; font-weight: 600; }
+.balance-grid { display: grid; grid-template-cols: 1fr 1fr; }
+.label { font-size: 9px; color: var(--text-dim); display: block; margin-bottom: 5px; }
+.amount { font-size: 24px; font-weight: 800; }
+.amount.gray { color: #444; }
+.amount span { font-size: 16px; color: var(--text-dim); }
+
+.main-grid { display: grid; grid-template-cols: 1fr 1fr; gap: 10px; margin-bottom: 100px; }
+.grid-item { background: var(--card-bg); border-radius: 20px; padding: 20px; display: flex; 
+             flex-direction: column; align-items: center; text-align: center; border: 1px solid #ffffff0a; position: relative; }
+.grid-item span { font-size: 9px; font-weight: bold; margin-top: 10px; line-height: 1.2; }
+.grid-item .icon { font-size: 24px; }
+.full-width { grid-column: span 2; flex-direction: row; justify-content: flex-start; padding: 15px 25px; }
+.full-width span { margin: 0 0 0 15px; }
+mark { position: absolute; top: 10px; right: 10px; background: var(--accent); color: white; font-size: 7px; padding: 2px 6px; border-radius: 4px; }
+
+/* Bottom Nav */
+.bottom-nav { position: fixed; bottom: 20px; left: 20px; right: 20px; background: #1c2030ee; 
+              backdrop-filter: blur(10px); border-radius: 20px; display: flex; padding: 5px; border: 1px solid #ffffff0a; }
+.nav-btn { flex: 1; border: none; background: none; color: var(--text-dim); padding: 10px; display: flex; flex-direction: column; align-items: center; }
+.nav-btn span { font-size: 9px; font-weight: bold; margin-top: 4px; }
+.nav-btn.active { color: var(--accent); background: #ffffff05; border-radius: 15px; }
