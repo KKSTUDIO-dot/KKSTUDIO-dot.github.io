@@ -3,59 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DS Studio Fix</title>
+    <title>DS Studio Official</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --bg: #0a0a0c; --card: #141417; --accent: #e91e63; --text: #ffffff; --dim: #71717a; --success: #4ade80; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
         body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
+        /* Auth UI */
         #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .auth-box { background: var(--card); padding: 25px; border-radius: 28px; width: 100%; border: 1px solid rgba(255,255,255,0.05); }
+        .auth-box { background: var(--card); padding: 25px; border-radius: 28px; width: 100%; max-width: 400px; border: 1px solid rgba(255,255,255,0.05); }
         .auth-tabs { display: flex; margin-bottom: 20px; background: #000; border-radius: 12px; padding: 4px; }
-        .auth-tab { flex: 1; padding: 10px; text-align: center; font-size: 14px; font-weight: bold; color: var(--dim); cursor: pointer; border-radius: 10px; }
+        .auth-tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; font-weight: 800; color: var(--dim); cursor: pointer; border-radius: 10px; transition: 0.3s; }
         .auth-tab.active { background: var(--accent); color: #fff; }
-        input { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: #000; color: #fff; outline: none; }
-        .primary-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--accent); color: #fff; font-weight: 700; cursor: pointer; }
+        
+        input { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: #000; color: #fff; font-size: 16px; outline: none; }
+        input:focus { border-color: var(--accent); }
+        .primary-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--accent); color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; }
 
+        /* Main App */
         #app { height: 100vh; display: none; flex-direction: column; }
-        .page { display: none; padding: 40px 20px; flex-grow: 1; }
+        .page { display: none; padding: 30px 20px; flex-grow: 1; overflow-y: auto; }
         .active-page { display: block; }
-        .nav { position: fixed; bottom: 20px; left: 20px; right: 20px; background: rgba(20,20,23,0.9); backdrop-filter: blur(20px); border-radius: 24px; display: flex; padding: 6px; border: 1px solid rgba(255,255,255,0.05); }
-        .nav-link { flex: 1; padding: 12px; text-align: center; color: var(--dim); font-size: 10px; font-weight: 800; text-transform: uppercase; }
+
+        .profile-card { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; }
+        .balance-num { font-size: 36px; font-weight: 900; color: var(--success); margin-top: 5px; }
+
+        /* Admin Styles */
+        .admin-user { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.03); }
+        .admin-input { width: 80px; background: #000; border: 1px solid #333; color: var(--success); padding: 8px; border-radius: 10px; text-align: center; font-weight: 700; }
+
+        /* Nav */
+        .nav { position: fixed; bottom: 20px; left: 20px; right: 20px; background: rgba(20,20,23,0.95); backdrop-filter: blur(20px); border-radius: 24px; display: flex; padding: 6px; border: 1px solid rgba(255,255,255,0.1); }
+        .nav-link { flex: 1; padding: 14px; text-align: center; color: var(--dim); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
         .nav-link.active { color: var(--accent); }
-        .admin-item { background: var(--card); padding: 12px; border-radius: 16px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
 
     <div id="auth-screen">
         <div class="auth-box">
+            <h2 style="text-align:center; margin-bottom:20px; letter-spacing:-1px;">DS STUDIO</h2>
             <div class="auth-tabs">
-                <div class="auth-tab active" id="tab-login" onclick="setAuthMode('login')">ВХОД</div>
-                <div class="auth-tab" id="tab-reg" onclick="setAuthMode('reg')">РЕГИСТРАЦИЯ</div>
+                <div class="auth-tab active" id="tab-login" onclick="setMode('login')">ВХОД</div>
+                <div class="auth-tab" id="tab-reg" onclick="setMode('reg')">РЕГИСТРАЦИЯ</div>
             </div>
-            <input type="text" id="nick-input" placeholder="Никнейм">
-            <input type="password" id="pass-input" placeholder="Пароль">
+            <input type="text" id="nick" placeholder="Никнейм">
+            <input type="password" id="pass" placeholder="Пароль">
             <button class="primary-btn" id="auth-btn" onclick="handleAuth()">ВОЙТИ</button>
-            <p id="msg" style="color:var(--accent); font-size:12px; text-align:center; margin-top:10px;"></p>
+            <p id="error-msg" style="color:var(--accent); font-size:12px; text-align:center; margin-top:15px; font-weight:600;"></p>
         </div>
     </div>
 
     <div id="app">
-        <div id="p-home" class="page active-page"><h1 style="text-align:center;margin-top:50px;opacity:0.2">DS STUDIO</h1></div>
-        <div id="p-profile" class="page">
-            <h2 id="u-nick" style="margin-bottom:10px">User</h2>
-            <div style="background:var(--card);padding:20px;border-radius:20px">
-                <div style="font-size:12px;color:var(--dim)">БАЛАНС</div>
-                <div style="font-size:32px;font-weight:900;color:var(--success)">$ <span id="u-bal">0</span></div>
+        <div id="p-home" class="page active-page">
+            <div style="text-align:center; margin-top:100px;">
+                <h1 style="font-size:40px; font-style:italic; opacity:0.1;">DS STUDIO</h1>
+                <p style="color:var(--dim); margin-top:10px;">Добро пожаловать в систему</p>
             </div>
-            <button class="primary-btn" style="margin-top:20px;background:#222" onclick="location.reload()">ВЫЙТИ</button>
         </div>
-        <div id="p-admin" class="page"><h2>Админ-панель</h2><div id="user-list"></div></div>
-        <nav class="nav" id="menu">
-            <div class="nav-link active" onclick="tab('p-home', this)">Главная</div>
-            <div class="nav-link" onclick="tab('p-profile', this)">Профиль</div>
+
+        <div id="p-profile" class="page">
+            <div class="profile-card">
+                <div style="color:var(--dim); font-size:12px; font-weight:800;">ПОЛЬЗОВАТЕЛЬ</div>
+                <div style="font-size:24px; font-weight:800;" id="display-nick">...</div>
+            </div>
+            <div class="profile-card">
+                <div style="color:var(--dim); font-size:12px; font-weight:800;">ВАШ БАЛАНС</div>
+                <div class="balance-num">$ <span id="display-bal">0</span></div>
+            </div>
+            <button class="primary-btn" style="background:#222; margin-top:20px;" onclick="location.reload()">ВЫЙТИ</button>
+        </div>
+
+        <div id="p-admin" class="page">
+            <h2 style="margin-bottom:20px;">Админ-центр</h2>
+            <div id="admin-list"></div>
+        </div>
+
+        <nav class="nav" id="main-menu">
+            <div class="nav-link active" onclick="showTab('p-home', this)">Главная</div>
+            <div class="nav-link" onclick="showTab('p-profile', this)">Профиль</div>
         </nav>
     </div>
 
@@ -76,64 +103,64 @@
         const fApp = initializeApp(firebaseConfig);
         const db = getDatabase(fApp);
         const tg = window.Telegram.WebApp;
-        
-        // ТВОЙ ID ИЗ СКРИНШОТА
-        const MY_ID = "7765615767"; 
-        let mode = 'login';
+        tg.expand();
 
-        window.setAuthMode = (m) => {
-            mode = m;
+        let currentMode = 'login';
+
+        window.setMode = (m) => {
+            currentMode = m;
             document.getElementById('tab-login').classList.toggle('active', m === 'login');
             document.getElementById('tab-reg').classList.toggle('active', m === 'reg');
             document.getElementById('auth-btn').innerText = m === 'login' ? 'ВОЙТИ' : 'СОЗДАТЬ АККАУНТ';
-            document.getElementById('msg').innerText = "";
+            document.getElementById('error-msg').innerText = "";
         };
 
         window.handleAuth = async () => {
-            const nick = document.getElementById('nick-input').value.trim();
-            const pass = document.getElementById('pass-input').value.trim();
-            const uid = String(tg.initDataUnsafe?.user?.id || "dev_test");
-            const msgBox = document.getElementById('msg');
+            const nick = document.getElementById('nick').value.trim();
+            const pass = document.getElementById('pass').value.trim();
+            const err = document.getElementById('error-msg');
 
-            if(!nick || !pass) { msgBox.innerText = "Заполните все поля"; return; }
+            if(!nick || !pass) { err.innerText = "Заполните ник и пароль!"; return; }
 
-            const uRef = ref(db, 'users/' + uid);
-            const snap = await get(uRef);
+            const userRef = ref(db, 'users/' + nick); // Теперь ключ в базе - это НИК
+            const snap = await get(userRef);
 
-            if(mode === 'login') {
+            if(currentMode === 'login') {
                 if(snap.exists() && snap.val().password === pass) {
-                    runApp(snap.val());
+                    startApp(snap.val());
                 } else {
-                    msgBox.innerText = "Неверный ник или пароль";
+                    err.innerText = "Неверный ник или пароль!";
                 }
             } else {
                 if(snap.exists()) {
-                    msgBox.innerText = "Аккаунт уже существует!";
+                    err.innerText = "Этот ник уже занят!";
                 } else {
-                    const newUser = { id: uid, nickname: nick, password: pass, balance: 100 };
-                    await set(uRef, newUser);
-                    runApp(newUser);
+                    const userData = { nickname: nick, password: pass, balance: 100 };
+                    await set(userRef, userData);
+                    startApp(userData);
                 }
             }
         };
 
-        function runApp(user) {
+        function startApp(user) {
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
-            document.getElementById('u-nick').innerText = user.nickname;
+            document.getElementById('display-nick').innerText = user.nickname;
             
-            onValue(ref(db, 'users/' + user.id + '/balance'), s => {
-                document.getElementById('u-bal').innerText = s.val() || 0;
+            // Следим за балансом
+            onValue(ref(db, 'users/' + user.nickname + '/balance'), (s) => {
+                document.getElementById('display-bal').innerText = s.val() || 0;
             });
 
-            if(String(user.id) === MY_ID) {
-                const menu = document.getElementById('menu');
+            // Проверка на админа Derrick
+            if(user.nickname.toLowerCase() === 'derrick') {
+                const menu = document.getElementById('main-menu');
                 if(!document.getElementById('adm-btn')) {
                     const btn = document.createElement('div');
                     btn.id = "adm-btn";
-                    btn.className = 'nav-link';
-                    btn.innerText = 'Админ';
-                    btn.onclick = function() { tab('p-admin', this) };
+                    btn.className = "nav-link";
+                    btn.innerText = "Админ";
+                    btn.onclick = function() { showTab('p-admin', this) };
                     menu.appendChild(btn);
                     loadAdmin();
                 }
@@ -141,30 +168,30 @@
         }
 
         function loadAdmin() {
-            onValue(ref(db, 'users'), snap => {
-                const list = document.getElementById('user-list');
+            onValue(ref(db, 'users'), (snap) => {
+                const list = document.getElementById('admin-list');
                 list.innerHTML = "";
-                const data = snap.val();
-                for(let k in data) {
-                    const u = data[k];
-                    const d = document.createElement('div');
-                    d.className = 'admin-item';
-                    d.innerHTML = `<span>${u.nickname}</span><input type="number" style="width:70px;background:#000;color:#4ade80;border:1px solid #333;text-align:center;padding:5px;border-radius:8px" value="${u.balance}">`;
-                    d.querySelector('input').onchange = (e) => {
-                        update(ref(db, 'users/'+u.id), {balance: parseInt(e.target.value)});
+                const all = snap.val();
+                for(let nick in all) {
+                    const u = all[nick];
+                    const item = document.createElement('div');
+                    item.className = 'admin-user';
+                    item.innerHTML = `<span>${u.nickname}</span><input type="number" class="admin-input" value="${u.balance}">`;
+                    item.querySelector('input').onchange = (e) => {
+                        update(ref(db, 'users/' + nick), { balance: parseInt(e.target.value) });
                     };
-                    list.appendChild(d);
+                    list.appendChild(item);
                 }
             });
         }
 
-        window.tab = (id, el) => {
+        window.showTab = (id, el) => {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             document.getElementById(id).classList.add('active-page');
             el.classList.add('active');
+            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         };
     </script>
 </body>
 </html>
-
