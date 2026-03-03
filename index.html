@@ -3,126 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DS Studio App</title>
+    <title>DS Studio OS</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-color: #0d0f17;
-            --card-bg: #1c2030;
+            --bg: #0a0a0c;
+            --card: #141417;
             --accent: #e91e63;
-            --text-main: #ffffff;
-            --text-dim: #6b7280;
+            --text: #ffffff;
+            --dim: #71717a;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-color); color: var(--text-main); height: 100vh; overflow: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
-        /* Splash Screen */
-        #splash {
-            position: fixed; inset: 0; background: #000; z-index: 1000;
-            display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.5s ease;
-        }
-        .loader-wrapper { width: 280px; text-align: center; }
-        .line-bg { height: 1px; background: #1a1a1a; margin-bottom: 30px; position: relative; overflow: hidden; }
-        #fill { height: 100%; background: #fff; width: 0%; box-shadow: 0 0 10px #fff; transition: width 0.2s; }
-        .logo { font-size: 32px; font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -1px; }
-        .logo span { color: var(--accent); }
+        /* Auth Layer */
+        #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; }
+        .auth-box { background: var(--card); padding: 30px; border-radius: 28px; width: 100%; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        h2 { font-size: 24px; margin-bottom: 25px; text-align: center; letter-spacing: -0.5px; }
+        input { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: #000; color: #fff; font-size: 16px; outline: none; }
+        input:focus { border-color: var(--accent); }
+        .primary-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--accent); color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; transition: transform 0.2s; }
+        .primary-btn:active { transform: scale(0.98); }
 
-        /* Main App */
-        #app { height: 100vh; opacity: 0; transition: opacity 0.5s ease; display: flex; flex-direction: column; }
-        .show { opacity: 1 !important; }
-        .page { display: none; padding: 40px 25px; flex-grow: 1; }
+        /* App Shell */
+        #app { height: 100vh; display: none; flex-direction: column; }
+        .page { display: none; padding: 40px 20px; flex-grow: 1; overflow-y: auto; }
         .active-page { display: block; }
 
-        .profile-content {
-            display: flex; align-items: center; gap: 15px;
-            background: var(--card-bg); padding: 20px; border-radius: 24px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-        .avatar { 
-            width: 60px; height: 60px; 
-            background: linear-gradient(to top right, #fb923c, #ec4899); 
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 24px; font-weight: bold; text-transform: uppercase;
-        }
-        .user-info h2 { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
-        .badge { font-size: 10px; color: var(--text-dim); font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; }
+        /* Profile UI */
+        .profile-header { background: var(--card); padding: 20px; border-radius: 24px; display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .avatar { width: 55px; height: 55px; background: linear-gradient(135deg, #e91e63, #880e4f); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; }
+        .balance-card { background: linear-gradient(135deg, #1c1c21 0%, #0a0a0c 100%); padding: 25px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.03); text-align: center; }
+        .balance-val { font-size: 36px; font-weight: 900; color: #4ade80; margin-top: 5px; }
 
-        /* Баланс */
-        .balance-card {
-            margin-top: 20px;
-            background: linear-gradient(135deg, #1c2030 0%, #0d0f17 100%);
-            padding: 20px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
-            text-align: center;
-        }
-        .balance-label { color: var(--text-dim); font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; }
-        .balance-value { font-size: 32px; font-weight: 900; color: #4ade80; }
+        /* Admin UI */
+        .admin-item { background: var(--card); padding: 15px; border-radius: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .admin-input { width: 80px; background: #000; border: 1px solid #333; color: #4ade80; padding: 8px; border-radius: 8px; text-align: center; font-weight: bold; }
 
-        /* Bottom Nav */
-        .bottom-nav {
-            position: fixed; bottom: 25px; left: 20px; right: 20px;
-            background: rgba(28, 32, 48, 0.9); backdrop-filter: blur(15px);
-            border-radius: 25px; display: flex; padding: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
-        .nav-item {
-            flex: 1; display: flex; flex-direction: column; align-items: center;
-            justify-content: center; color: var(--text-dim); padding: 10px;
-            font-size: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer;
-        }
-        .nav-item svg { width: 22px; height: 22px; margin-bottom: 4px; fill: currentColor; }
-        .nav-item.active { color: var(--accent); }
+        /* Navigation */
+        .nav { position: fixed; bottom: 20px; left: 20px; right: 20px; background: rgba(20,20,23,0.8); backdrop-filter: blur(20px); border-radius: 24px; display: flex; padding: 6px; border: 1px solid rgba(255,255,255,0.05); }
+        .nav-link { flex: 1; padding: 12px; text-align: center; color: var(--dim); font-size: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+        .nav-link.active { color: var(--accent); }
     </style>
 </head>
 <body>
 
-    <div id="splash">
-        <div class="loader-wrapper">
-            <div class="line-bg"><div id="fill"></div></div>
-            <div class="logo">DS <span>STUDIO</span></div>
+    <div id="auth-screen">
+        <div class="auth-box">
+            <h2>DS STUDIO</h2>
+            <input type="text" id="login" placeholder="Придумайте ник">
+            <input type="password" id="pass" placeholder="Пароль">
+            <button class="primary-btn" onclick="auth()">ВОЙТИ В СИСТЕМУ</button>
+            <p id="err" style="color:#f43f5e; font-size:12px; text-align:center; margin-top:10px; display:none;">Неверный пароль!</p>
         </div>
     </div>
 
     <div id="app">
-        <div id="home-page" class="page active-page">
-            <h1 style="text-align: center; color: var(--text-dim); margin-top: 50px;">Главная</h1>
+        <div id="p-home" class="page active-page">
+            <h1 style="text-align:center; margin-top:50px; opacity:0.3;">ГЛАВНАЯ</h1>
         </div>
 
-        <div id="profile-page" class="page">
-            <div class="profile-content">
-                <div class="avatar" id="u-pic">?</div>
-                <div class="user-info">
-                    <h2 id="u-name">Загрузка...</h2>
-                    <div class="badge">STUDIO MEMBER</div>
+        <div id="p-profile" class="page">
+            <div class="profile-header">
+                <div class="avatar" id="u-ava">?</div>
+                <div>
+                    <div style="font-size:18px; font-weight:700;" id="u-nick">User</div>
+                    <div style="font-size:10px; color:var(--accent); font-weight:900;">ID: <span id="u-id">0</span></div>
                 </div>
             </div>
-
             <div class="balance-card">
-                <div class="balance-label">Ваш баланс</div>
-                <div class="balance-value"><span id="u-balance">0</span> $</div>
+                <div style="font-size:11px; font-weight:800; color:var(--dim);">ТЕКУЩИЙ БАЛАНС</div>
+                <div class="balance-val"><span id="u-bal">0</span> $</div>
             </div>
         </div>
 
-        <nav class="bottom-nav">
-            <div class="nav-item active" onclick="showPage('home-page', this)">
-                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                Главная
-            </div>
-            <div class="nav-item" onclick="showPage('profile-page', this)">
-                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                Профиль
-            </div>
+        <div id="p-admin" class="page">
+            <h2 style="text-align:left; margin-bottom:20px;">Управление игроками</h2>
+            <div id="user-list"></div>
+        </div>
+
+        <nav class="nav" id="menu">
+            <div class="nav-link active" onclick="tab('p-home', this)">Главная</div>
+            <div class="nav-link" onclick="tab('p-profile', this)">Профиль</div>
         </nav>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // ТВОИ ДАННЫЕ ИЗ FIREBASE
+        // Твой конфиг из Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAQECyI2wLqHF0BzletUPiG3ryOqWROPOE",
             authDomain: "ds-studio-app.firebaseapp.com",
@@ -135,64 +106,84 @@
 
         const fApp = initializeApp(firebaseConfig);
         const db = getDatabase(fApp);
-
         const tg = window.Telegram.WebApp;
-        tg.ready();
+        tg.expand();
 
-        async function syncUser(user) {
-            const userRef = ref(db, 'users/' + user.id);
-            
-            onValue(userRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    document.getElementById('u-balance').innerText = data.balance || 0;
+        const MY_ID = 8169971367; // Твой ID для админки
+
+        window.auth = async () => {
+            const nick = document.getElementById('login').value.trim();
+            const pass = document.getElementById('pass').value.trim();
+            const uid = tg.initDataUnsafe?.user?.id || "local_dev";
+
+            if (!nick || !pass) return;
+
+            const uRef = ref(db, 'users/' + uid);
+            const snap = await get(uRef);
+
+            if (snap.exists()) {
+                const data = snap.val();
+                if (data.password === pass) {
+                    run(data);
                 } else {
-                    set(userRef, {
-                        name: user.first_name,
-                        username: user.username || "none",
-                        balance: 100 
-                    });
+                    document.getElementById('err').style.display = 'block';
+                }
+            } else {
+                const user = { id: uid, nickname: nick, password: pass, balance: 100 };
+                await set(uRef, user);
+                run(user);
+            }
+        };
+
+        function run(user) {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('app').style.display = 'flex';
+            document.getElementById('u-nick').innerText = user.nickname;
+            document.getElementById('u-id').innerText = user.id;
+            document.getElementById('u-ava').innerText = user.nickname[0].toUpperCase();
+
+            onValue(ref(db, 'users/' + user.id + '/balance'), (s) => {
+                document.getElementById('u-bal').innerText = s.val() || 0;
+            });
+
+            // Если ты админ - добавляем вкладку
+            if (user.id == MY_ID) {
+                const m = document.getElementById('menu');
+                m.innerHTML += `<div class="nav-link" onclick="tab('p-admin', this)">Админ</div>`;
+                initAdmin();
+            }
+        }
+
+        function initAdmin() {
+            onValue(ref(db, 'users'), (snap) => {
+                const div = document.getElementById('user-list');
+                div.innerHTML = "";
+                const data = snap.val();
+                for (let key in data) {
+                    const u = data[key];
+                    div.innerHTML += `
+                        <div class="admin-item">
+                            <span>${u.nickname}</span>
+                            <input class="admin-input" type="number" value="${u.balance}" 
+                                onchange="editBal('${u.id}', this.value)">
+                        </div>`;
                 }
             });
         }
 
-        window.showPage = (pageId, element) => {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active-page');
-            element.classList.add('active');
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        window.editBal = (id, val) => {
+            update(ref(db, 'users/' + id), { balance: parseInt(val) });
         };
 
-        window.addEventListener('load', () => {
-            const fill = document.getElementById('fill');
-            let p = 0;
-            const timer = setInterval(() => {
-                p += 33;
-                if (p >= 100) {
-                    p = 100;
-                    clearInterval(timer);
-                    setTimeout(() => {
-                        document.getElementById('splash').style.opacity = '0';
-                        document.getElementById('app').classList.add('show');
-                        setTimeout(() => document.getElementById('splash').remove(), 500);
-                    }, 300);
-                }
-                fill.style.width = p + '%';
-            }, 100);
-
-            if (tg.initDataUnsafe?.user) {
-                const u = tg.initDataUnsafe.user;
-                document.getElementById('u-name').innerText = u.username ? `@${u.username}` : u.first_name;
-                document.getElementById('u-pic').innerText = u.first_name[0];
-                syncUser(u);
-            } else {
-                // Тестовый режим для ПК
-                document.getElementById('u-name').innerText = "DS Developer";
-                document.getElementById('u-pic').innerText = "D";
-            }
-        });
+        window.tab = (id, el) => {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(id).classList.add('active-page');
+            el.classList.add('active');
+            tg.HapticFeedback.impactOccurred('light');
+        };
     </script>
 </body>
 </html>
+
 
