@@ -2,218 +2,131 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arizona Mobile | Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Arizona Mobile Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --arizona-orange: #ff8c00;
-            --bg-dark: #0f0f0f;
-            --card-bg: #1a1a1a;
-            --green: #2ecc71;
-            --text-gray: #888;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background: var(--bg-dark);
-            color: white;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 450px;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        header {
-            text-align: center;
-            padding: 30px 0;
-            border-bottom: 2px solid var(--arizona-orange);
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        .login-card, .profile-card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            background: #252525;
-            border: 1px solid #333;
-            border-radius: 8px;
-            color: white;
-            font-size: 16px;
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            background: var(--arizona-orange);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        /* Виджет профиля */
-        .profile-card { display: none; text-align: center; }
-
-        .skin-img {
-            width: 120px;
-            height: auto;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 5px 15px rgba(255,140,0,0.3));
-        }
-
-        .stats-list {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            text-align: left;
-            margin-top: 20px;
-        }
-
-        .stat-box {
-            background: #222;
-            padding: 12px;
-            border-radius: 10px;
-            border-left: 3px solid var(--arizona-orange);
-        }
-
-        .stat-label { font-size: 10px; color: var(--text-gray); text-transform: uppercase; }
-        .stat-value { display: block; font-weight: 700; margin-top: 5px; }
-        .money { color: var(--green); }
-
-        .loader { display: none; color: var(--arizona-orange); margin: 10px 0; font-size: 14px; }
+        :root { --accent: #ff8c00; --bg: #0d0d0d; --card: #1a1a1a; }
+        body { font-family: 'Roboto', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .app { width: 100%; max-width: 400px; }
+        .card { background: var(--card); border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #222; }
+        header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        label { font-size: 11px; color: var(--accent); font-weight: 700; text-transform: uppercase; }
+        input, select { width: 100%; padding: 14px; margin: 8px 0 18px; background: #252525; border: 1px solid #333; border-radius: 12px; color: #fff; box-sizing: border-box; font-size: 16px; outline: none; }
+        .btn { width: 100%; padding: 16px; background: var(--accent); border: none; border-radius: 12px; color: #fff; font-weight: 700; cursor: pointer; font-size: 16px; }
+        
+        /* Profile View */
+        #profile-view { display: none; text-align: center; }
+        .skin-img { height: 160px; filter: drop-shadow(0 5px 15px rgba(255,140,0,0.3)); margin-bottom: 15px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .box { background: #222; padding: 12px; border-radius: 12px; text-align: left; border: 1px solid #282828; }
+        .box span { display: block; font-size: 10px; color: #777; margin-bottom: 4px; }
+        .box b { font-size: 14px; }
+        .money { color: #2ecc71; }
+        .loader { display: none; color: var(--accent); margin-top: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<header>
-    <div style="font-size: 24px; font-weight: 700;">ARIZONA <span style="color:var(--arizona-orange)">MOBILE</span></div>
-</header>
-
-<div class="app-container">
-    <div class="login-card" id="login-screen">
-        <h3 style="margin-top:0">Вход в кабинет</h3>
-        <input type="text" id="nick" placeholder="Nick_Name" value="">
+<div class="app">
+    <div id="login-view" class="card">
+        <header><h2>ARIZONA <span style="color:var(--accent)">MOBILE</span></h2></header>
+        <label>Ваш Никнейм</label>
+        <input type="text" id="nick" placeholder="Name_Surname">
+        
+        <label>Выберите сервер</label>
         <select id="server">
-            <option value="1">Phoenix</option>
-            <option value="2">Tucson</option>
-            <option value="10">Surprise</option>
-            <option value="20">Sun-City</option>
-            <option value="30">Love</option>
+            <option value="1">01 - Phoenix</option><option value="2">02 - Tucson</option>
+            <option value="3">03 - Scottdale</option><option value="4">04 - Chandler</option>
+            <option value="5">05 - Brainburg</option><option value="6">06 - Saint-Rose</option>
+            <option value="7">07 - Mesa</option><option value="8">08 - Red-Rock</option>
+            <option value="9">09 - Yuma</option><option value="10">10 - Surprise</option>
+            <option value="11">11 - Prescott</option><option value="12">12 - Glendale</option>
+            <option value="13">13 - Kingman</option><option value="14">14 - Winslow</option>
+            <option value="15">15 - Payson</option><option value="16">16 - Gilbert</option>
+            <option value="17">17 - Show-Low</option><option value="18">18 - Casa-Grande</option>
+            <option value="19">19 - Page</option><option value="20">20 - Sun-City</option>
+            <option value="21">21 - Queen-Creek</option><option value="22">22 - Sedona</option>
+            <option value="23">23 - Holiday</option><option value="24">24 - Wednesday</option>
+            <option value="25">25 - Yava</option><option value="26">26 - Faraway</option>
+            <option value="27">27 - Bumble Bee</option><option value="28">28 - Christmas</option>
+            <option value="29">29 - Mirage</option><option value="30">30 - Love</option>
         </select>
-        <button onclick="loadPlayerData()">Загрузить данные</button>
-        <center><div id="loading" class="loader">Синхронизация с API...</div></center>
+        
+        <button class="btn" onclick="getProfile()">ПОСМОТРЕТЬ ПРОФИЛЬ</button>
+        <center><div id="load" class="loader">Загрузка данных...</div></center>
     </div>
 
-    <div class="profile-card" id="profile-screen">
-        <img id="ui-skin" src="https://arizona-rp.com/assets/img/skins/1.png" class="skin-img">
-        <h2 id="ui-nick" style="margin: 5px 0;">Nick_Name</h2>
-        <span id="ui-server-name" style="color: var(--text-gray); font-size: 14px;">Server</span>
+    <div id="profile-view" class="card">
+        <img id="p-skin" src="" class="skin-img">
+        <h2 id="p-nick" style="margin:0">Nick</h2>
+        <p id="p-srv" style="color:var(--accent); font-weight:bold; margin: 5px 0 15px; font-size:14px;"></p>
         
-        <div class="stats-list">
-            <div class="stat-box">
-                <span class="stat-label">Уровень</span>
-                <span id="ui-level" class="stat-value">0</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-label">Наличные</span>
-                <span id="ui-cash" class="stat-value money">$ 0</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-label">Организация</span>
-                <span id="ui-org" class="stat-value">Нет</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-label">Банк</span>
-                <span id="ui-bank" class="stat-value">$ 0</span>
-            </div>
+        <div class="grid">
+            <div class="box"><span>УРОВЕНЬ</span><b id="p-lvl">0</b></div>
+            <div class="box"><span>НАЛИЧНЫЕ</span><b id="p-cash" class="money">0</b></div>
+            <div class="box"><span>В БАНКЕ</span><b id="p-bank">0</b></div>
+            <div class="box"><span>ОРГАНИЗАЦИЯ</span><b id="p-org">-</b></div>
         </div>
-        
-        <button style="background:#333; margin-top: 30px;" onclick="location.reload()">Выйти</button>
+        <button class="btn" style="margin-top:20px; background:#333" onclick="location.reload()">НАЗАД</button>
     </div>
 </div>
 
 <script>
-    const API_KEY = 'BIj8OHrAlrhghiYkIjsWfRmNEJ8Ysth5';
+    // Твой ключ
+    const KEY = 'BIj8OHrAlrhghiYkIjsWfRmNEJ8Ysth5';
 
-    async function loadPlayerData() {
+    // Автозаполнение при загрузке
+    window.onload = () => {
+        if(localStorage.getItem('az_nick')) {
+            document.getElementById('nick').value = localStorage.getItem('az_nick');
+            document.getElementById('server').value = localStorage.getItem('az_srv');
+        }
+    };
+
+    async function getProfile() {
         const nick = document.getElementById('nick').value.trim();
-        const serverId = document.getElementById('server').value;
-        const loader = document.getElementById('loading');
-        
-        if (!nick) return alert("Введите ник!");
+        const srvId = document.getElementById('server').value;
+        const srvName = document.getElementById('server').options[document.getElementById('server').selectedIndex].text;
 
-        loader.style.display = 'block';
+        if(!nick.includes('_')) return alert("Введите ник с _ (например: Ivan_Ivanov)");
 
-        // URL API (замени на реальный эндпоинт, если он отличается)
-        const apiUrl = `https://arizona-rp.com/api/v1/profile?server=${serverId}&nick=${nick}`;
-        
-        // Настройка заголовков для передачи ключа
-        const myHeaders = new Headers();
-        myHeaders.append("X-API-Key", API_KEY);
+        // Сохраняем для следующего раза
+        localStorage.setItem('az_nick', nick);
+        localStorage.setItem('az_srv', srvId);
 
-        const requestOptions = {
-            method: 'GET',
-            headers: myHeaders,
-            redirect: 'follow'
-        };
+        document.getElementById('load').style.display = 'block';
+
+        const api = `https://arizona-rp.com/api/v1/profile?server=${srvId}&nick=${nick}`;
+        const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(api)}`;
 
         try {
-            // Используем прокси AllOrigins, чтобы избежать ошибки CORS на GitHub Pages
-            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
-            
-            const response = await fetch(proxyUrl);
+            const response = await fetch(proxy);
             const wrapper = await response.json();
-            
-            // Парсим содержимое, которое прислал прокси
-            const data = JSON.parse(wrapper.contents);
+            const res = JSON.parse(wrapper.contents);
 
-            if (data && data.success) {
-                const player = data.data;
+            if(res.success && res.data) {
+                const d = res.data;
+                document.getElementById('p-nick').innerText = d.username || nick;
+                document.getElementById('p-srv').innerText = srvName;
+                document.getElementById('p-lvl').innerText = d.level || 0;
+                document.getElementById('p-cash').innerText = `$ ${new Intl.NumberFormat().format(d.money || 0)}`;
+                document.getElementById('p-bank').innerText = `$ ${new Intl.NumberFormat().format(d.bank || 0)}`;
+                document.getElementById('p-org').innerText = d.organization || "Нет";
+                document.getElementById('p-skin').src = `https://arizona-rp.com/assets/img/skins/${d.skin_id || 1}.png`;
 
-                // Заполняем UI
-                document.getElementById('ui-nick').innerText = player.username || nick;
-                document.getElementById('ui-level').innerText = player.level || "0";
-                document.getElementById('ui-cash').innerText = `$ ${new Intl.NumberFormat().format(player.money || 0)}`;
-                document.getElementById('ui-bank').innerText = `$ ${new Intl.NumberFormat().format(player.bank || 0)}`;
-                document.getElementById('ui-org').innerText = player.organization || "Нет";
-                
-                // Подгружаем скин (если API отдает skin_id)
-                if (player.skin_id) {
-                    document.getElementById('ui-skin').src = `https://arizona-rp.com/assets/img/skins/${player.skin_id}.png`;
-                }
-
-                // Переключаем экраны
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('profile-screen').style.display = 'block';
+                document.getElementById('login-view').style.display = 'none';
+                document.getElementById('profile-view').style.display = 'block';
             } else {
-                alert("Ошибка: " + (data.message || "Игрок не найден"));
+                alert("Игрок не найден. Проверьте ник и сервер.");
             }
-        } catch (error) {
-            console.error(error);
-            alert("Не удалось подключиться к API. Проверьте ключ или соединение.");
+        } catch(e) {
+            alert("Ошибка сети. Попробуйте еще раз.");
         } finally {
-            loader.style.display = 'none';
+            document.getElementById('load').style.display = 'none';
         }
     }
 </script>
-
 </body>
 </html>
+
