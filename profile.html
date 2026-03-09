@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>MotoBeast — Мій профіль</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Стилі без змін (з останньої версії profile.html) */
+        :root {
+            --mz-red: #ff0000;
+            --mz-black: #08090a;
+            --mz-gray: #f8f9fa;
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.1);
+            --border-radius: 24px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--mz-gray);
+            color: #222;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .header-top {
+            background: #fff;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            box-shadow: var(--shadow-sm);
+        }
+        .header-flex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+        .logo-icon {
+            background: var(--mz-black);
+            width: 65px;
+            height: 55px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: skewX(-15deg);
+        }
+        .logo-icon i {
+            color: var(--mz-red);
+            font-size: 34px;
+            transform: skewX(15deg);
+        }
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            line-height: 0.8;
+        }
+        .logo-text .m {
+            color: var(--mz-black);
+            font-size: 18px;
+            letter-spacing: 3px;
+        }
+        .logo-text .b {
+            color: var(--mz-red);
+            font-size: 32px;
+            font-weight: 900;
+        }
+        .top-nav {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .top-nav a {
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            transition: 0.2s;
+        }
+        .top-nav a:hover {
+            color: var(--mz-red);
+        }
+        .user-block {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .auth-btn {
+            background: var(--mz-black);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+        .auth-btn:hover {
+            background: var(--mz-red);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .user-info span {
+            font-weight: 600;
+        }
+        .profile-btn {
+            background: var(--mz-black);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+        .profile-btn:hover {
+            background: var(--mz-red);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .admin-btn {
+            background: #ffd700;
+            color: var(--mz-black);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+        .admin-btn:hover {
+            background: #ffed4e;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .logout-btn {
+            color: var(--mz-red);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 30px;
+            transition: 0.2s;
+        }
+        .logout-btn:hover {
+            background: rgba(255,0,0,0.1);
+        }
+        .contacts-premium {
+            text-align: right;
+            font-family: Arial, sans-serif;
+        }
+        .c-phone {
+            font-size: 21px;
+            font-weight: 900;
+            color: #000;
+            text-decoration: none;
+            display: block;
+        }
+        .small-text {
+            font-size: 11px;
+            color: #666;
+            display: block;
+        }
+        .moto-label {
+            font-size: 12px;
+            color: var(--mz-red);
+            font-weight: bold;
+        }
+        .cart-box {
+            width: 50px;
+            height: 50px;
+            background: var(--mz-black);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            position: relative;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .cart-box:hover {
+            background: var(--mz-red);
+        }
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--mz-red);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 900;
+            border: 2px solid #fff;
+        }
+        .nav-bar {
+            background: var(--mz-black);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
+        }
+        .nav-flex {
+            display: flex;
+            height: 60px;
+            align-items: center;
+        }
+        .search-container {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 0 20px;
+            margin: 10px 0;
+            transition: 0.3s;
+            border: 1px solid transparent;
+        }
+        .search-container:focus-within {
+            background: rgba(255,255,255,0.15);
+            border-color: var(--mz-red);
+        }
+        .search-container input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            width: 100%;
+            height: 40px;
+            outline: none;
+            font-size: 15px;
+            padding-right: 15px;
+        }
+        .search-container input::placeholder {
+            color: #aaa;
+        }
+        .search-container i {
+            color: #888;
+            font-size: 18px;
+        }
+        #maintenance-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--mz-black);
+            color: white;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: 'Orbitron';
+        }
+        #maintenance-screen i {
+            font-size: 60px;
+            color: var(--mz-red);
+            margin-bottom: 20px;
+        }
+        .profile-page {
+            margin: 40px 0;
+        }
+        .profile-card {
+            background: #fff;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        .profile-title {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 20px;
+        }
+        .profile-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .info-item {
+            background: #f5f5f5;
+            border-radius: 16px;
+            padding: 15px;
+        }
+        .info-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .orders-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+        .order-item {
+            background: #f9f9f9;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--mz-red);
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .order-date {
+            font-weight: 600;
+            color: #555;
+        }
+        .order-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .status-new { background: #ffebee; color: #c62828; }
+        .status-processing { background: #fff3e0; color: #ef6c00; }
+        .status-done { background: #e8f5e9; color: #2e7d32; }
+        .status-cancelled { background: #f5f5f5; color: #616161; }
+        .order-products {
+            margin: 10px 0;
+        }
+        .order-products table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .order-products th {
+            text-align: left;
+            padding: 8px;
+            background: #eee;
+        }
+        .order-products td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        .order-total {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--mz-red);
+            text-align: right;
+            margin-top: 10px;
+        }
+        .no-orders {
+            text-align: center;
+            padding: 40px;
+            background: #f5f5f5;
+            border-radius: 16px;
+            font-size: 18px;
+        }
+        .btn {
+            background: var(--mz-black);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.2s;
+        }
+        .btn:hover {
+            background: var(--mz-red);
+        }
+        @media (max-width: 768px) {
+            .header-flex { flex-direction: column; align-items: stretch; gap: 15px; }
+            .logo-group { justify-content: center; }
+            .top-nav { justify-content: center; }
+            .user-block { justify-content: center; }
+            .contacts-premium { text-align: center; }
+            .cart-box { margin: 0 auto; }
+            .nav-flex { height: auto; padding: 10px 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="maintenance-screen">
+        <i class="fa-solid fa-screwdriver-wrench"></i>
+        <h1>MOTO<span>BEAST</span></h1>
+        <p>Технічні роботи</p>
+    </div>
+
+    <header class="header-top">
+        <div class="container header-flex">
+            <a href="index.html" class="logo-group">
+                <div class="logo-icon"><i class="fa-solid fa-dragon"></i></div>
+                <div class="logo-text"><span class="m">MOTO</span><span class="b">BEAST</span></div>
+            </a>
+            <nav class="top-nav">
+                <a href="#">Запчастини</a><a href="#">Екіпіровка</a><a href="#">Акції</a><a href="#">Контакти</a>
+            </nav>
+            <div class="user-block">
+                <div id="auth-buttons">
+                    <button class="auth-btn" onclick="window.location.href='index.html'">На головну</button>
+                </div>
+                <div id="user-info" style="display: none;" class="user-info">
+                    <span id="user-name"></span>
+                    <a href="profile.html" class="profile-btn"><i class="fa-solid fa-user"></i> Профіль</a>
+                    <a onclick="logout()" class="logout-btn">Вийти</a>
+                </div>
+            </div>
+            <div class="contacts-premium">
+                <span class="small-text" id="promo-text">Завантаження...</span>
+                <a href="tel:+380998183988" class="c-phone" id="site-phone">380998183988</a>
+                <span class="small-text">Дзвоніть Пн-Пт 9:00–18:00</span>
+                <span class="moto-label">мотозилла мотозапчасти</span>
+            </div>
+            <div class="actions">
+                <div class="cart-box" onclick="window.location.href='cart.html'">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="badge" id="cartBadge">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="nav-bar">
+        <div class="container nav-flex">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Введіть назву запчастини або модель мотоцикла...">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+        </div>
+    </div>
+
+    <main class="container profile-page">
+        <div id="profile-content">
+            <div style="text-align: center; padding: 60px;">Завантаження...</div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAQECyI2wLqHF0BzletUPiG3ryOqWROPOE",
+            databaseURL: "https://ds-studio-app-default-rtdb.firebaseio.com",
+            projectId: "ds-studio-app"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Отримуємо поточного користувача з localStorage
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+
+        // Якщо користувач не авторизований, перенаправляємо на головну
+        if (!currentUser) {
+            window.location.href = 'index.html';
+        }
+
+        // Оновлення UI шапки
+        function updateAuthUI() {
+            if (currentUser) {
+                document.getElementById('auth-buttons').style.display = 'none';
+                document.getElementById('user-info').style.display = 'flex';
+                document.getElementById('user-name').textContent = `Привіт, ${currentUser.firstName || currentUser.username}`;
+            } else {
+                document.getElementById('auth-buttons').style.display = 'flex';
+                document.getElementById('user-info').style.display = 'none';
+            }
+        }
+        updateAuthUI();
+
+        // Вихід
+        window.logout = () => {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        };
+
+        // Налаштування (техроботи, телефон, промо) – ОНОВЛЕНО
+        onValue(ref(db, 'settings'), (snap) => {
+            const s = snap.val();
+            if (s) {
+                const maintenance = s.maintenance || false;
+                // Показуємо екран технічних робіт тільки якщо він увімкнений І користувач не адмін
+                if (maintenance && (!currentUser || currentUser.role !== 'admin')) {
+                    document.getElementById('maintenance-screen').style.display = 'flex';
+                } else {
+                    document.getElementById('maintenance-screen').style.display = 'none';
+                }
+                document.getElementById('site-phone').innerText = s.phone || '380998183988';
+                document.getElementById('promo-text').innerText = s.promoText || 'Кращі ціни на запчастини';
+            }
+        });
+
+        // Оновлення бейджа корзини
+        function updateCartBadge() {
+            const cart = JSON.parse(localStorage.getItem('motocart')) || [];
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartBadge').textContent = totalItems;
+        }
+        updateCartBadge();
+
+        // Завантаження замовлень користувача
+        function loadUserOrders() {
+            onValue(ref(db, 'orders'), (snap) => {
+                const orders = snap.val();
+                const container = document.getElementById('profile-content');
+                if (!orders) {
+                    renderProfile([]);
+                    return;
+                }
+
+                // Фільтруємо замовлення за userId (логін)
+                const userOrders = Object.keys(orders)
+                    .map(id => ({ id, ...orders[id] }))
+                    .filter(o => o.userId === currentUser.username)
+                    .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+
+                renderProfile(userOrders);
+            });
+        }
+
+        function renderProfile(orders) {
+            const container = document.getElementById('profile-content');
+            
+            // Інформація про користувача + кнопка адмінки, якщо роль admin
+            const adminButton = currentUser.role === 'admin' 
+                ? `<a href="admin.html" class="admin-btn" style="margin-left: 15px;"><i class="fa-solid fa-crown"></i> Адмінка</a>` 
+                : '';
+
+            const userHtml = `
+                <div class="profile-card">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <h1 class="profile-title">Мій профіль</h1>
+                        ${adminButton}
+                    </div>
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <div class="info-label">Логін</div>
+                            <div class="info-value">${currentUser.username}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Ім'я</div>
+                            <div class="info-value">${currentUser.firstName || '—'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Прізвище</div>
+                            <div class="info-value">${currentUser.lastName || '—'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Роль</div>
+                            <div class="info-value">${currentUser.role === 'admin' ? 'Адміністратор' : 'Користувач'}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Історія замовлень
+            let ordersHtml = `
+                <div class="profile-card">
+                    <h2 class="orders-title">Історія замовлень</h2>
+            `;
+
+            if (orders.length === 0) {
+                ordersHtml += `<div class="no-orders">У вас ще немає замовлень</div>`;
+            } else {
+                orders.forEach(order => {
+                    const date = order.createdAt ? new Date(order.createdAt).toLocaleString('uk-UA') : 'дата невідома';
+                    
+                    let statusClass = 'status-new';
+                    if (order.status === 'обробляється') statusClass = 'status-processing';
+                    else if (order.status === 'виконано') statusClass = 'status-done';
+                    else if (order.status === 'скасовано') statusClass = 'status-cancelled';
+
+                    const itemsRows = order.items.map(item => `
+                        <tr>
+                            <td>${item.name}</td>
+                            <td>${item.quantity}</td>
+                            <td>${item.price} грн</td>
+                            <td>${item.quantity * item.price} грн</td>
+                        </tr>
+                    `).join('');
+
+                    ordersHtml += `
+                        <div class="order-item">
+                            <div class="order-header">
+                                <span class="order-date">Замовлення від ${date}</span>
+                                <span class="order-status ${statusClass}">${order.status || 'новий'}</span>
+                            </div>
+                            <div class="order-products">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Товар</th>
+                                            <th>К-сть</th>
+                                            <th>Ціна</th>
+                                            <th>Сума</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${itemsRows}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="order-total">
+                                Разом: ${order.total} грн
+                            </div>
+                            ${order.delivery ? `
+                                <div style="margin-top:10px; font-size:14px;">
+                                    <strong>Доставка:</strong> 
+                                    ${order.delivery.method === 'nova' ? `Нова пошта, м. ${order.delivery.city}, відд. ${order.delivery.warehouse}` : 'Самовивіз'}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+            }
+            ordersHtml += `</div>`;
+
+            container.innerHTML = userHtml + ordersHtml;
+        }
+
+        loadUserOrders();
+
+        // Пошук (перенаправлення на головну)
+        document.getElementById('searchInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                window.location.href = 'index.html?search=' + encodeURIComponent(e.target.value);
+            }
+        });
+    </script>
+</body>
+</html>

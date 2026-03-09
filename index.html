@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>MotoBeast — магазин мото-запчастин</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --mz-red: #ff0000;
+            --mz-black: #08090a;
+            --mz-gray: #f8f9fa;
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.1);
+            --border-radius: 24px;
+            --input-radius: 16px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--mz-gray);
+            color: #222;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Шапка */
+        .header-top {
+            background: #fff;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            box-shadow: var(--shadow-sm);
+        }
+        .header-flex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+        .logo-icon {
+            background: var(--mz-black);
+            width: 65px;
+            height: 55px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: skewX(-15deg);
+            transition: 0.2s;
+        }
+        .logo-icon i {
+            color: var(--mz-red);
+            font-size: 34px;
+            transform: skewX(15deg);
+        }
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            line-height: 0.8;
+        }
+        .logo-text .m {
+            color: var(--mz-black);
+            font-size: 18px;
+            letter-spacing: 3px;
+        }
+        .logo-text .b {
+            color: var(--mz-red);
+            font-size: 32px;
+            font-weight: 900;
+        }
+        .top-nav {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .top-nav a {
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            transition: 0.2s;
+        }
+        .top-nav a:hover {
+            color: var(--mz-red);
+        }
+        .user-block {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .auth-btn {
+            background: var(--mz-black);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+        .auth-btn:hover {
+            background: var(--mz-red);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .user-info span {
+            font-weight: 600;
+        }
+        .profile-btn {
+            background: var(--mz-black);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+        .profile-btn:hover {
+            background: var(--mz-red);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .logout-btn {
+            color: var(--mz-red);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 30px;
+            transition: 0.2s;
+        }
+        .logout-btn:hover {
+            background: rgba(255,0,0,0.1);
+        }
+        .contacts-premium {
+            text-align: right;
+            font-family: Arial, sans-serif;
+        }
+        .c-phone {
+            font-size: 21px;
+            font-weight: 900;
+            color: #000;
+            text-decoration: none;
+            display: block;
+        }
+        .small-text {
+            font-size: 11px;
+            color: #666;
+            display: block;
+        }
+        .moto-label {
+            font-size: 12px;
+            color: var(--mz-red);
+            font-weight: bold;
+        }
+        .cart-box {
+            width: 50px;
+            height: 50px;
+            background: var(--mz-black);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            position: relative;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .cart-box:hover {
+            background: var(--mz-red);
+        }
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--mz-red);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 900;
+            border: 2px solid #fff;
+        }
+
+        /* Панель пошуку */
+        .nav-bar {
+            background: var(--mz-black);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
+        }
+        .nav-flex {
+            display: flex;
+            height: 60px;
+            align-items: center;
+        }
+        .search-container {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 0 20px;
+            margin: 10px 0;
+            transition: 0.3s;
+            border: 1px solid transparent;
+        }
+        .search-container:focus-within {
+            background: rgba(255,255,255,0.15);
+            border-color: var(--mz-red);
+        }
+        .search-container input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            width: 100%;
+            height: 40px;
+            outline: none;
+            font-size: 15px;
+            padding-right: 15px;
+        }
+        .search-container input::placeholder {
+            color: #aaa;
+        }
+        .search-container i {
+            color: #888;
+            font-size: 18px;
+        }
+
+        /* Екран технічних робіт */
+        #maintenance-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--mz-black);
+            color: white;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: 'Orbitron';
+        }
+        #maintenance-screen i {
+            font-size: 60px;
+            color: var(--mz-red);
+            margin-bottom: 20px;
+        }
+
+        /* Каталог (2 картки в ряд) */
+        .main { padding: 40px 0; }
+        .grid {
+            max-width: 700px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 20px;
+            border: 1px solid #f0f0f0;
+            transition: 0.3s;
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            overflow: hidden;
+            padding: 15px;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--mz-red);
+            box-shadow: var(--shadow-md);
+        }
+        .p-img {
+            height: 120px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #aaa;
+            overflow: hidden;
+        }
+        .p-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 8px;
+            color: #333;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 40px;
+        }
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .stars {
+            color: #ffc107;
+        }
+        .rating-count {
+            color: #888;
+        }
+        .price-block {
+            display: flex;
+            flex-direction: column;
+            margin: 5px 0;
+        }
+        .old-price {
+            font-size: 14px;
+            color: #888;
+            text-decoration: line-through;
+            margin-bottom: 2px;
+        }
+        .p-price {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--mz-red);
+            line-height: 1.2;
+        }
+        .buy-btn {
+            background: var(--mz-black);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: 0.2s;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+        .buy-btn:hover {
+            background: var(--mz-red);
+        }
+
+        /* Модальне вікно авторизації */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: var(--border-radius);
+            max-width: 450px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: var(--shadow-lg);
+            animation: modalFade 0.3s ease;
+        }
+        @keyframes modalFade {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #888;
+            transition: 0.2s;
+        }
+        .close:hover {
+            color: var(--mz-red);
+        }
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+            margin: 30px 0 20px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .tab-btn.active {
+            background: var(--mz-red);
+            color: white;
+        }
+        .auth-tab-content {
+            display: none;
+        }
+        .auth-tab-content.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 15px 18px;
+            border: 2px solid #eee;
+            border-radius: var(--input-radius);
+            font-family: inherit;
+            font-size: 16px;
+            transition: 0.2s;
+            background: #fafafa;
+        }
+        .form-group input:focus {
+            border-color: var(--mz-red);
+            outline: none;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(255,0,0,0.1);
+        }
+        .btn-primary {
+            background: var(--mz-black);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 18px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+            box-shadow: var(--shadow-sm);
+            margin-top: 10px;
+        }
+        .btn-primary:hover {
+            background: var(--mz-red);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .auth-message {
+            margin-top: 20px;
+            color: red;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* Адаптивність */
+        @media (max-width: 768px) {
+            .header-flex { flex-direction: column; align-items: stretch; gap: 15px; }
+            .logo-group { justify-content: center; }
+            .top-nav { justify-content: center; }
+            .user-block { justify-content: center; }
+            .contacts-premium { text-align: center; }
+            .cart-box { margin: 0 auto; }
+            .nav-flex { height: auto; padding: 10px 0; }
+            .grid {
+                max-width: 100%;
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+        @media (max-width: 480px) {
+            .container { padding: 0 12px; }
+            .p-img { height: 100px; font-size: 30px; }
+            .p-price { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="maintenance-screen">
+        <i class="fa-solid fa-screwdriver-wrench"></i>
+        <h1>MOTO<span>BEAST</span></h1>
+        <p>Технічні роботи</p>
+    </div>
+
+    <header class="header-top">
+        <div class="container header-flex">
+            <a href="index.html" class="logo-group">
+                <div class="logo-icon"><i class="fa-solid fa-dragon"></i></div>
+                <div class="logo-text"><span class="m">MOTO</span><span class="b">BEAST</span></div>
+            </a>
+            <nav class="top-nav">
+                <a href="#">Запчастини</a><a href="#">Екіпіровка</a><a href="#">Акції</a><a href="#">Контакти</a>
+            </nav>
+            <div class="user-block">
+                <div id="auth-buttons">
+                    <button class="auth-btn" onclick="showAuthModal()">Увійти</button>
+                </div>
+                <div id="user-info" style="display: none;" class="user-info">
+                    <span id="user-name"></span>
+                    <a href="profile.html" class="profile-btn"><i class="fa-solid fa-user"></i> Профіль</a>
+                    <a onclick="logout()" class="logout-btn">Вийти</a>
+                </div>
+            </div>
+            <div class="contacts-premium">
+                <span class="small-text" id="promo-text">Завантаження...</span>
+                <a href="tel:+380998183988" class="c-phone" id="site-phone">380998183988</a>
+                <span class="small-text">Дзвоніть Пн-Пт 9:00–18:00</span>
+                <span class="moto-label">мотозилла мотозапчасти</span>
+            </div>
+            <div class="actions">
+                <div class="cart-box" onclick="window.location.href='cart.html'">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="badge" id="cartBadge">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="nav-bar">
+        <div class="container nav-flex">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Введіть назву запчастини або модель мотоцикла...">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+        </div>
+    </div>
+
+    <main class="container main">
+        <div class="grid" id="product-grid"></div>
+    </main>
+
+    <!-- Модальне вікно авторизації -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAuthModal()">&times;</span>
+            <h2 style="font-size: 28px; margin-bottom: 10px;">Вхід / Реєстрація</h2>
+            
+            <div class="auth-tabs">
+                <button class="tab-btn active" onclick="switchAuthTab('login')">Вхід</button>
+                <button class="tab-btn" onclick="switchAuthTab('register')">Реєстрація</button>
+            </div>
+            
+            <div id="loginAuth" class="auth-tab-content active">
+                <div class="form-group">
+                    <label>Логін</label>
+                    <input type="text" id="login-username" placeholder="Ваш логін">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="login-password" placeholder="••••••••">
+                </div>
+                <button class="btn-primary" onclick="signIn()">Увійти</button>
+            </div>
+            
+            <div id="registerAuth" class="auth-tab-content">
+                <div class="form-group">
+                    <label>Логін *</label>
+                    <input type="text" id="reg-username" placeholder="Унікальний логін">
+                </div>
+                <div class="form-group">
+                    <label>Пароль *</label>
+                    <input type="password" id="reg-password" placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label>Ім'я</label>
+                    <input type="text" id="reg-firstname" placeholder="Ім'я">
+                </div>
+                <div class="form-group">
+                    <label>Прізвище</label>
+                    <input type="text" id="reg-lastname" placeholder="Прізвище">
+                </div>
+                <button class="btn-primary" onclick="signUp()">Зареєструватися</button>
+            </div>
+            
+            <div id="authMessage" class="auth-message"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAQECyI2wLqHF0BzletUPiG3ryOqWROPOE",
+            databaseURL: "https://ds-studio-app-default-rtdb.firebaseio.com",
+            projectId: "ds-studio-app"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        let allProducts = [];
+
+        // Стан авторизації
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+        updateAuthUI();
+
+        // Налаштування (техроботи, телефон, промо)
+        onValue(ref(db, 'settings'), (snap) => {
+            const s = snap.val();
+            if (s) {
+                const maintenance = s.maintenance || false;
+                if (maintenance && (!currentUser || currentUser.role !== 'admin')) {
+                    document.getElementById('maintenance-screen').style.display = 'flex';
+                } else {
+                    document.getElementById('maintenance-screen').style.display = 'none';
+                }
+                document.getElementById('site-phone').innerText = s.phone || '380998183988';
+                document.getElementById('promo-text').innerText = s.promoText || 'Кращі ціни на запчастини';
+            }
+        });
+
+        // Функції корзини
+        function getCart() {
+            return JSON.parse(localStorage.getItem('motocart')) || [];
+        }
+
+        function saveCart(cart) {
+            localStorage.setItem('motocart', JSON.stringify(cart));
+            updateCartBadge();
+        }
+
+        function updateCartBadge() {
+            const cart = getCart();
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartBadge').textContent = totalItems;
+        }
+
+        window.addToCart = (product) => {
+            const cart = getCart();
+            const existing = cart.find(item => item.id === product.id);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            saveCart(cart);
+            alert('Товар додано до кошика');
+        };
+
+        updateCartBadge();
+
+        // Допоміжна функція для відображення зірок
+        function renderStars(rating) {
+            const full = '★'.repeat(Math.floor(rating));
+            const half = rating % 1 >= 0.5 ? '½' : '';
+            const empty = '☆'.repeat(5 - Math.ceil(rating));
+            return full + half + empty;
+        }
+
+        // Відмальовування товарів
+        function renderProducts(products) {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = products.map(item => {
+                const safeName = item.name.replace(/'/g, "\\'");
+                const imageHtml = item.imageUrl ? 
+                    `<img src="${item.imageUrl}" alt="${item.name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fa-solid ${item.icon || 'fa-box'}\'></i>';">` : 
+                    `<i class="fa-solid ${item.icon || 'fa-box'}"></i>`;
+                
+                const price = Number(item.price).toLocaleString('uk-UA') + ' грн';
+                const oldPrice = item.old_price ? Number(item.old_price).toLocaleString('uk-UA') + ' грн' : null;
+                const rating = item.rating || 0;
+                const reviewsCount = item.reviewsCount || 0;
+
+                return `
+                    <a href="product.html?id=${item.id}" class="card">
+                        <div class="card-content">
+                            <div class="p-img">${imageHtml}</div>
+                            <h3>${item.name}</h3>
+                            <div class="rating">
+                                <span class="stars">${renderStars(rating)}</span>
+                                <span class="rating-count">(${reviewsCount})</span>
+                            </div>
+                            <div class="price-block">
+                                ${oldPrice ? `<span class="old-price">${oldPrice}</span>` : ''}
+                                <span class="p-price">${price}</span>
+                            </div>
+                            <button class="buy-btn" onclick="event.preventDefault(); event.stopPropagation(); addToCart({
+                                id: '${item.id}',
+                                name: '${safeName}',
+                                price: ${item.price},
+                                icon: '${item.icon || 'fa-box'}',
+                                imageUrl: '${item.imageUrl || ''}'
+                            })">КУПИТИ</button>
+                        </div>
+                    </a>
+                `;
+            }).join('');
+        }
+
+        onValue(ref(db, 'products'), (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                allProducts = Object.keys(data).map(id => ({ id, ...data[id] }));
+                renderProducts(allProducts);
+            }
+        });
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = allProducts.filter(p => p.name.toLowerCase().includes(query));
+            renderProducts(filtered);
+        });
+
+        // ========== АВТОРИЗАЦІЯ ==========
+        function updateAuthUI() {
+            if (currentUser) {
+                document.getElementById('auth-buttons').style.display = 'none';
+                document.getElementById('user-info').style.display = 'flex';
+                document.getElementById('user-name').textContent = `Привіт, ${currentUser.firstName || currentUser.username}`;
+            } else {
+                document.getElementById('auth-buttons').style.display = 'flex';
+                document.getElementById('user-info').style.display = 'none';
+            }
+        }
+
+        window.showAuthModal = () => {
+            document.getElementById('authModal').style.display = 'flex';
+        };
+
+        window.closeAuthModal = () => {
+            document.getElementById('authModal').style.display = 'none';
+            document.getElementById('authMessage').innerText = '';
+        };
+
+        window.switchAuthTab = (tab) => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.auth-tab-content').forEach(c => c.classList.remove('active'));
+            if (tab === 'login') {
+                document.querySelector('[onclick="switchAuthTab(\'login\')"]').classList.add('active');
+                document.getElementById('loginAuth').classList.add('active');
+            } else {
+                document.querySelector('[onclick="switchAuthTab(\'register\')"]').classList.add('active');
+                document.getElementById('registerAuth').classList.add('active');
+            }
+        };
+
+        window.signUp = async () => {
+            const username = document.getElementById('reg-username').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            const firstName = document.getElementById('reg-firstname').value.trim();
+            const lastName = document.getElementById('reg-lastname').value.trim();
+
+            if (!username || !password) {
+                document.getElementById('authMessage').innerText = 'Логін і пароль обов\'язкові';
+                return;
+            }
+
+            const snapshot = await get(child(ref(db), 'users/' + username));
+            if (snapshot.exists()) {
+                document.getElementById('authMessage').innerText = 'Користувач з таким логіном вже існує';
+                return;
+            }
+
+            const userData = {
+                username,
+                password,
+                firstName,
+                lastName,
+                role: 'user',
+                createdAt: new Date().toISOString()
+            };
+            await set(ref(db, 'users/' + username), userData);
+            
+            currentUser = userData;
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+            updateAuthUI();
+            closeAuthModal();
+        };
+
+        window.signIn = async () => {
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            if (!username || !password) {
+                document.getElementById('authMessage').innerText = 'Введіть логін і пароль';
+                return;
+            }
+
+            const snapshot = await get(child(ref(db), 'users/' + username));
+            if (!snapshot.exists()) {
+                document.getElementById('authMessage').innerText = 'Невірний логін або пароль';
+                return;
+            }
+
+            const userData = snapshot.val();
+            if (userData.password !== password) {
+                document.getElementById('authMessage').innerText = 'Невірний логін або пароль';
+                return;
+            }
+
+            currentUser = userData;
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+            updateAuthUI();
+            closeAuthModal();
+        };
+
+        window.logout = () => {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateAuthUI();
+        };
+    </script>
+</body>
+</html>
