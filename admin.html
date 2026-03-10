@@ -7,7 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="style/main.css">
     <style>
+        /* Стилі адмін-панелі (ті самі, що були, лише доповнені) */
         :root {
             --red: #ff0000;
             --black: #0d0e10;
@@ -26,7 +28,6 @@
             overflow: hidden;
         }
 
-        /* Sidebar */
         .sidebar {
             width: 280px;
             background: var(--black);
@@ -44,9 +45,6 @@
             text-decoration: none;
             border-bottom: 2px solid var(--red);
             padding-bottom: 10px;
-        }
-        .logo span {
-            color: var(--red);
         }
         .nav-btn {
             color: #888;
@@ -70,7 +68,6 @@
             color: white;
         }
 
-        /* Основний контент */
         .main-wrapper {
             flex: 1;
             display: flex;
@@ -107,7 +104,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Картки */
         .admin-card {
             background: white;
             padding: 25px;
@@ -122,7 +118,6 @@
             gap: 25px;
         }
 
-        /* Форми */
         input, select, textarea {
             width: 100%;
             padding: 12px;
@@ -170,7 +165,6 @@
             font-size: 18px;
         }
 
-        /* Таблиці */
         .table-responsive {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -195,23 +189,10 @@
             font-size: 14px;
         }
 
-        /* Бейджі */
-        .badge-stock {
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 800;
-        }
-        .in-stock {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-        .out-stock {
-            background: #ffebee;
-            color: #c62828;
-        }
+        .badge-stock { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; }
+        .in-stock { background: #e8f5e9; color: #2e7d32; }
+        .out-stock { background: #ffebee; color: #c62828; }
 
-        /* Замовлення */
         .order-item {
             background: #f9f9f9;
             border-radius: 12px;
@@ -250,14 +231,12 @@
             margin: 5px 0 0 20px;
         }
 
-        /* Користувачі */
         .role-select {
             padding: 5px;
             border-radius: 6px;
             border: 1px solid #ddd;
         }
 
-        /* Статистика */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -303,7 +282,6 @@
             color: #c62828;
         }
 
-        /* Експорт/Імпорт */
         .export-import {
             display: flex;
             gap: 15px;
@@ -317,12 +295,11 @@
             background: white;
         }
 
-        /* Відгуки */
-        .review-row {
+        .review-item {
             background: #f9f9f9;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
         }
         .review-header {
             display: flex;
@@ -339,7 +316,6 @@
             gap: 10px;
         }
 
-        /* Нотифікація */
         #toast {
             position: fixed;
             bottom: 20px;
@@ -353,7 +329,6 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
-        /* Адаптивність */
         @media (max-width: 768px) {
             body {
                 flex-direction: column;
@@ -401,6 +376,10 @@
         <div class="nav-btn" onclick="showSection('users')"><i class="fa-solid fa-users"></i><span> Користувачі</span></div>
         <div class="nav-btn" onclick="showSection('stats')"><i class="fa-solid fa-chart-simple"></i><span> Статистика</span></div>
         <div class="nav-btn" onclick="showSection('reviews')"><i class="fa-solid fa-star"></i><span> Відгуки</span></div>
+        <div class="nav-btn" onclick="showSection('categories')"><i class="fa-solid fa-folder-tree"></i><span> Категорії</span></div>
+        <div class="nav-btn" onclick="showSection('brands')"><i class="fa-solid fa-motorcycle"></i><span> Марки</span></div>
+        <div class="nav-btn" onclick="showSection('models')"><i class="fa-solid fa-list"></i><span> Моделі</span></div>
+        <div class="nav-btn" onclick="showSection('productModels')"><i class="fa-solid fa-link"></i><span> Сумісність</span></div>
         <div class="nav-btn" onclick="showSection('sys')"><i class="fa-solid fa-gears"></i><span> Налаштування</span></div>
     </div>
 
@@ -412,7 +391,7 @@
 
         <div class="content">
             
-            <!-- Секція Товари -->
+            <!-- Секція Товари (з вибором категорії) -->
             <div id="inventory" class="section active">
                 <div class="grid-main">
                     <div class="admin-card">
@@ -449,6 +428,16 @@
                         <label>Іконка (без fa-)</label>
                         <input type="text" id="p-icon" value="gear">
 
+                        <label>Категорія *</label>
+                        <select id="p-category" required>
+                            <option value="">Виберіть категорію</option>
+                        </select>
+
+                        <label>Сумісні моделі</label>
+                        <div id="models-checkboxes" style="max-height:200px; overflow-y:auto; border:1px solid #ddd; padding:10px; margin-bottom:15px;">
+                            Завантаження...
+                        </div>
+
                         <button class="btn-action" id="main-btn" onclick="handleProduct()">ОПУБЛІКУВАТИ</button>
                         <button id="cancel-btn" style="display:none; background:none; border:none; color:#888; margin-top:10px;" onclick="resetForm()">Скасувати</button>
                     </div>
@@ -468,6 +457,7 @@
                                         <th>Склад</th>
                                         <th>Рейтинг</th>
                                         <th>Відгуки</th>
+                                        <th>Категорія</th>
                                         <th>Дії</th>
                                     </tr>
                                 </thead>
@@ -481,18 +471,9 @@
             <!-- Секція Замовлення -->
             <div id="orders" class="section">
                 <div class="admin-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
-                        <h3>Замовлення</h3>
-                        <div>
-                            <label>Період: </label>
-                            <select id="export-period">
-                                <option value="today">Сьогодні</option>
-                                <option value="week">Останній тиждень</option>
-                                <option value="month">Останній місяць</option>
-                                <option value="all">Всі</option>
-                            </select>
-                            <button class="btn-action" style="width: auto; padding: 10px 20px;" onclick="exportOrders()">📥 Експорт CSV</button>
-                        </div>
+                    <h3>Замовлення</h3>
+                    <div class="export-import">
+                        <button class="btn-action" style="width: auto;" onclick="exportOrders()">📥 Експорт CSV</button>
                     </div>
                     <div id="orders-list"></div>
                 </div>
@@ -506,31 +487,21 @@
                 </div>
             </div>
 
-            <!-- Статистика -->
+            <!-- Секція Статистика -->
             <div id="stats" class="section">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-title">📊 Замовлень за 7 днів</div>
-                        <div class="stat-value" id="orders-week">0</div>
-                        <div class="chart-container">
-                            <canvas id="orders-chart"></canvas>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">🔥 Найпопулярніші товари</div>
-                        <div id="popular-products"></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">⚠️ Товари з низьким залишком (≤3)</div>
-                        <div id="low-stock"></div>
-                    </div>
+                <div class="stats-grid" id="stats-cards"></div>
+                <div class="admin-card">
+                    <h3>Популярні товари</h3>
+                    <div id="popular-products"></div>
                 </div>
                 <div class="admin-card">
-                    <h3>📦 Імпорт товарів з CSV</h3>
-                    <p>Формат: назва, артикул, бренд, ціна, стара_ціна, кількість, опис, характеристики, icon, imageUrl</p>
-                    <div class="export-import">
-                        <input type="file" id="csv-file" accept=".csv" class="file-input">
-                        <button class="btn-action" style="width: auto;" onclick="importProducts()">Завантажити та імпортувати</button>
+                    <h3>Товари, що закінчуються</h3>
+                    <div id="low-stock"></div>
+                </div>
+                <div class="admin-card">
+                    <h3>Графік замовлень</h3>
+                    <div class="chart-container">
+                        <canvas id="ordersChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -543,33 +514,107 @@
                 </div>
             </div>
 
-            <!-- Налаштування -->
-            <div id="sys" class="section">
-                <div class="admin-card" style="max-width: 600px;">
-                    <h3>Налаштування</h3>
-                    <label>Телефон</label>
-                    <input type="text" id="sys-phone" value="380998183988">
-                    
-                    <label>Промо-текст</label>
-                    <input type="text" id="sys-promo" placeholder="Знижка 10%">
-
-                    <hr>
-                    
-                    <h4>Telegram</h4>
-                    <label>Token бота</label>
-                    <input type="text" id="telegram-token" placeholder="123456:ABC...">
-                    
-                    <label>Chat ID</label>
-                    <input type="text" id="telegram-chat" placeholder="123456789">
-
-                    <hr>
-                    
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0;">
-                        <span>Технічні роботи</span>
-                        <input type="checkbox" id="sys-maintenance" style="width:auto;">
+            <!-- Секція Категорії -->
+            <div id="categories" class="section">
+                <div class="grid-main">
+                    <div class="admin-card">
+                        <h3 id="category-form-mode">Додати категорію</h3>
+                        <input type="hidden" id="edit-category-id">
+                        <label>Назва категорії *</label>
+                        <input type="text" id="category-name" placeholder="Лампи та світло">
+                        <label>URL зображення (необов'язково)</label>
+                        <input type="url" id="category-image" placeholder="https://...">
+                        <label>Батьківська категорія (необов'язково)</label>
+                        <select id="category-parent">
+                            <option value="">(коренева)</option>
+                        </select>
+                        <button class="btn-action" onclick="handleCategory()">ЗБЕРЕГТИ</button>
+                        <button id="cancel-category-btn" style="display:none; background:none; border:none; color:#888; margin-top:10px;" onclick="resetCategoryForm()">Скасувати</button>
                     </div>
-                    
-                    <button class="btn-action" onclick="saveSystem()">ЗБЕРЕГТИ</button>
+                    <div class="admin-card">
+                        <h3>Список категорій</h3>
+                        <div class="table-responsive" id="categories-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Секція Марки -->
+            <div id="brands" class="section">
+                <div class="grid-main">
+                    <div class="admin-card">
+                        <h3 id="brand-form-mode">Додати марку</h3>
+                        <input type="hidden" id="edit-brand-id">
+                        <label>Назва марки *</label>
+                        <input type="text" id="brand-name" placeholder="Honda">
+                        <label>URL зображення (необов'язково)</label>
+                        <input type="url" id="brand-image" placeholder="https://...">
+                        <button class="btn-action" onclick="handleBrand()">ЗБЕРЕГТИ</button>
+                        <button id="cancel-brand-btn" style="display:none; background:none; border:none; color:#888; margin-top:10px;" onclick="resetBrandForm()">Скасувати</button>
+                    </div>
+                    <div class="admin-card">
+                        <h3>Список марок</h3>
+                        <div class="table-responsive" id="brands-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Секція Моделі -->
+            <div id="models" class="section">
+                <div class="grid-main">
+                    <div class="admin-card">
+                        <h3 id="model-form-mode">Додати модель</h3>
+                        <input type="hidden" id="edit-model-id">
+                        <label>Назва моделі *</label>
+                        <input type="text" id="model-name" placeholder="CBR600RR">
+                        <label>Марка *</label>
+                        <select id="model-brand"></select>
+                        <label>URL зображення (необов'язково)</label>
+                        <input type="url" id="model-image" placeholder="https://...">
+                        <button class="btn-action" onclick="handleModel()">ЗБЕРЕГТИ</button>
+                        <button id="cancel-model-btn" style="display:none; background:none; border:none; color:#888; margin-top:10px;" onclick="resetModelForm()">Скасувати</button>
+                    </div>
+                    <div class="admin-card">
+                        <h3>Список моделей</h3>
+                        <div class="table-responsive" id="models-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Секція Сумісність (товари-моделі) -->
+            <div id="productModels" class="section">
+                <div class="admin-card">
+                    <h3>Прив'язка товарів до моделей</h3>
+                    <p>Редагується безпосередньо в картці товару (пункт "Склад").</p>
+                    <div class="table-responsive" id="productModels-list"></div>
+                </div>
+            </div>
+
+            <!-- Секція Налаштування -->
+            <div id="sys" class="section">
+                <div class="grid-main">
+                    <div class="admin-card">
+                        <h3>Загальні налаштування</h3>
+                        <label>Телефон</label>
+                        <input type="text" id="sys-phone" placeholder="380998183988">
+                        <label>Промо-текст</label>
+                        <input type="text" id="sys-promo" placeholder="Кращі ціни на запчастини">
+                        <label>Режим технічних робіт</label>
+                        <select id="sys-maintenance">
+                            <option value="false">Вимкнено</option>
+                            <option value="true">Увімкнено</option>
+                        </select>
+                        <label>Telegram Bot Token</label>
+                        <input type="text" id="sys-telegram-token" placeholder="123456:ABC...">
+                        <label>Telegram Chat ID</label>
+                        <input type="text" id="sys-telegram-chat" placeholder="-100123456789">
+                        <button class="btn-action" onclick="saveSystem()">ЗБЕРЕГТИ</button>
+                    </div>
+                    <div class="admin-card">
+                        <h3>Імпорт/Експорт</h3>
+                        <button class="btn-action" style="margin-bottom:15px;" onclick="exportAll()">Експортувати всі дані (JSON)</button>
+                        <input type="file" id="importFile" accept=".json" class="file-input">
+                        <button class="btn-action" onclick="importAll()">Імпортувати дані (JSON)</button>
+                    </div>
                 </div>
             </div>
 
@@ -578,7 +623,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, onValue, remove, update, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, set, onValue, remove, update, get, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAQECyI2wLqHF0BzletUPiG3ryOqWROPOE",
@@ -589,7 +634,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Перевірка адміна
         let currentUser = JSON.parse(localStorage.getItem('currentUser'));
         if (!currentUser || currentUser.role !== 'admin') {
             alert('Доступ заборонено. Тільки для адміністраторів.');
@@ -609,14 +653,53 @@
             document.getElementById(id).classList.add('active');
             event.currentTarget.classList.add('active');
             document.getElementById('view-title').innerText = event.currentTarget.innerText.trim();
-            if (id === 'orders') loadOrders();
+            if (id === 'inventory') loadProducts();
+            else if (id === 'orders') loadOrders();
             else if (id === 'users') loadUsers();
             else if (id === 'stats') loadStats();
             else if (id === 'reviews') loadReviewsForAdmin();
+            else if (id === 'categories') loadCategories();
+            else if (id === 'brands') loadBrands();
+            else if (id === 'models') { loadBrandsSelect(); loadModels(); }
+            else if (id === 'productModels') loadProductModels();
+            else if (id === 'sys') loadSystem();
         };
 
-        // ========== ТОВАРИ ==========
-        window.handleProduct = () => {
+        // ========== ТОВАРИ (СКЛАД) ==========
+        async function loadLeafCategories(selectedCategory = '') {
+            const snap = await get(ref(db, 'categories'));
+            const categories = snap.val() || {};
+            const allIds = Object.keys(categories);
+            const parentIds = new Set();
+            allIds.forEach(id => {
+                const cat = categories[id];
+                if (cat.parent) parentIds.add(cat.parent);
+            });
+            const leafIds = allIds.filter(id => !parentIds.has(id));
+            let options = '<option value="">Виберіть категорію</option>';
+            leafIds.forEach(id => {
+                options += `<option value="${id}" ${selectedCategory === id ? 'selected' : ''}>${categories[id].name}</option>`;
+            });
+            document.getElementById('p-category').innerHTML = options;
+        }
+
+        async function loadModelsCheckboxes(selected = {}) {
+            const modelsSnap = await get(ref(db, 'models'));
+            const models = modelsSnap.val() || {};
+            let html = '';
+            Object.keys(models).forEach(id => {
+                const m = models[id];
+                html += `
+                    <div>
+                        <input type="checkbox" class="model-checkbox" value="${id}" id="model-${id}" ${selected[id] ? 'checked' : ''}>
+                        <label for="model-${id}">${m.name}</label>
+                    </div>
+                `;
+            });
+            document.getElementById('models-checkboxes').innerHTML = html || '<p>Немає моделей</p>';
+        }
+
+        window.handleProduct = async () => {
             const editId = document.getElementById('edit-id').value;
             const id = editId || "item_" + Date.now();
             const data = {
@@ -629,47 +712,28 @@
                 imageUrl: document.getElementById('p-image').value,
                 desc: document.getElementById('p-desc').value,
                 specs: document.getElementById('p-specs').value,
-                icon: document.getElementById('p-icon').value ? 'fa-' + document.getElementById('p-icon').value : 'fa-box'
+                icon: document.getElementById('p-icon').value ? 'fa-' + document.getElementById('p-icon').value : 'fa-box',
+                categoryId: document.getElementById('p-category').value
             };
 
-            if(data.name && data.price) {
-                set(ref(db, 'products/' + id), data).then(() => {
-                    notify(editId ? "Товар оновлено!" : "Товар додано!");
-                    resetForm();
-                });
-            } else {
-                notify("Заповніть назву та ціну");
+            if(!data.name || !data.price || !data.categoryId) {
+                notify("Заповніть назву, ціну та категорію");
+                return;
             }
+
+            await set(ref(db, 'products/' + id), data);
+
+            const checkboxes = document.querySelectorAll('.model-checkbox:checked');
+            const links = {};
+            checkboxes.forEach(cb => { links[cb.value] = true; });
+            await set(ref(db, 'productModels/' + id), links);
+
+            notify(editId ? "Товар оновлено!" : "Товар додано!");
+            resetForm();
         };
 
-        onValue(ref(db, 'products'), (snap) => {
-            const data = snap.val();
-            const list = document.getElementById('inventory-list');
-            list.innerHTML = "";
-            if(data) {
-                Object.keys(data).forEach(id => {
-                    const p = data[id];
-                    const stockClass = p.stock > 0 ? 'in-stock' : 'out-stock';
-                    list.innerHTML += `
-                        <tr>
-                            <td><b>${p.name || ''}</b></td>
-                            <td>${p.article || ''}</td>
-                            <td>${p.price || 0} грн</td>
-                            <td>${p.old_price ? p.old_price + ' грн' : ''}</td>
-                            <td><span class="badge-stock ${stockClass}">${p.stock > 0 ? 'Є ('+p.stock+')' : 'Немає'}</span></td>
-                            <td>${p.rating ? p.rating.toFixed(1) : '0.0'}</td>
-                            <td>${p.reviewsCount || 0}</td>
-                            <td>
-                                <button class="btn-edit" onclick="editMode('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button class="btn-del" onclick="deleteP('${id}')"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>`;
-                });
-            }
-        });
-
         window.editMode = (id) => {
-            onValue(ref(db, 'products/' + id), (snap) => {
+            onValue(ref(db, 'products/' + id), async (snap) => {
                 const p = snap.val();
                 document.getElementById('edit-id').value = id;
                 document.getElementById('p-name').value = p.name || "";
@@ -682,6 +746,12 @@
                 document.getElementById('p-desc').value = p.desc || "";
                 document.getElementById('p-specs').value = p.specs || "";
                 document.getElementById('p-icon').value = p.icon ? p.icon.replace('fa-', '') : 'gear';
+                await loadLeafCategories(p.categoryId || '');
+
+                onValue(ref(db, 'productModels/' + id), (linkSnap) => {
+                    const links = linkSnap.val() || {};
+                    loadModelsCheckboxes(links);
+                }, { onlyOnce: true });
                 
                 document.getElementById('form-mode').innerText = "Редагування";
                 document.getElementById('main-btn').innerText = "ЗБЕРЕГТИ";
@@ -701,409 +771,633 @@
             document.getElementById('p-specs').value = "";
             document.getElementById('p-image').value = "";
             document.getElementById('p-icon').value = "gear";
+            loadLeafCategories('');
             document.getElementById('form-mode').innerText = "Додати товар";
             document.getElementById('main-btn').innerText = "ОПУБЛІКУВАТИ";
             document.getElementById('cancel-btn').style.display = "none";
+            loadModelsCheckboxes({});
         };
 
-        window.deleteP = (id) => { if(confirm("Видалити?")) remove(ref(db, 'products/' + id)); };
+        window.deleteP = (id) => {
+            if (confirm("Видалити товар?")) {
+                remove(ref(db, 'products/' + id));
+                remove(ref(db, 'productModels/' + id));
+            }
+        };
+
+        function loadProducts() {
+            onValue(ref(db, 'products'), (snap) => {
+                const data = snap.val();
+                const list = document.getElementById('inventory-list');
+                list.innerHTML = "";
+                if(data) {
+                    onValue(ref(db, 'categories'), (catSnap) => {
+                        const cats = catSnap.val() || {};
+                        Object.keys(data).forEach(id => {
+                            const p = data[id];
+                            const stockClass = p.stock > 0 ? 'in-stock' : 'out-stock';
+                            const catName = p.categoryId ? (cats[p.categoryId]?.name || '?') : '-';
+                            list.innerHTML += `
+                                <tr>
+                                    <td><b>${p.name || ''}</b></td>
+                                    <td>${p.article || ''}</td>
+                                    <td>${p.price || 0} грн</td>
+                                    <td>${p.old_price ? p.old_price + ' грн' : ''}</td>
+                                    <td><span class="badge-stock ${stockClass}">${p.stock > 0 ? 'Є ('+p.stock+')' : 'Немає'}</span></td>
+                                    <td>${p.rating ? p.rating.toFixed(1) : '0.0'}</td>
+                                    <td>${p.reviewsCount || 0}</td>
+                                    <td>${catName}</td>
+                                    <td>
+                                        <button class="btn-edit" onclick="editMode('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                                        <button class="btn-del" onclick="deleteP('${id}')"><i class="fa-solid fa-trash"></i></button>
+                                    </td>
+                                </tr>`;
+                        });
+                    }, { onlyOnce: true });
+                }
+            });
+        }
 
         // ========== ЗАМОВЛЕННЯ ==========
-        let allOrders = [];
-        function loadOrders() {
+        window.loadOrders = () => {
             onValue(ref(db, 'orders'), (snap) => {
                 const orders = snap.val();
-                allOrders = orders ? Object.keys(orders).map(id => ({ id, ...orders[id] })) : [];
-                renderOrdersList(allOrders);
-            });
-        }
-
-        function renderOrdersList(orders) {
-            const container = document.getElementById('orders-list');
-            if (!orders.length) {
-                container.innerHTML = 'Замовлень немає.';
-                return;
-            }
-            let html = '';
-            const sorted = [...orders].sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-            sorted.forEach(order => {
-                const date = order.createdAt ? new Date(order.createdAt).toLocaleString('uk-UA') : 'дата?';
-                const fullName = [order.customer?.lastName, order.customer?.firstName, order.customer?.middleName].filter(Boolean).join(' ') || 'не вказано';
-                
-                let deliveryStr = '';
-                if (order.delivery) {
-                    deliveryStr = order.delivery.method === 'nova' 
-                        ? `НП: ${order.delivery.city}, ${order.delivery.warehouse}` 
-                        : 'Самовивіз';
+                const container = document.getElementById('orders-list');
+                if (!orders) {
+                    container.innerHTML = '<p>Немає замовлень</p>';
+                    return;
                 }
-                
-                html += `
-                    <div class="order-item">
-                        <div class="order-header">
-                            <span><strong>#${order.id.slice(-6)}</strong> ${date}</span>
-                            <select class="order-status" data-id="${order.id}" style="padding:5px;">
-                                <option value="новий" ${order.status === 'новий' ? 'selected' : ''}>Новий</option>
-                                <option value="обробляється" ${order.status === 'обробляється' ? 'selected' : ''}>В роботі</option>
-                                <option value="виконано" ${order.status === 'виконано' ? 'selected' : ''}>Виконано</option>
-                                <option value="скасовано" ${order.status === 'скасовано' ? 'selected' : ''}>Скасовано</option>
-                            </select>
-                        </div>
-                        <div class="order-body">
-                            <div class="order-customer">
-                                <div><i class="fa-solid fa-user"></i> ${fullName}</div>
-                                <div><i class="fa-solid fa-phone"></i> ${order.customer?.phone || ''}</div>
-                                <div><i class="fa-solid fa-truck"></i> ${deliveryStr}</div>
-                                ${order.comment ? `<div><i class="fa-solid fa-comment"></i> ${order.comment}</div>` : ''}
+                let html = '';
+                Object.keys(orders).reverse().forEach(id => {
+                    const o = orders[id];
+                    const date = o.createdAt ? new Date(o.createdAt).toLocaleString('uk-UA') : 'немає дати';
+                    const fullName = [o.customer?.lastName, o.customer?.firstName, o.customer?.middleName].filter(Boolean).join(' ') || 'не вказано';
+                    const delivery = o.delivery?.method === 'nova' 
+                        ? `Нова пошта: ${o.delivery.city}, №${o.delivery.warehouse}`
+                        : 'Самовивіз';
+                    const itemsList = o.items?.map(item => `<li>${item.name} — ${item.quantity} шт. × ${item.price} грн</li>`).join('') || '';
+                    html += `
+                        <div class="order-item">
+                            <div class="order-header">
+                                <span><strong>Замовлення #${id.slice(-6)}</strong> від ${date}</span>
+                                <select class="order-status" onchange="updateOrderStatus('${id}', this.value)">
+                                    <option value="новий" ${o.status === 'новий' ? 'selected' : ''}>Новий</option>
+                                    <option value="обробляється" ${o.status === 'обробляється' ? 'selected' : ''}>Обробляється</option>
+                                    <option value="виконано" ${o.status === 'виконано' ? 'selected' : ''}>Виконано</option>
+                                    <option value="скасовано" ${o.status === 'скасовано' ? 'selected' : ''}>Скасовано</option>
+                                </select>
                             </div>
-                            <div class="order-products">
-                                <b>Товари:</b>
-                                <ul>
-                                    ${order.items ? order.items.map(item => `<li>${item.name} — ${item.quantity} шт. × ${item.price} грн</li>`).join('') : ''}
-                                </ul>
-                                <b>Сума: ${order.total} грн</b>
+                            <div class="order-body">
+                                <div class="order-customer">
+                                    <strong>${fullName}</strong><br>
+                                    📞 ${o.customer?.phone}<br>
+                                    🚚 ${delivery}<br>
+                                    ${o.comment ? `💬 ${o.comment}` : ''}
+                                </div>
+                                <div class="order-products">
+                                    <strong>Товари:</strong>
+                                    <ul>${itemsList}</ul>
+                                    <strong>Загальна сума: ${o.total} грн</strong>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-
-            document.querySelectorAll('.order-status').forEach(select => {
-                select.addEventListener('change', (e) => {
-                    const orderId = e.target.dataset.id;
-                    const newStatus = e.target.value;
-                    update(ref(db, `orders/${orderId}`), { status: newStatus })
-                        .then(() => notify('Статус оновлено'));
+                    `;
                 });
+                container.innerHTML = html;
             });
-        }
-
-        window.exportOrders = () => {
-            const period = document.getElementById('export-period').value;
-            let filteredOrders = [...allOrders];
-
-            const now = new Date();
-            if (period === 'today') {
-                const todayStr = now.toISOString().split('T')[0];
-                filteredOrders = allOrders.filter(o => o.createdAt && o.createdAt.startsWith(todayStr));
-            } else if (period === 'week') {
-                const weekAgo = new Date(now.setDate(now.getDate() - 7));
-                filteredOrders = allOrders.filter(o => new Date(o.createdAt) >= weekAgo);
-            } else if (period === 'month') {
-                const monthAgo = new Date(now.setMonth(now.getMonth() - 1));
-                filteredOrders = allOrders.filter(o => new Date(o.createdAt) >= monthAgo);
-            }
-
-            if (filteredOrders.length === 0) {
-                notify('Немає замовлень за обраний період');
-                return;
-            }
-
-            let csv = 'ID;Дата;ПІБ;Телефон;Доставка;Коментар;Товари;Сума\n';
-            filteredOrders.forEach(o => {
-                const date = o.createdAt ? new Date(o.createdAt).toLocaleString('uk-UA') : '';
-                const fullName = [o.customer?.lastName, o.customer?.firstName, o.customer?.middleName].filter(Boolean).join(' ');
-                const delivery = o.delivery ? (o.delivery.method === 'nova' ? `НП ${o.delivery.city} ${o.delivery.warehouse}` : 'Самовивіз') : '';
-                const items = o.items ? o.items.map(i => `${i.name} (${i.quantity}х${i.price})`).join(', ') : '';
-                csv += `${o.id};${date};${fullName};${o.customer?.phone};${delivery};${o.comment || ''};"${items}";${o.total}\n`;
-            });
-
-            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `orders_${period}_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-            notify('Експорт завершено');
         };
 
-        // ========== ІМПОРТ ТОВАРІВ ==========
-        window.importProducts = () => {
-            const fileInput = document.getElementById('csv-file');
-            if (!fileInput.files.length) {
-                notify('Оберіть CSV-файл');
-                return;
-            }
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                const text = e.target.result;
-                const lines = text.split('\n').filter(line => line.trim() !== '');
-                let success = 0;
-                for (let i = 0; i < lines.length; i++) {
-                    const parts = lines[i].split(',').map(s => s.trim());
-                    if (parts.length < 4) continue;
-                    const [name, article, brand, priceStr, oldPriceStr, stockStr, desc, specs, icon, imageUrl] = parts;
-                    const id = "item_" + Date.now() + "_" + i;
-                    const product = {
-                        name: name || '',
-                        article: article || '',
-                        brand: brand || '',
-                        price: Number(priceStr) || 0,
-                        old_price: oldPriceStr ? Number(oldPriceStr) : null,
-                        stock: Number(stockStr) || 0,
-                        desc: desc || '',
-                        specs: specs || '',
-                        icon: icon ? 'fa-' + icon : 'fa-box',
-                        imageUrl: imageUrl || ''
-                    };
-                    if (product.name && product.price > 0) {
-                        await set(ref(db, 'products/' + id), product);
-                        success++;
-                    }
-                }
-                notify(`Імпорт завершено. Додано ${success} товарів.`);
-                fileInput.value = '';
-            };
-            reader.readAsText(file, 'UTF-8');
+        window.updateOrderStatus = (orderId, status) => {
+            update(ref(db, 'orders/' + orderId), { status }).then(() => notify('Статус оновлено'));
+        };
+
+        window.exportOrders = () => {
+            onValue(ref(db, 'orders'), (snap) => {
+                const orders = snap.val();
+                if (!orders) { alert('Немає замовлень'); return; }
+                const csvRows = [];
+                const headers = ['ID', 'Дата', 'ПІБ', 'Телефон', 'Доставка', 'Товари', 'Сума', 'Статус', 'Коментар'];
+                csvRows.push(headers.join(';'));
+                Object.keys(orders).forEach(id => {
+                    const o = orders[id];
+                    const date = o.createdAt || '';
+                    const fullName = [o.customer?.lastName, o.customer?.firstName, o.customer?.middleName].filter(Boolean).join(' ') || '';
+                    const delivery = o.delivery?.method === 'nova' ? `НП: ${o.delivery.city} ${o.delivery.warehouse}` : 'Самовивіз';
+                    const items = o.items?.map(i => `${i.name} x${i.quantity}`).join(', ') || '';
+                    const row = [id, date, fullName, o.customer?.phone || '', delivery, items, o.total, o.status, o.comment || ''];
+                    csvRows.push(row.map(v => `"${v}"`).join(';'));
+                });
+                const csvContent = csvRows.join('\n');
+                const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' }); // BOM для Excel
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'orders.csv';
+                link.click();
+            }, { onlyOnce: true });
         };
 
         // ========== КОРИСТУВАЧІ ==========
-        function loadUsers() {
+        window.loadUsers = () => {
             onValue(ref(db, 'users'), (snap) => {
                 const users = snap.val();
                 const container = document.getElementById('users-list');
                 if (!users) {
-                    container.innerHTML = '<p>Немає користувачів.</p>';
+                    container.innerHTML = '<p>Немає користувачів</p>';
                     return;
                 }
-
-                let html = `<table><thead><tr><th>Логін</th><th>Ім'я</th><th>Роль</th><th></th></tr></thead><tbody>`;
-
+                let html = '<table><thead><tr><th>Логін</th><th>Ім\'я</th><th>Прізвище</th><th>Роль</th><th>Дії</th></tr></thead><tbody>';
                 Object.keys(users).forEach(username => {
                     const u = users[username];
                     html += `
                         <tr>
-                            <td><b>${username}</b></td>
-                            <td>${u.firstName || ''} ${u.lastName || ''}</td>
+                            <td>${username}</td>
+                            <td>${u.firstName || ''}</td>
+                            <td>${u.lastName || ''}</td>
                             <td>
-                                <select class="role-select" data-username="${username}">
+                                <select class="role-select" id="role-${username}">
                                     <option value="user" ${u.role === 'user' ? 'selected' : ''}>Користувач</option>
                                     <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Адмін</option>
                                 </select>
                             </td>
                             <td>
                                 <button class="btn-edit" onclick="saveUserRole('${username}')"><i class="fa-solid fa-save"></i></button>
+                                <button class="btn-del" onclick="deleteUser('${username}')"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>
                     `;
                 });
-
-                html += `</tbody></table>`;
+                html += '</tbody></table>';
                 container.innerHTML = html;
             });
-        }
+        };
 
         window.saveUserRole = (username) => {
-            const select = document.querySelector(`select[data-username="${username}"]`);
-            const newRole = select.value;
-            update(ref(db, `users/${username}`), { role: newRole })
-                .then(() => notify(`Роль ${username} змінено`));
+            const role = document.getElementById('role-' + username).value;
+            update(ref(db, 'users/' + username), { role }).then(() => notify('Роль оновлено'));
+        };
+
+        window.deleteUser = (username) => {
+            if (confirm(`Видалити користувача ${username}?`)) {
+                remove(ref(db, 'users/' + username)).then(() => notify('Видалено'));
+            }
         };
 
         // ========== СТАТИСТИКА ==========
-        let chartInstance = null;
-        async function loadStats() {
-            const ordersSnap = await new Promise(resolve => onValue(ref(db, 'orders'), resolve, { onlyOnce: true }));
-            const orders = ordersSnap.val() ? Object.values(ordersSnap.val()) : [];
+        let ordersChart = null;
+        window.loadStats = async () => {
+            const productsSnap = await get(ref(db, 'products'));
+            const products = productsSnap.val() || {};
+            const ordersSnap = await get(ref(db, 'orders'));
+            const orders = ordersSnap.val() || {};
+            const usersSnap = await get(ref(db, 'users'));
+            const users = usersSnap.val() || {};
 
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            const recentOrders = orders.filter(o => o.createdAt && new Date(o.createdAt) >= weekAgo);
-            document.getElementById('orders-week').innerText = recentOrders.length;
+            const totalProducts = Object.keys(products).length;
+            const totalOrders = Object.keys(orders).length;
+            const totalUsers = Object.keys(users).length;
 
-            const days = [];
-            const counts = [];
-            for (let i = 6; i >= 0; i--) {
-                const day = new Date();
-                day.setDate(day.getDate() - i);
-                const dayStr = day.toLocaleDateString('uk-UA', { day: 'numeric', month: 'short' });
-                days.push(dayStr);
-                const dayStart = new Date(day.setHours(0,0,0,0));
-                const dayEnd = new Date(day.setHours(23,59,59,999));
-                const count = recentOrders.filter(o => {
-                    const d = new Date(o.createdAt);
-                    return d >= dayStart && d <= dayEnd;
-                }).length;
-                counts.push(count);
-            }
+            let totalRevenue = 0;
+            Object.values(orders).forEach(o => totalRevenue += o.total || 0);
 
-            const ctx = document.getElementById('orders-chart').getContext('2d');
-            if (chartInstance) chartInstance.destroy();
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: days,
-                    datasets: [{
-                        label: 'Кількість замовлень',
-                        data: counts,
-                        backgroundColor: 'rgba(255, 0, 0, 0.5)',
-                        borderColor: 'var(--red)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true, stepSize: 1 } }
-                }
-            });
+            document.getElementById('stats-cards').innerHTML = `
+                <div class="stat-card"><div class="stat-title">Товарів</div><div class="stat-value">${totalProducts}</div></div>
+                <div class="stat-card"><div class="stat-title">Замовлень</div><div class="stat-value">${totalOrders}</div></div>
+                <div class="stat-card"><div class="stat-title">Користувачів</div><div class="stat-value">${totalUsers}</div></div>
+                <div class="stat-card"><div class="stat-title">Виручка</div><div class="stat-value">${totalRevenue} грн</div></div>
+            `;
 
-            const productCount = {};
-            orders.forEach(o => {
+            // Популярні товари
+            const productCounts = {};
+            Object.values(orders).forEach(o => {
                 if (o.items) {
                     o.items.forEach(item => {
-                        const name = item.name;
-                        productCount[name] = (productCount[name] || 0) + item.quantity;
+                        productCounts[item.id] = (productCounts[item.id] || 0) + item.quantity;
                     });
                 }
             });
-            const popular = Object.entries(productCount)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5);
-            const popularHtml = popular.map(([name, count]) => `
-                <div class="popular-item">
-                    <span class="popular-name">${name}</span>
-                    <span class="popular-count">${count} шт.</span>
-                </div>
-            `).join('');
-            document.getElementById('popular-products').innerHTML = popularHtml || '<p>Немає даних</p>';
-
-            const productsSnap = await new Promise(resolve => onValue(ref(db, 'products'), resolve, { onlyOnce: true }));
-            const products = productsSnap.val() ? Object.entries(productsSnap.val()) : [];
-            const lowStock = products.filter(([_, p]) => p.stock <= 3 && p.stock > 0).map(([id, p]) => p);
-            const lowHtml = lowStock.map(p => `
-                <div class="popular-item warning-item">
-                    <span class="popular-name">${p.name}</span>
-                    <span class="popular-count">${p.stock} шт.</span>
-                </div>
-            `).join('');
-            document.getElementById('low-stock').innerHTML = lowHtml || '<p>Немає товарів з низьким залишком</p>';
-        }
-
-        // ========== ВІДГУКИ ==========
-        async function loadReviewsForAdmin() {
-            const reviewsSnap = await new Promise(resolve => onValue(ref(db, 'reviews'), resolve, { onlyOnce: true }));
-            const reviews = reviewsSnap.val() || {};
-            const container = document.getElementById('reviews-list-admin');
-            
-            if (Object.keys(reviews).length === 0) {
-                container.innerHTML = '<p>Немає відгуків</p>';
-                return;
+            const popular = Object.entries(productCounts).sort((a,b) => b[1] - a[1]).slice(0,5);
+            let popHtml = '';
+            for (let [pid, count] of popular) {
+                const p = products[pid];
+                popHtml += `<div class="popular-item"><span class="popular-name">${p?.name || pid}</span><span class="popular-count">${count} шт.</span></div>`;
             }
+            document.getElementById('popular-products').innerHTML = popHtml || '<p>Немає даних</p>';
 
-            // Сортуємо: спочатку немодеровані
-            const sorted = Object.entries(reviews)
-                .map(([id, r]) => ({ id, ...r }))
-                .sort((a, b) => {
-                    if (a.moderated === b.moderated) return 0;
-                    return a.moderated ? 1 : -1;
-                });
+            // Товари, що закінчуються (stock < 3)
+            const lowStock = Object.entries(products).filter(([_,p]) => p.stock && p.stock < 3).sort((a,b) => a[1].stock - b[1].stock);
+            let lowHtml = '';
+            lowStock.forEach(([id,p]) => {
+                lowHtml += `<div class="popular-item"><span class="popular-name">${p.name}</span><span class="popular-count warning-item">${p.stock} шт.</span></div>`;
+            });
+            document.getElementById('low-stock').innerHTML = lowHtml || '<p>Немає</p>';
 
-            let html = '';
-            for (let r of sorted) {
-                // Отримуємо назву товару
-                const productSnap = await get(ref(db, 'products/' + r.productId));
-                const product = productSnap.val();
-                const productName = product ? product.name : 'Невідомий товар';
-
-                html += `
-                    <div class="review-item" style="margin-bottom: 15px; padding: 15px; background: #f9f9f9; border-radius: 10px;">
-                        <div class="review-header">
-                            <div>
-                                <b>${r.userName}</b> | ${productName}
-                            </div>
-                            <div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
-                        </div>
-                        <div style="margin: 10px 0;">${r.text}</div>
-                        <div style="font-size: 12px; color: #888;">${new Date(r.date).toLocaleString('uk-UA')}</div>
-                        <div class="review-actions" style="margin-top: 10px;">
-                            ${!r.visible ? `
-                                <button class="btn-edit" onclick="moderateReview('${r.id}', true)"><i class="fa-solid fa-check"></i> Опублікувати</button>
-                            ` : `
-                                <button class="btn-edit" onclick="moderateReview('${r.id}', false)"><i class="fa-solid fa-eye-slash"></i> Приховати</button>
-                            `}
-                            <button class="btn-del" onclick="deleteReview('${r.id}')"><i class="fa-solid fa-trash"></i> Видалити</button>
-                        </div>
-                    </div>
-                `;
+            // Графік замовлень по днях
+            const last7Days = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                last7Days.push(d.toLocaleDateString('uk-UA'));
             }
-            container.innerHTML = html;
-        }
-
-        window.moderateReview = async (reviewId, visible) => {
-            const reviewSnap = await get(ref(db, 'reviews/' + reviewId));
-            const review = reviewSnap.val();
-            const productId = review.productId;
-
-            await update(ref(db, 'reviews/' + reviewId), { moderated: true, visible: visible });
-
-            // Перераховуємо рейтинг товару
-            const reviewsSnap = await get(ref(db, 'reviews'));
-            const allReviews = reviewsSnap.val() || {};
-            const productReviews = Object.values(allReviews).filter(r => r.productId === productId && r.visible === true);
-            const total = productReviews.reduce((sum, r) => sum + r.rating, 0);
-            const avg = productReviews.length ? total / productReviews.length : 0;
-
-            await update(ref(db, 'products/' + productId), {
-                rating: avg,
-                reviewsCount: productReviews.length
+            const counts = last7Days.map(day => 0);
+            Object.values(orders).forEach(o => {
+                if (o.createdAt) {
+                    const orderDate = new Date(o.createdAt).toLocaleDateString('uk-UA');
+                    const idx = last7Days.indexOf(orderDate);
+                    if (idx !== -1) counts[idx]++;
+                }
             });
 
-            notify('Статус відгуку оновлено, рейтинг перераховано');
-            loadReviewsForAdmin(); // перезавантажити список
+            if (ordersChart) ordersChart.destroy();
+            const ctx = document.getElementById('ordersChart').getContext('2d');
+            ordersChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: last7Days,
+                    datasets: [{
+                        label: 'Кількість замовлень',
+                        data: counts,
+                        borderColor: '#ff0000',
+                        backgroundColor: 'rgba(255,0,0,0.1)',
+                        tension: 0.2
+                    }]
+                }
+            });
         };
 
-        window.deleteReview = async (reviewId) => {
-            if (!confirm('Видалити відгук?')) return;
-            const reviewSnap = await get(ref(db, 'reviews/' + reviewId));
-            const review = reviewSnap.val();
-            const productId = review.productId;
-
-            await remove(ref(db, 'reviews/' + reviewId));
-
-            // Перераховуємо рейтинг товару
-            const reviewsSnap = await get(ref(db, 'reviews'));
-            const allReviews = reviewsSnap.val() || {};
-            const productReviews = Object.values(allReviews).filter(r => r.productId === productId && r.visible === true);
-            const total = productReviews.reduce((sum, r) => sum + r.rating, 0);
-            const avg = productReviews.length ? total / productReviews.length : 0;
-
-            await update(ref(db, 'products/' + productId), {
-                rating: avg,
-                reviewsCount: productReviews.length
+        // ========== ВІДГУКИ ==========
+        window.loadReviewsForAdmin = () => {
+            onValue(ref(db, 'reviews'), (snap) => {
+                const reviews = snap.val();
+                const container = document.getElementById('reviews-list-admin');
+                if (!reviews) {
+                    container.innerHTML = '<p>Немає відгуків</p>';
+                    return;
+                }
+                let html = '';
+                Object.keys(reviews).reverse().forEach(id => {
+                    const r = reviews[id];
+                    html += `
+                        <div class="review-item">
+                            <div class="review-header">
+                                <span><strong>${r.userName}</strong> — ${new Date(r.date).toLocaleString('uk-UA')}</span>
+                                <span class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+                            </div>
+                            <div><strong>Товар:</strong> (ID: ${r.productId})</div>
+                            <div>${r.text}</div>
+                            <div class="review-actions">
+                                <button class="btn-edit" onclick="moderateReview('${id}', ${!r.visible})">${r.visible ? 'Приховати' : 'Показати'}</button>
+                                <button class="btn-del" onclick="deleteReview('${id}')">Видалити</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
             });
+        };
 
-            notify('Відгук видалено, рейтинг перераховано');
-            loadReviewsForAdmin();
+        window.moderateReview = (id, visible) => {
+            update(ref(db, 'reviews/' + id), { visible, moderated: true }).then(() => notify('Змінено'));
+        };
+
+        window.deleteReview = (id) => {
+            if (confirm('Видалити відгук?')) {
+                remove(ref(db, 'reviews/' + id)).then(() => notify('Видалено'));
+            }
+        };
+
+        // ========== КАТЕГОРІЇ ==========
+        function loadCategories() {
+            onValue(ref(db, 'categories'), (snap) => {
+                const categories = snap.val();
+                const list = document.getElementById('categories-list');
+                if (!categories) {
+                    list.innerHTML = '<p>Немає категорій</p>';
+                    return;
+                }
+                let html = '<table><thead><tr><th>Назва</th><th>Зображення</th><th>Батьківська</th><th>Дії</th></tr></thead><tbody>';
+                const catArray = Object.entries(categories).map(([id, c]) => ({ id, ...c }));
+                catArray.forEach(c => {
+                    const parentName = c.parent ? (categories[c.parent]?.name || '?') : '(коренева)';
+                    html += `
+                        <tr>
+                            <td>${c.name}</td>
+                            <td>${c.image ? '<img src="'+c.image+'" width="50">' : '-'}</td>
+                            <td>${parentName}</td>
+                            <td>
+                                <button class="btn-edit" onclick="editCategory('${c.id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn-del" onclick="deleteCategory('${c.id}')"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                html += '</tbody></table>';
+                list.innerHTML = html;
+            });
+        }
+
+        function loadCategorySelect(selectedParent = '') {
+            onValue(ref(db, 'categories'), (snap) => {
+                const categories = snap.val() || {};
+                let options = '<option value="">(коренева)</option>';
+                Object.keys(categories).forEach(id => {
+                    options += `<option value="${id}" ${selectedParent === id ? 'selected' : ''}>${categories[id].name}</option>`;
+                });
+                document.getElementById('category-parent').innerHTML = options;
+            }, { onlyOnce: true });
+        }
+
+        window.handleCategory = () => {
+            const id = document.getElementById('edit-category-id').value || "cat_" + Date.now();
+            const data = {
+                name: document.getElementById('category-name').value,
+                image: document.getElementById('category-image').value,
+                parent: document.getElementById('category-parent').value || null
+            };
+            if (!data.name) { notify("Введіть назву"); return; }
+            set(ref(db, 'categories/' + id), data).then(() => {
+                notify("Категорію збережено");
+                resetCategoryForm();
+                loadCategories();
+            });
+        };
+
+        window.editCategory = (id) => {
+            onValue(ref(db, 'categories/' + id), (snap) => {
+                const c = snap.val();
+                document.getElementById('edit-category-id').value = id;
+                document.getElementById('category-name').value = c.name;
+                document.getElementById('category-image').value = c.image || '';
+                loadCategorySelect(c.parent || '');
+                document.getElementById('category-form-mode').innerText = "Редагування категорії";
+                document.getElementById('cancel-category-btn').style.display = "block";
+            }, { onlyOnce: true });
+        };
+
+        window.resetCategoryForm = () => {
+            document.getElementById('edit-category-id').value = "";
+            document.getElementById('category-name').value = "";
+            document.getElementById('category-image').value = "";
+            loadCategorySelect('');
+            document.getElementById('category-form-mode').innerText = "Додати категорію";
+            document.getElementById('cancel-category-btn').style.display = "none";
+        };
+
+        window.deleteCategory = (id) => {
+            if (confirm("Видалити категорію?")) {
+                remove(ref(db, 'categories/' + id)).then(() => notify("Видалено"));
+            }
+        };
+
+        // ========== МАРКИ ==========
+        window.loadBrands = () => {
+            onValue(ref(db, 'brands'), (snap) => {
+                const brands = snap.val();
+                const list = document.getElementById('brands-list');
+                if (!brands) {
+                    list.innerHTML = '<p>Немає марок</p>';
+                    return;
+                }
+                let html = '<table><thead><tr><th>Назва</th><th>Зображення</th><th>Дії</th></tr></thead><tbody>';
+                Object.keys(brands).forEach(id => {
+                    const b = brands[id];
+                    html += `
+                        <tr>
+                            <td>${b.name}</td>
+                            <td>${b.image ? '<img src="'+b.image+'" width="50">' : '-'}</td>
+                            <td>
+                                <button class="btn-edit" onclick="editBrand('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn-del" onclick="deleteBrand('${id}')"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                html += '</tbody></table>';
+                list.innerHTML = html;
+            });
+        };
+
+        window.handleBrand = () => {
+            const id = document.getElementById('edit-brand-id').value || "brand_" + Date.now();
+            const data = {
+                name: document.getElementById('brand-name').value,
+                image: document.getElementById('brand-image').value
+            };
+            if (!data.name) { notify("Введіть назву"); return; }
+            set(ref(db, 'brands/' + id), data).then(() => {
+                notify("Марку збережено");
+                resetBrandForm();
+                loadBrands();
+            });
+        };
+
+        window.editBrand = (id) => {
+            onValue(ref(db, 'brands/' + id), (snap) => {
+                const b = snap.val();
+                document.getElementById('edit-brand-id').value = id;
+                document.getElementById('brand-name').value = b.name;
+                document.getElementById('brand-image').value = b.image || '';
+                document.getElementById('brand-form-mode').innerText = "Редагування марки";
+                document.getElementById('cancel-brand-btn').style.display = "block";
+            }, { onlyOnce: true });
+        };
+
+        window.resetBrandForm = () => {
+            document.getElementById('edit-brand-id').value = "";
+            document.getElementById('brand-name').value = "";
+            document.getElementById('brand-image').value = "";
+            document.getElementById('brand-form-mode').innerText = "Додати марку";
+            document.getElementById('cancel-brand-btn').style.display = "none";
+        };
+
+        window.deleteBrand = (id) => {
+            if (confirm("Видалити марку?")) {
+                remove(ref(db, 'brands/' + id)).then(() => notify("Видалено"));
+            }
+        };
+
+        // ========== МОДЕЛІ ==========
+        window.loadBrandsSelect = () => {
+            onValue(ref(db, 'brands'), (snap) => {
+                const brands = snap.val() || {};
+                let options = '<option value="">Виберіть марку</option>';
+                Object.keys(brands).forEach(id => {
+                    options += `<option value="${id}">${brands[id].name}</option>`;
+                });
+                document.getElementById('model-brand').innerHTML = options;
+            });
+        };
+
+        window.loadModels = () => {
+            onValue(ref(db, 'models'), (snap) => {
+                const models = snap.val();
+                const list = document.getElementById('models-list');
+                if (!models) {
+                    list.innerHTML = '<p>Немає моделей</p>';
+                    return;
+                }
+                onValue(ref(db, 'brands'), (brandSnap) => {
+                    const brands = brandSnap.val() || {};
+                    let html = '<table><thead><tr><th>Назва</th><th>Марка</th><th>Зображення</th><th>Дії</th></tr></thead><tbody>';
+                    Object.keys(models).forEach(id => {
+                        const m = models[id];
+                        const brandName = brands[m.brandId]?.name || '?';
+                        html += `
+                            <tr>
+                                <td>${m.name}</td>
+                                <td>${brandName}</td>
+                                <td>${m.image ? '<img src="'+m.image+'" width="50">' : '-'}</td>
+                                <td>
+                                    <button class="btn-edit" onclick="editModel('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    <button class="btn-del" onclick="deleteModel('${id}')"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    html += '</tbody></table>';
+                    list.innerHTML = html;
+                }, { onlyOnce: true });
+            });
+        };
+
+        window.handleModel = () => {
+            const id = document.getElementById('edit-model-id').value || "model_" + Date.now();
+            const data = {
+                name: document.getElementById('model-name').value,
+                brandId: document.getElementById('model-brand').value,
+                image: document.getElementById('model-image').value
+            };
+            if (!data.name || !data.brandId) { notify("Заповніть назву та оберіть марку"); return; }
+            set(ref(db, 'models/' + id), data).then(() => {
+                notify("Модель збережено");
+                resetModelForm();
+                loadModels();
+            });
+        };
+
+        window.editModel = (id) => {
+            onValue(ref(db, 'models/' + id), (snap) => {
+                const m = snap.val();
+                document.getElementById('edit-model-id').value = id;
+                document.getElementById('model-name').value = m.name;
+                document.getElementById('model-image').value = m.image || '';
+                // Встановити вибрану марку в селекті
+                const select = document.getElementById('model-brand');
+                for (let opt of select.options) {
+                    if (opt.value === m.brandId) opt.selected = true;
+                }
+                document.getElementById('model-form-mode').innerText = "Редагування моделі";
+                document.getElementById('cancel-model-btn').style.display = "block";
+            }, { onlyOnce: true });
+        };
+
+        window.resetModelForm = () => {
+            document.getElementById('edit-model-id').value = "";
+            document.getElementById('model-name').value = "";
+            document.getElementById('model-image').value = "";
+            document.getElementById('model-brand').value = "";
+            document.getElementById('model-form-mode').innerText = "Додати модель";
+            document.getElementById('cancel-model-btn').style.display = "none";
+        };
+
+        window.deleteModel = (id) => {
+            if (confirm("Видалити модель?")) {
+                remove(ref(db, 'models/' + id)).then(() => notify("Видалено"));
+            }
+        };
+
+        // ========== СУМІСНІСТЬ (ПЕРЕГЛЯД) ==========
+        window.loadProductModels = () => {
+            onValue(ref(db, 'productModels'), (linkSnap) => {
+                const links = linkSnap.val() || {};
+                onValue(ref(db, 'products'), (prodSnap) => {
+                    const products = prodSnap.val() || {};
+                    onValue(ref(db, 'models'), (modelSnap) => {
+                        const models = modelSnap.val() || {};
+                        let html = '<table><thead><tr><th>Товар</th><th>Сумісні моделі</th></tr></thead><tbody>';
+                        Object.keys(links).forEach(pid => {
+                            const p = products[pid];
+                            const modelIds = Object.keys(links[pid] || {});
+                            const modelNames = modelIds.map(mid => models[mid]?.name || mid).join(', ');
+                            html += `
+                                <tr>
+                                    <td>${p?.name || pid}</td>
+                                    <td>${modelNames || '—'}</td>
+                                </tr>
+                            `;
+                        });
+                        html += '</tbody></table>';
+                        document.getElementById('productModels-list').innerHTML = html || '<p>Немає зв\'язків</p>';
+                    }, { onlyOnce: true });
+                }, { onlyOnce: true });
+            });
         };
 
         // ========== НАЛАШТУВАННЯ ==========
-        window.saveSystem = () => {
-            update(ref(db, 'settings'), {
-                phone: document.getElementById('sys-phone').value,
-                promoText: document.getElementById('sys-promo').value,
-                maintenance: document.getElementById('sys-maintenance').checked,
-                telegramToken: document.getElementById('telegram-token').value,
-                telegramChat: document.getElementById('telegram-chat').value
-            }).then(() => notify("Налаштування збережено!"));
+        window.loadSystem = () => {
+            onValue(ref(db, 'settings'), (snap) => {
+                const s = snap.val() || {};
+                document.getElementById('sys-phone').value = s.phone || '';
+                document.getElementById('sys-promo').value = s.promoText || '';
+                document.getElementById('sys-maintenance').value = s.maintenance ? 'true' : 'false';
+                document.getElementById('sys-telegram-token').value = s.telegramToken || '';
+                document.getElementById('sys-telegram-chat').value = s.telegramChat || '';
+            }, { onlyOnce: true });
         };
 
-        onValue(ref(db, 'settings'), (snap) => {
-            const s = snap.val();
-            if(s) {
-                document.getElementById('sys-phone').value = s.phone || "";
-                document.getElementById('sys-promo').value = s.promoText || "";
-                document.getElementById('sys-maintenance').checked = s.maintenance || false;
-                document.getElementById('telegram-token').value = s.telegramToken || "";
-                document.getElementById('telegram-chat').value = s.telegramChat || "";
-            }
-        });
+        window.saveSystem = () => {
+            const data = {
+                phone: document.getElementById('sys-phone').value,
+                promoText: document.getElementById('sys-promo').value,
+                maintenance: document.getElementById('sys-maintenance').value === 'true',
+                telegramToken: document.getElementById('sys-telegram-token').value,
+                telegramChat: document.getElementById('sys-telegram-chat').value
+            };
+            set(ref(db, 'settings'), data).then(() => notify('Налаштування збережено'));
+        };
 
-        // Якщо активний розділ при завантаженні
+        window.exportAll = () => {
+            onValue(ref(db, '/'), (snap) => {
+                const data = snap.val();
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'motobeast-backup.json';
+                link.click();
+            }, { onlyOnce: true });
+        };
+
+        window.importAll = () => {
+            const file = document.getElementById('importFile').files[0];
+            if (!file) { alert('Виберіть файл'); return; }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (confirm('Імпорт замінить всі дані! Продовжити?')) {
+                        set(ref(db, '/'), data).then(() => notify('Імпорт виконано'));
+                    }
+                } catch (err) {
+                    alert('Невірний JSON');
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        // ========== ІНІЦІАЛІЗАЦІЯ ==========
+        loadProducts();
+        loadLeafCategories();
+        loadModelsCheckboxes({});
+
+        // Якщо якась секція активна при завантаженні, завантажити її дані
         if (document.getElementById('orders').classList.contains('active')) loadOrders();
         else if (document.getElementById('users').classList.contains('active')) loadUsers();
         else if (document.getElementById('stats').classList.contains('active')) loadStats();
         else if (document.getElementById('reviews').classList.contains('active')) loadReviewsForAdmin();
+        else if (document.getElementById('categories').classList.contains('active')) loadCategories();
+        else if (document.getElementById('brands').classList.contains('active')) loadBrands();
+        else if (document.getElementById('models').classList.contains('active')) { loadBrandsSelect(); loadModels(); }
+        else if (document.getElementById('productModels').classList.contains('active')) loadProductModels();
+        else if (document.getElementById('sys').classList.contains('active')) loadSystem();
     </script>
 </body>
 </html>

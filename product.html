@@ -6,275 +6,8 @@
     <title>MotoBeast — деталі товару</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style/main.css">
     <style>
-        :root {
-            --mz-red: #ff0000;
-            --mz-black: #08090a;
-            --mz-gray: #f8f9fa;
-            --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
-            --shadow-md: 0 8px 24px rgba(0,0,0,0.1);
-            --shadow-lg: 0 16px 32px rgba(0,0,0,0.15);
-            --border-radius: 24px;
-            --input-radius: 16px;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--mz-gray);
-            color: #222;
-            line-height: 1.5;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Шапка */
-        .header-top {
-            background: #fff;
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
-            box-shadow: var(--shadow-sm);
-        }
-        .header-flex {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-        .logo-group {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            text-decoration: none;
-        }
-        .logo-icon {
-            background: var(--mz-black);
-            width: 65px;
-            height: 55px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transform: skewX(-15deg);
-            transition: 0.2s;
-        }
-        .logo-icon i {
-            color: var(--mz-red);
-            font-size: 34px;
-            transform: skewX(15deg);
-        }
-        .logo-text {
-            font-family: 'Orbitron', sans-serif;
-            line-height: 0.8;
-        }
-        .logo-text .m {
-            color: var(--mz-black);
-            font-size: 18px;
-            letter-spacing: 3px;
-        }
-        .logo-text .b {
-            color: var(--mz-red);
-            font-size: 32px;
-            font-weight: 900;
-        }
-        .top-nav {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-        .top-nav a {
-            text-decoration: none;
-            color: #333;
-            font-size: 14px;
-            font-weight: 800;
-            text-transform: uppercase;
-            transition: 0.2s;
-        }
-        .top-nav a:hover {
-            color: var(--mz-red);
-        }
-        .user-block {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .auth-btn {
-            background: var(--mz-black);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: var(--shadow-sm);
-        }
-        .auth-btn:hover {
-            background: var(--mz-red);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .user-info span {
-            font-weight: 600;
-        }
-        .profile-btn {
-            background: var(--mz-black);
-            color: white;
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: 0.2s;
-            box-shadow: var(--shadow-sm);
-        }
-        .profile-btn:hover {
-            background: var(--mz-red);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-        .logout-btn {
-            color: var(--mz-red);
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 30px;
-            transition: 0.2s;
-        }
-        .logout-btn:hover {
-            background: rgba(255,0,0,0.1);
-        }
-        .contacts-premium {
-            text-align: right;
-            font-family: Arial, sans-serif;
-        }
-        .c-phone {
-            font-size: 21px;
-            font-weight: 900;
-            color: #000;
-            text-decoration: none;
-            display: block;
-        }
-        .small-text {
-            font-size: 11px;
-            color: #666;
-            display: block;
-        }
-        .moto-label {
-            font-size: 12px;
-            color: var(--mz-red);
-            font-weight: bold;
-        }
-        .cart-box {
-            width: 50px;
-            height: 50px;
-            background: var(--mz-black);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            position: relative;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .cart-box:hover {
-            background: var(--mz-red);
-        }
-        .badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--mz-red);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: 900;
-            border: 2px solid #fff;
-        }
-
-        /* Панель пошуку */
-        .nav-bar {
-            background: var(--mz-black);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: var(--shadow-md);
-        }
-        .nav-flex {
-            display: flex;
-            height: 60px;
-            align-items: center;
-        }
-        .search-container {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 0 20px;
-            margin: 10px 0;
-            transition: 0.3s;
-            border: 1px solid transparent;
-        }
-        .search-container:focus-within {
-            background: rgba(255,255,255,0.15);
-            border-color: var(--mz-red);
-        }
-        .search-container input {
-            background: transparent;
-            border: none;
-            color: #fff;
-            width: 100%;
-            height: 40px;
-            outline: none;
-            font-size: 15px;
-            padding-right: 15px;
-        }
-        .search-container input::placeholder {
-            color: #aaa;
-        }
-        .search-container i {
-            color: #888;
-            font-size: 18px;
-        }
-
-        /* Екран технічних робіт */
-        #maintenance-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--mz-black);
-            color: white;
-            z-index: 9999;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-family: 'Orbitron';
-        }
-        #maintenance-screen i {
-            font-size: 60px;
-            color: var(--mz-red);
-            margin-bottom: 20px;
-        }
-
-        /* Хлібні крихти */
         .breadcrumb {
             margin: 30px 0 20px;
             font-size: 14px;
@@ -293,7 +26,6 @@
             font-weight: 600;
         }
 
-        /* Детальна сторінка товару */
         .product-wrapper {
             background: #fff;
             border-radius: var(--border-radius);
@@ -306,7 +38,6 @@
             grid-template-columns: 1fr 1fr;
             gap: 50px;
         }
-        /* Галерея */
         .gallery {
             display: flex;
             flex-direction: column;
@@ -359,7 +90,6 @@
             border-color: var(--mz-red);
             background: #fff;
         }
-        /* Інформація про товар */
         .product-info {
             display: flex;
             flex-direction: column;
@@ -470,7 +200,6 @@
             color: var(--mz-red);
         }
 
-        /* Вкладки */
         .tabs {
             margin-top: 40px;
             border-top: 2px solid #eee;
@@ -547,7 +276,6 @@
             color: #222;
         }
 
-        /* Схожі товари */
         .related {
             margin-top: 60px;
         }
@@ -604,7 +332,6 @@
             font-size: 20px;
         }
 
-        /* ===== ВІДГУКИ (КРАСИВО) ===== */
         .reviews-section {
             margin-top: 60px;
             padding-top: 40px;
@@ -673,8 +400,6 @@
             line-height: 1.6;
             color: #444;
         }
-
-        /* КРАСИВА ФОРМА ВІДГУКУ */
         .add-review {
             background: #fff;
             border-radius: var(--border-radius);
@@ -751,7 +476,6 @@
             box-shadow: var(--shadow-md);
         }
 
-        /* Адаптивність */
         @media (max-width: 900px) {
             .product-grid {
                 grid-template-columns: 1fr;
@@ -763,13 +487,6 @@
             .old-price { font-size: 20px; }
         }
         @media (max-width: 768px) {
-            .header-flex { flex-direction: column; align-items: stretch; gap: 15px; }
-            .logo-group { justify-content: center; }
-            .top-nav { justify-content: center; }
-            .user-block { justify-content: center; }
-            .contacts-premium { text-align: center; }
-            .cart-box { margin: 0 auto; }
-            .nav-flex { height: auto; padding: 10px 0; }
             .product-wrapper { padding: 25px; }
             .thumbnails { flex-wrap: wrap; }
             .btn-buy { max-width: 100%; }
@@ -780,7 +497,6 @@
             .add-review { padding: 25px; }
         }
         @media (max-width: 480px) {
-            .container { padding: 0 12px; }
             .product-wrapper { padding: 20px; }
             .main-image i { font-size: 120px; }
             .product-title { font-size: 26px; }
@@ -796,38 +512,38 @@
         <p>Технічні роботи</p>
     </div>
 
-    <header class="header-top">
-        <div class="container header-flex">
-            <a href="index.html" class="logo-group">
-                <div class="logo-icon"><i class="fa-solid fa-dragon"></i></div>
-                <div class="logo-text"><span class="m">MOTO</span><span class="b">BEAST</span></div>
-            </a>
-            <nav class="top-nav">
-                <a href="#">Запчастини</a>
-                <a href="#">Екіпіровка</a>
-                <a href="#">Акції</a>
-                <a href="#">Контакти</a>
-            </nav>
-            <div class="user-block">
-                <div id="auth-buttons">
-                    <button class="auth-btn" onclick="window.location.href='index.html'">На головну</button>
+    <header class="header">
+        <div class="header-top">
+            <div class="container header-flex">
+                <a href="index.html" class="logo-group">
+                    <div class="logo-icon"><i class="fa-solid fa-dragon"></i></div>
+                    <div class="logo-text"><span class="m">MOTO</span><span class="b">BEAST</span></div>
+                </a>
+                <nav class="nav-menu">
+                    <a href="#">Запчастини</a>
+                    <a href="#">Екіпіровка</a>
+                    <a href="#">Акції</a>
+                    <a href="#">Контакти</a>
+                </nav>
+                <div class="user-actions">
+                    <div id="auth-buttons">
+                        <button class="auth-btn" onclick="showAuthModal()">Увійти</button>
+                    </div>
+                    <div id="user-info" style="display: none;" class="user-info">
+                        <span id="user-name"></span>
+                        <a href="profile.html" class="profile-btn"><i class="fa-solid fa-user"></i> Профіль</a>
+                        <a onclick="logout()" class="logout-btn">Вийти</a>
+                    </div>
+                    <div class="cart-box" onclick="window.location.href='cart.html'">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="badge" id="cartBadge">0</span>
+                    </div>
                 </div>
-                <div id="user-info" style="display: none;" class="user-info">
-                    <span id="user-name"></span>
-                    <a href="profile.html" class="profile-btn"><i class="fa-solid fa-user"></i> Профіль</a>
-                    <a onclick="logout()" class="logout-btn">Вийти</a>
-                </div>
-            </div>
-            <div class="contacts-premium">
-                <span class="small-text" id="promo-text">Завантаження...</span>
-                <a href="tel:+380998183988" class="c-phone" id="site-phone">380998183988</a>
-                <span class="small-text">Дзвоніть Пн-Пт 9:00–18:00</span>
-                <span class="moto-label">мотозилла мотозапчасти</span>
-            </div>
-            <div class="actions">
-                <div class="cart-box" onclick="window.location.href='cart.html'">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                    <span class="badge" id="cartBadge">0</span>
+                <div class="contacts-premium">
+                    <span class="small-text" id="promo-text">Завантаження...</span>
+                    <a href="tel:+380998183988" class="c-phone" id="site-phone">380998183988</a>
+                    <span class="small-text">Пн-Пт 9:00–18:00</span>
+                    <span class="moto-label">мотозилла мотозапчасти</span>
                 </div>
             </div>
         </div>
@@ -847,12 +563,54 @@
             <a href="index.html">Головна</a> / <a href="#">Каталог</a> / <span id="breadcrumb-product">Товар</span>
         </div>
 
-        <div id="product-main"></div> <!-- Сюди завантажиться товар + відгуки -->
+        <div id="product-main"></div>
     </main>
+
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAuthModal()">&times;</span>
+            <h2 style="font-size: 28px; margin-bottom: 10px;">Вхід / Реєстрація</h2>
+            <div class="auth-tabs">
+                <button class="tab-btn active" onclick="switchAuthTab('login')">Вхід</button>
+                <button class="tab-btn" onclick="switchAuthTab('register')">Реєстрація</button>
+            </div>
+            <div id="loginAuth" class="auth-tab-content active">
+                <div class="form-group">
+                    <label>Логін</label>
+                    <input type="text" id="login-username" placeholder="Ваш логін">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="login-password" placeholder="••••••••">
+                </div>
+                <button class="btn-primary" onclick="signIn()">Увійти</button>
+            </div>
+            <div id="registerAuth" class="auth-tab-content">
+                <div class="form-group">
+                    <label>Логін *</label>
+                    <input type="text" id="reg-username" placeholder="Унікальний логін">
+                </div>
+                <div class="form-group">
+                    <label>Пароль *</label>
+                    <input type="password" id="reg-password" placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label>Ім'я</label>
+                    <input type="text" id="reg-firstname" placeholder="Ім'я">
+                </div>
+                <div class="form-group">
+                    <label>Прізвище</label>
+                    <input type="text" id="reg-lastname" placeholder="Прізвище">
+                </div>
+                <button class="btn-primary" onclick="signUp()">Зареєструватися</button>
+            </div>
+            <div id="authMessage" class="auth-message"></div>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue, push, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, onValue, push, set, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAQECyI2wLqHF0BzletUPiG3ryOqWROPOE",
@@ -863,10 +621,8 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Стан авторизації (для перевірки адміна)
         let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 
-        // Функції для корзини
         function getCart() {
             return JSON.parse(localStorage.getItem('motocart')) || [];
         }
@@ -896,7 +652,6 @@
 
         updateCartBadge();
 
-        // Налаштування (техроботи, телефон, промо)
         onValue(ref(db, 'settings'), (snap) => {
             const s = snap.val();
             if (s) {
@@ -911,7 +666,6 @@
             }
         });
 
-        // Функція парсингу характеристик
         function parseSpecs(specsText) {
             if (!specsText) return [];
             return specsText.split('\n').map(line => {
@@ -924,7 +678,6 @@
             }).filter(item => item.name || item.value);
         }
 
-        // Завантаження всіх товарів для блоку "Схожі товари"
         let allProducts = [];
         onValue(ref(db, 'products'), (snap) => {
             const data = snap.val();
@@ -936,7 +689,6 @@
             }
         });
 
-        // Відображення схожих товарів
         function renderRelated(products) {
             const container = document.getElementById('related-products');
             if (!container) return;
@@ -958,7 +710,6 @@
             }).join('');
         }
 
-        // ========== ВІДГУКИ ==========
         function renderStars(rating) {
             const full = '★'.repeat(Math.floor(rating));
             const half = rating % 1 >= 0.5 ? '½' : '';
@@ -974,7 +725,6 @@
                     .map(([id, r]) => ({ id, ...r }))
                     .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-                // Оновлюємо середній рейтинг з товару
                 onValue(ref(db, 'products/' + productId), (snap) => {
                     const product = snap.val();
                     if (product) {
@@ -1003,7 +753,6 @@
             });
         }
 
-        // Отримуємо ID товару з URL
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id');
 
@@ -1043,7 +792,6 @@
                         </div>
                     `).join('') : '<p>Характеристики не вказані</p>';
 
-                    // Додаємо блок відгуків
                     mainDiv.innerHTML = `
                         <div class="product-wrapper">
                             <div class="product-grid">
@@ -1092,7 +840,6 @@
                             <div class="related-grid" id="related-products"></div>
                         </div>
 
-                        <!-- Блок відгуків (красивий) -->
                         <div class="reviews-section">
                             <h2>Відгуки покупців</h2>
                             <div class="average-rating">
@@ -1128,7 +875,6 @@
                         </div>
                     `;
 
-                    // Логіка перемикання вкладок
                     document.querySelectorAll('.tab-header').forEach(header => {
                         header.addEventListener('click', () => {
                             document.querySelectorAll('.tab-header').forEach(h => h.classList.remove('active'));
@@ -1139,14 +885,11 @@
                         });
                     });
 
-                    // Оновлюємо рекомендації (виключаємо поточний товар)
                     const otherProducts = allProducts.filter(p => p.id !== productId).slice(0, 4);
                     renderRelated(otherProducts);
 
-                    // ===== ВІДГУКИ: ініціалізація =====
                     loadReviews(productId);
 
-                    // Вибір зірок (красива анімація)
                     const stars = document.querySelectorAll('.rating-select .star');
                     let selectedRating = 0;
                     stars.forEach(star => {
@@ -1164,7 +907,6 @@
                         });
                     });
 
-                    // Відправка форми
                     const reviewForm = document.getElementById('review-form');
                     reviewForm.addEventListener('submit', async (e) => {
                         e.preventDefault();
@@ -1218,12 +960,102 @@
             `;
         }
 
-        // Пошук (перенаправлення на головну)
         document.getElementById('searchInput').addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 window.location.href = 'index.html?search=' + encodeURIComponent(e.target.value);
             }
         });
+
+        window.showAuthModal = () => {
+            document.getElementById('authModal').style.display = 'flex';
+        };
+        window.closeAuthModal = () => {
+            document.getElementById('authModal').style.display = 'none';
+            document.getElementById('authMessage').innerText = '';
+        };
+        window.switchAuthTab = (tab) => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.auth-tab-content').forEach(c => c.classList.remove('active'));
+            if (tab === 'login') {
+                document.querySelector('[onclick="switchAuthTab(\'login\')"]').classList.add('active');
+                document.getElementById('loginAuth').classList.add('active');
+            } else {
+                document.querySelector('[onclick="switchAuthTab(\'register\')"]').classList.add('active');
+                document.getElementById('registerAuth').classList.add('active');
+            }
+        };
+        window.signUp = async () => {
+            const username = document.getElementById('reg-username').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            const firstName = document.getElementById('reg-firstname').value.trim();
+            const lastName = document.getElementById('reg-lastname').value.trim();
+
+            if (!username || !password) {
+                document.getElementById('authMessage').innerText = 'Логін і пароль обов\'язкові';
+                return;
+            }
+
+            const snapshot = await get(child(ref(db), 'users/' + username));
+            if (snapshot.exists()) {
+                document.getElementById('authMessage').innerText = 'Користувач з таким логіном вже існує';
+                return;
+            }
+
+            const userData = {
+                username,
+                password,
+                firstName,
+                lastName,
+                role: 'user',
+                createdAt: new Date().toISOString()
+            };
+            await set(ref(db, 'users/' + username), userData);
+            currentUser = userData;
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+            updateAuthUI();
+            closeAuthModal();
+        };
+        window.signIn = async () => {
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            if (!username || !password) {
+                document.getElementById('authMessage').innerText = 'Введіть логін і пароль';
+                return;
+            }
+
+            const snapshot = await get(child(ref(db), 'users/' + username));
+            if (!snapshot.exists()) {
+                document.getElementById('authMessage').innerText = 'Невірний логін або пароль';
+                return;
+            }
+
+            const userData = snapshot.val();
+            if (userData.password !== password) {
+                document.getElementById('authMessage').innerText = 'Невірний логін або пароль';
+                return;
+            }
+
+            currentUser = userData;
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+            updateAuthUI();
+            closeAuthModal();
+        };
+        window.logout = () => {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateAuthUI();
+        };
+        function updateAuthUI() {
+            if (currentUser) {
+                document.getElementById('auth-buttons').style.display = 'none';
+                document.getElementById('user-info').style.display = 'flex';
+                document.getElementById('user-name').textContent = ''; // ім'я не показуємо
+            } else {
+                document.getElementById('auth-buttons').style.display = 'flex';
+                document.getElementById('user-info').style.display = 'none';
+            }
+        }
     </script>
 </body>
 </html>
