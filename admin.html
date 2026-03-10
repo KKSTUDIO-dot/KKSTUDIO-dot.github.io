@@ -198,7 +198,7 @@
         .in-stock { background: #e8f5e9; color: #2e7d32; }
         .out-stock { background: #ffebee; color: #c62828; }
 
-        /* Нові стилі для замовлень */
+        /* Стилі для замовлень */
         .order-card {
             background: #fff;
             border-radius: 16px;
@@ -498,7 +498,7 @@
                 </div>
             </div>
 
-            <!-- Секція Замовлення (перероблена) -->
+            <!-- Секція Замовлення -->
             <div id="orders" class="section">
                 <div class="admin-card">
                     <h3>Замовлення</h3>
@@ -544,7 +544,7 @@
                 </div>
             </div>
 
-            <!-- Секція Категорії (перероблена) -->
+            <!-- Секція Категорії -->
             <div id="categories" class="section">
                 <div class="grid-main">
                     <div class="admin-card">
@@ -562,7 +562,10 @@
                         <button id="cancel-category-btn" style="display:none; background:none; border:none; color:#888; margin-top:10px;" onclick="resetCategoryForm()">Скасувати</button>
                     </div>
                     <div class="admin-card">
-                        <h3>Список категорій</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h3>Список категорій</h3>
+                            <button class="btn-action btn-small" onclick="loadCategories()">⟲ Оновити</button>
+                        </div>
                         <div id="categories-grid" class="categories-grid"></div>
                     </div>
                 </div>
@@ -619,7 +622,7 @@
                 </div>
             </div>
 
-            <!-- Секція Налаштування (оновлено Telegram) -->
+            <!-- Секція Налаштування -->
             <div id="sys" class="section">
                 <div class="grid-main">
                     <div class="admin-card">
@@ -668,7 +671,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, onValue, remove, update, get, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, set, onValue, remove, update, get, push, off } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAQECyI2wLqHF0BzletUPiG3ryOqWROPOE",
@@ -841,7 +844,9 @@
         function loadProducts() {
             const list = document.getElementById('inventory-list');
             if (!list) return;
-            onValue(ref(db, 'products'), (snap) => {
+            const productsRef = ref(db, 'products');
+            off(productsRef);
+            onValue(productsRef, (snap) => {
                 const data = snap.val();
                 list.innerHTML = "";
                 if(data) {
@@ -871,12 +876,17 @@
                 } else {
                     list.innerHTML = '<tr><td colspan="9">Немає товарів</td></tr>';
                 }
+            }, (error) => {
+                console.error(error);
+                list.innerHTML = '<tr><td colspan="9">Помилка завантаження</td></tr>';
             });
         }
 
-        // ========== ЗАМОВЛЕННЯ (ПЕРЕРОБЛЕНО) ==========
+        // ========== ЗАМОВЛЕННЯ ==========
         window.loadOrders = () => {
-            onValue(ref(db, 'orders'), (snap) => {
+            const ordersRef = ref(db, 'orders');
+            off(ordersRef);
+            onValue(ordersRef, (snap) => {
                 const orders = snap.val();
                 const container = document.getElementById('orders-list');
                 if (!orders) {
@@ -892,7 +902,6 @@
                         ? `Нова пошта: ${o.delivery.city}, №${o.delivery.warehouse}`
                         : 'Самовивіз';
                     
-                    // Генеруємо таблицю товарів
                     let itemsHtml = '';
                     if (o.items && o.items.length) {
                         itemsHtml = `
@@ -954,6 +963,9 @@
                     `;
                 });
                 container.innerHTML = html;
+            }, (error) => {
+                console.error(error);
+                document.getElementById('orders-list').innerHTML = '<p>Помилка завантаження</p>';
             });
         };
 
@@ -1006,7 +1018,9 @@
 
         // ========== КОРИСТУВАЧІ ==========
         window.loadUsers = () => {
-            onValue(ref(db, 'users'), (snap) => {
+            const usersRef = ref(db, 'users');
+            off(usersRef);
+            onValue(usersRef, (snap) => {
                 const users = snap.val();
                 const container = document.getElementById('users-list');
                 if (!users) {
@@ -1036,6 +1050,9 @@
                 });
                 html += '</tbody></table>';
                 container.innerHTML = html;
+            }, (error) => {
+                console.error(error);
+                document.getElementById('users-list').innerHTML = '<p>Помилка завантаження</p>';
             });
         };
 
@@ -1134,7 +1151,9 @@
 
         // ========== ВІДГУКИ ==========
         window.loadReviewsForAdmin = () => {
-            onValue(ref(db, 'reviews'), (snap) => {
+            const reviewsRef = ref(db, 'reviews');
+            off(reviewsRef);
+            onValue(reviewsRef, (snap) => {
                 const reviews = snap.val();
                 const container = document.getElementById('reviews-list-admin');
                 if (!reviews) {
@@ -1160,6 +1179,9 @@
                     `;
                 });
                 container.innerHTML = html;
+            }, (error) => {
+                console.error(error);
+                document.getElementById('reviews-list-admin').innerHTML = '<p>Помилка завантаження</p>';
             });
         };
 
@@ -1173,31 +1195,64 @@
             }
         };
 
-        // ========== КАТЕГОРІЇ (перероблено на картки) ==========
+        // ========== КАТЕГОРІЇ ==========
         function loadCategories() {
-            onValue(ref(db, 'categories'), (snap) => {
+            const container = document.getElementById('categories-grid');
+            if (!container) {
+                console.error('Element #categories-grid not found');
+                return;
+            }
+            
+            container.innerHTML = '<p style="text-align:center;">Завантаження...</p>';
+            
+            const categoriesRef = ref(db, 'categories');
+            off(categoriesRef);
+            
+            onValue(categoriesRef, (snap) => {
                 const categories = snap.val();
-                const container = document.getElementById('categories-grid');
+                container.innerHTML = '';
+                
                 if (!categories) {
                     container.innerHTML = '<p>Немає категорій</p>';
                     return;
                 }
+                
+                if (typeof categories !== 'object' || Array.isArray(categories)) {
+                    console.error('Invalid categories data:', categories);
+                    container.innerHTML = '<p>Помилка даних категорій</p>';
+                    return;
+                }
+                
                 let html = '';
-                Object.entries(categories).forEach(([id, cat]) => {
-                    const parentName = cat.parent ? (categories[cat.parent]?.name || '?') : 'Коренева';
-                    html += `
-                        <div class="category-card">
-                            ${cat.image ? `<img src="${cat.image}" class="category-image" alt="${cat.name}">` : ''}
-                            <div class="category-name">${cat.name}</div>
-                            <div class="category-parent">Батько: ${parentName}</div>
-                            <div class="category-actions">
-                                <button class="btn-edit" onclick="editCategory('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button class="btn-del" onclick="deleteCategory('${id}')"><i class="fa-solid fa-trash"></i></button>
+                try {
+                    Object.entries(categories).forEach(([id, cat]) => {
+                        if (!cat || typeof cat !== 'object') return;
+                        
+                        const name = cat.name || 'Без назви';
+                        const parentName = cat.parent ? (categories[cat.parent]?.name || '?') : 'Коренева';
+                        const image = cat.image ? `<img src="${cat.image}" class="category-image" alt="${name}" onerror="this.style.display=\'none\'">` : '';
+                        
+                        html += `
+                            <div class="category-card">
+                                ${image}
+                                <div class="category-name">${escapeHtml(name)}</div>
+                                <div class="category-parent">Батько: ${escapeHtml(parentName)}</div>
+                                <div class="category-actions">
+                                    <button class="btn-edit" onclick="editCategory('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    <button class="btn-del" onclick="deleteCategory('${id}')"><i class="fa-solid fa-trash"></i></button>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
+                        `;
+                    });
+                } catch (error) {
+                    console.error('Error rendering categories:', error);
+                    html = '<p>Помилка відображення категорій</p>';
+                }
+                
+                container.innerHTML = html || '<p>Немає категорій</p>';
+            }, (error) => {
+                console.error('Firebase error:', error);
+                container.innerHTML = '<p>Помилка завантаження даних</p>';
             });
         }
 
@@ -1256,7 +1311,9 @@
 
         // ========== МАРКИ ==========
         window.loadBrands = () => {
-            onValue(ref(db, 'brands'), (snap) => {
+            const brandsRef = ref(db, 'brands');
+            off(brandsRef);
+            onValue(brandsRef, (snap) => {
                 const brands = snap.val();
                 const list = document.getElementById('brands-list');
                 if (!brands) {
@@ -1279,6 +1336,9 @@
                 });
                 html += '</tbody></table>';
                 list.innerHTML = html;
+            }, (error) => {
+                console.error(error);
+                document.getElementById('brands-list').innerHTML = '<p>Помилка завантаження</p>';
             });
         };
 
@@ -1330,11 +1390,13 @@
                     options += `<option value="${id}">${brands[id].name}</option>`;
                 });
                 document.getElementById('model-brand').innerHTML = options;
-            });
+            }, { onlyOnce: true });
         };
 
         window.loadModels = () => {
-            onValue(ref(db, 'models'), (snap) => {
+            const modelsRef = ref(db, 'models');
+            off(modelsRef);
+            onValue(modelsRef, (snap) => {
                 const models = snap.val();
                 const list = document.getElementById('models-list');
                 if (!models) {
@@ -1362,6 +1424,9 @@
                     html += '</tbody></table>';
                     list.innerHTML = html;
                 }, { onlyOnce: true });
+            }, (error) => {
+                console.error(error);
+                document.getElementById('models-list').innerHTML = '<p>Помилка завантаження</p>';
             });
         };
 
@@ -1412,7 +1477,9 @@
 
         // ========== СУМІСНІСТЬ (ПЕРЕГЛЯД) ==========
         window.loadProductModels = () => {
-            onValue(ref(db, 'productModels'), (linkSnap) => {
+            const productModelsRef = ref(db, 'productModels');
+            off(productModelsRef);
+            onValue(productModelsRef, (linkSnap) => {
                 const links = linkSnap.val() || {};
                 onValue(ref(db, 'products'), (prodSnap) => {
                     const products = prodSnap.val() || {};
@@ -1434,10 +1501,13 @@
                         document.getElementById('productModels-list').innerHTML = html || '<p>Немає зв\'язків</p>';
                     }, { onlyOnce: true });
                 }, { onlyOnce: true });
+            }, (error) => {
+                console.error(error);
+                document.getElementById('productModels-list').innerHTML = '<p>Помилка завантаження</p>';
             });
         };
 
-        // ========== НАЛАШТУВАННЯ (ОНОВЛЕНО TELEGRAM) ==========
+        // ========== НАЛАШТУВАННЯ ==========
         window.loadSystem = () => {
             onValue(ref(db, 'settings'), (snap) => {
                 const s = snap.val() || {};
@@ -1490,7 +1560,6 @@
             }
         };
 
-        // Функція для відправки сповіщень (викликається з інших місць)
         async function sendTelegramNotification(message, type = 'order') {
             const settingsSnap = await get(ref(db, 'settings'));
             const settings = settingsSnap.val() || {};
@@ -1498,7 +1567,6 @@
             const chatId = settings.telegramChat;
             if (!token || !chatId) return;
 
-            // Перевіряємо, чи ввімкнено сповіщення для цього типу
             if (type === 'order' && settings.notifyOrders === false) return;
             if (type === 'review' && settings.notifyReviews === false) return;
             if (type === 'user' && settings.notifyUsers === false) return;
@@ -1543,6 +1611,17 @@
             };
             reader.readAsText(file);
         };
+
+        // Допоміжна функція для екранування HTML
+        function escapeHtml(unsafe) {
+            if (!unsafe) return '';
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
 
         // ========== ІНІЦІАЛІЗАЦІЯ ==========
         loadProducts();
