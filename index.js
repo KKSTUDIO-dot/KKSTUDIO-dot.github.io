@@ -1,6 +1,7 @@
 import { getDatabase, ref, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getStorage, ref as storageRef, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 import { getCurrentUser, logout, isAdmin, getFavorites, addFavorite, removeFavorite, isFavorite, addToHistory } from './helpers.js';
-import { db } from './firebase-config.js';
+import { db, storage } from './firebase-config.js';
 
 // Пользовательское меню
 const user = getCurrentUser();
@@ -71,6 +72,11 @@ function getFiltered() {
 function renderPage() {
     const filtered = getFiltered();
     const total = filtered.length;
+    const maxPage = Math.ceil(total / pageSize) || 1;
+    // Корректируем текущую страницу, если она выходит за пределы
+    if (currentPage > maxPage) {
+        currentPage = maxPage;
+    }
     const start = (currentPage - 1) * pageSize;
     const end = start + pageSize;
     const pageItems = filtered.slice(start, end);
@@ -156,12 +162,24 @@ function renderPage() {
             });
         });
 
-        // Удаление (только свои)
+        // Удаление (только свои) с очисткой изображений
         document.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 const id = btn.dataset.id;
                 if (confirm('Удалить объявление?')) {
+                    const item = allItems.find(i => i.id === id);
+                    // Удаляем изображения из Storage, если они есть
+                    if (item && item.images && item.images.length) {
+                        for (let i = 0; i < item.images.length; i++) {
+                            try {
+                                const imgRef = storageRef(storage, `items/${item.id}/${i}`);
+                                await deleteObject(imgRef);
+                            } catch (err) {
+                                console.warn('Ошибка удаления изображения', err);
+                            }
+                        }
+                    }
                     await remove(ref(db, `items/${id}`));
                 }
             });
