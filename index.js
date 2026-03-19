@@ -1,6 +1,6 @@
 import { getDatabase, ref, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import { getStorage, ref as storageRef, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-import { getCurrentUser, logout, isAdmin, getFavorites, addFavorite, removeFavorite, isFavorite, addToHistory } from './helpers.js';
+import { getCurrentUser, logout, isAdmin, getFavorites, addFavorite, removeFavorite, isFavorite, addToHistory, getUserData } from './helpers.js';
 import { db, storage } from './firebase-config.js';
 
 // Пользовательское меню
@@ -10,9 +10,23 @@ if (user) {
     document.getElementById('userMenu').style.display = 'flex';
     document.getElementById('userNickDisplay').textContent = user.userNick;
     document.getElementById('logoutBtn').addEventListener('click', logout);
-    isAdmin(user.userId).then(admin => {
-        if (admin) document.getElementById('adminLink').style.display = 'inline-flex';
-    });
+
+    // Проверка на отображение ссылки на админку
+    (async () => {
+        // 1. Обычная проверка через isAdmin
+        const admin = await isAdmin(user.userId);
+        if (admin) {
+            document.getElementById('adminLink').style.display = 'inline-flex';
+            return;
+        }
+
+        // 2. Если не админ, проверяем Telegram ID
+        const userData = await getUserData(user.userId);
+        // Замените число на нужный Telegram ID
+        if (userData && userData.telegramId === 8169971367) {
+            document.getElementById('adminLink').style.display = 'inline-flex';
+        }
+    })();
 }
 
 // Элементы
@@ -169,7 +183,6 @@ function renderPage() {
                 const id = btn.dataset.id;
                 if (confirm('Удалить объявление?')) {
                     const item = allItems.find(i => i.id === id);
-                    // Удаляем изображения из Storage, если они есть
                     if (item && item.images && item.images.length) {
                         for (let i = 0; i < item.images.length; i++) {
                             try {
