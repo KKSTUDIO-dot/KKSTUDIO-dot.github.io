@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мой профиль | Arzmob Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo"><i class="fas fa-store"></i> Arzmob</div>
+            <div class="header-actions">
+                <a href="index.html" class="btn-secondary"><i class="fas fa-arrow-left"></i> На главную</a>
+                <span class="user-nick" id="userNickDisplay"></span>
+                <button class="icon-btn" id="logoutBtn" title="Выйти"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </div>
+
+        <div class="profile-header">
+            <h2><i class="fas fa-user-circle"></i> <span id="userNick"></span></h2>
+            <button class="btn-secondary" id="logoutBtn2">Выйти</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="my">Мои объявления</button>
+            <button class="tab-btn" data-tab="favorites">Избранное</button>
+            <button class="tab-btn" data-tab="history">История</button>
+        </div>
+
+        <div id="myItems" class="items-grid" style="display: grid;"></div>
+        <div id="favoritesItems" class="items-grid" style="display: none;"></div>
+        <div id="historyItems" class="items-grid" style="display: none;"></div>
+
+        <div class="watermark">
+            <i class="fas fa-store"></i> Arzmob Store 2026
+        </div>
+    </div>
+
+    <script type="module">
+        import { getDatabase, ref, query, orderByChild, equalTo, onValue, remove, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getCurrentUser, logout, getFavorites, getHistory } from './helpers.js';
+        import { db } from './firebase-config.js';
+
+        const user = getCurrentUser();
+        if (!user) window.location.href = 'login.html';
+
+        document.getElementById('userNick').textContent = user.userNick;
+        document.getElementById('userNickDisplay').textContent = user.userNick;
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+        document.getElementById('logoutBtn2').addEventListener('click', logout);
+
+        // Вкладки
+        const tabs = document.querySelectorAll('.tab-btn');
+        const myDiv = document.getElementById('myItems');
+        const favDiv = document.getElementById('favoritesItems');
+        const histDiv = document.getElementById('historyItems');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const which = tab.dataset.tab;
+                myDiv.style.display = which === 'my' ? 'grid' : 'none';
+                favDiv.style.display = which === 'favorites' ? 'grid' : 'none';
+                histDiv.style.display = which === 'history' ? 'grid' : 'none';
+                if (which === 'favorites') loadFavorites();
+                if (which === 'history') loadHistory();
+            });
+        });
+
+        // Мои объявления
+        const itemsRef = ref(db, 'items');
+        const userItemsQuery = query(itemsRef, orderByChild('userId'), equalTo(user.userId));
+        onValue(userItemsQuery, (snapshot) => {
+            const data = snapshot.val();
+            if (!data) {
+                myDiv.innerHTML = '<p>У вас пока нет объявлений. <a href="tovar.html">Добавить</a></p>';
+                return;
+            }
+            let html = '';
+            for (let id in data) {
+                const item = data[id];
+                const price = item.price.toLocaleString();
+                let statusText = item.status === 'approved' ? '✅ Одобрено' : item.status === 'pending' ? '⏳ На модерации' : item.status;
+                html += `
+                    <div class="item-card" data-id="${id}">
+                        <h3 class="item-title">${escapeHtml(item.name)}</h3>
+                        <div class="item-price">💰 ${price}</div>
+                        <div class="status">${statusText}</div>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <a href="edit.html?id=${id}" class="btn-primary" style="padding:8px 16px; font-size:0.9rem;">Редактировать</a>
+                            <button class="btn-primary" style="background:#dc3545; padding:8px 16px;" data-id="${id}" id="del-${id}">Удалить</button>
+                        </div>
+                    </div>
+                `;
+            }
+            myDiv.innerHTML = html;
+            for (let id in data) {
+                document.getElementById(`del-${id}`)?.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    if (confirm('Удалить?')) await remove(ref(db, `items/${id}`));
+                });
+            }
+        });
+
+        async function loadFavorites() {
+            const favIds = getFavorites();
+            if (favIds.length === 0) {
+                favDiv.innerHTML = '<p>Нет избранных товаров</p>';
+                return;
+            }
+            let html = '';
+            for (let id of favIds) {
+                const snap = await get(ref(db, `items/${id}`));
+                const item = snap.val();
+                if (item && item.status === 'approved') {
+                    html += `<div class="item-card" data-id="${id}"><h3>${item.name}</h3><div>💰 ${item.price}</div></div>`;
+                }
+            }
+            favDiv.innerHTML = html || '<p>Нет доступных товаров</p>';
+            document.querySelectorAll('#favoritesItems .item-card').forEach(c => {
+                c.addEventListener('click', () => window.location.href = `product.html?id=${c.dataset.id}`);
+            });
+        }
+
+        async function loadHistory() {
+            const histIds = getHistory();
+            if (histIds.length === 0) {
+                histDiv.innerHTML = '<p>История пуста</p>';
+                return;
+            }
+            let html = '';
+            for (let id of histIds) {
+                const snap = await get(ref(db, `items/${id}`));
+                const item = snap.val();
+                if (item) {
+                    html += `<div class="item-card" data-id="${id}"><h3>${item.name}</h3><div>💰 ${item.price}</div></div>`;
+                }
+            }
+            histDiv.innerHTML = html || '<p>Нет доступных товаров</p>';
+            document.querySelectorAll('#historyItems .item-card').forEach(c => {
+                c.addEventListener('click', () => window.location.href = `product.html?id=${c.dataset.id}`);
+            });
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe.replace(/[&<>"]/g, m => {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                if (m === '"') return '&quot;';
+                return m;
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация | Arzmob Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" style="display: flex; justify-content: center; align-items: center;">
+        <div class="form-container">
+            <h1><i class="fas fa-user-plus"></i> Регистрация</h1>
+            <div class="subtitle">Придумайте ник и пароль (минимум 6 символов)</div>
+            <div class="form-group">
+                <label>Никнейм</label>
+                <input type="text" id="nick" placeholder="Ваш игровой ник" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" id="pass" placeholder="••••••">
+            </div>
+            <button class="btn-primary" id="registerBtn"><i class="fas fa-check"></i> Зарегистрироваться</button>
+            <div class="error" id="errorMsg"></div>
+            <div class="link">Уже есть аккаунт? <a href="login.html">Войти</a></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { hashPassword } from './helpers.js';
+        import { db } from './firebase-config.js';
+
+        document.getElementById('registerBtn').addEventListener('click', async () => {
+            const nick = document.getElementById('nick').value.trim();
+            const pass = document.getElementById('pass').value.trim();
+            const errorDiv = document.getElementById('errorMsg');
+
+            if (!nick || !pass) {
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = 'Заполните все поля';
+                return;
+            }
+            if (pass.length < 6) {
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = 'Пароль должен быть не менее 6 символов';
+                return;
+            }
+
+            const usersRef = ref(db, 'users');
+            const snapshot = await get(usersRef);
+            const users = snapshot.val() || {};
+
+            const existing = Object.values(users).find(u => u.nick === nick);
+            if (existing) {
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = 'Ник уже занят';
+                return;
+            }
+
+            const hashed = await hashPassword(pass);
+            const newUserRef = ref(db, 'users/' + Date.now());
+            await set(newUserRef, {
+                nick: nick,
+                password: hashed,
+                role: 'user',
+                registered: Date.now()
+            });
+
+            alert('Регистрация успешна! Теперь войдите.');
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>
