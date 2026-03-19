@@ -2,25 +2,72 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Новое объявление | Arzmob Store</title>
+    <!-- Telegram Web App -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Стили для прелоадера (если отсутствуют в style.css) */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.3s;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #dee2e6;
+            border-top-color: #6c757d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
-    <div class="container" style="display: flex; justify-content: center;">
+    <!-- Прелоадер -->
+    <div id="preloader">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="container" style="display: flex; justify-content: center; flex-direction: column; align-items: center;">
+        <!-- Шапка с кнопкой назад и логотипом -->
+        <div class="header" style="width: 100%;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button class="icon-btn" onclick="history.back()" title="Назад"><i class="fas fa-arrow-left"></i></button>
+                <div class="logo"><i class="fas fa-store"></i> Arzmob</div>
+            </div>
+            <div class="header-actions">
+                <!-- Кнопка закрытия Telegram (будет показана только внутри Telegram) -->
+                <button class="icon-btn" id="closeTelegramBtn" title="Закрыть" style="display: none;"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+
+        <!-- Форма добавления товара -->
         <div class="form-container">
             <h1><i class="fas fa-plus-circle"></i> Создать объявление</h1>
-            <div class="subtitle">Заполните информацию</div>
+            <div class="subtitle">Заполните информацию о товаре или услуге</div>
 
             <div class="form-group">
-                <label>Название</label>
-                <input type="text" id="name" placeholder="Например: M4A1">
+                <label>Название предмета</label>
+                <input type="text" id="name" placeholder="Например: M4A1, Бронежилет">
             </div>
+
             <div class="form-group">
                 <label>Цена</label>
                 <input type="number" id="price" min="0" step="1" placeholder="0">
             </div>
+
             <div class="form-group">
                 <label>Категория</label>
                 <select id="category">
@@ -30,6 +77,7 @@
                     <option value="transport">Транспорт</option>
                 </select>
             </div>
+
             <div class="form-group">
                 <label>Тип сделки</label>
                 <select id="type">
@@ -39,19 +87,59 @@
                     <option value="ad">Реклама</option>
                 </select>
             </div>
+
             <div class="form-group">
                 <label>Описание (необязательно)</label>
-                <textarea id="desc" rows="4"></textarea>
+                <textarea id="desc" placeholder="Состояние, характеристики..."></textarea>
             </div>
+
             <div class="form-group">
                 <label>Изображения (до 3 шт)</label>
                 <input type="file" id="images" accept="image/*" multiple>
                 <div id="preview"></div>
             </div>
+
             <button class="btn-primary" id="publishBtn"><i class="fas fa-cloud-upload-alt"></i> Опубликовать</button>
+        </div>
+
+        <!-- Водяной знак -->
+        <div class="watermark">
+            <i class="fas fa-store"></i> Arzmob Store 2026 — площадка для игроков Arizona Mobile
         </div>
     </div>
 
+    <!-- Скрипт для Telegram и прелоадера -->
+    <script>
+        (function() {
+            // Инициализация Telegram
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand(); // развернуть на весь экран
+                // Показать кнопку закрытия
+                const closeBtn = document.getElementById('closeTelegramBtn');
+                if (closeBtn) {
+                    closeBtn.style.display = 'inline-flex';
+                    closeBtn.addEventListener('click', () => Telegram.WebApp.close());
+                }
+                // Настройка цветов (опционально)
+                Telegram.WebApp.setHeaderColor('#6c757d');
+                Telegram.WebApp.setBackgroundColor('#e9ecef');
+            }
+
+            // Скрыть прелоадер после полной загрузки
+            window.addEventListener('load', function() {
+                const preloader = document.getElementById('preloader');
+                if (preloader) {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => {
+                        preloader.style.display = 'none';
+                    }, 300);
+                }
+            });
+        })();
+    </script>
+
+    <!-- Модуль с логикой страницы -->
     <script type="module">
         import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
@@ -59,8 +147,12 @@
         import { db, storage } from './firebase-config.js';
 
         const user = getCurrentUser();
-        if (!user) window.location.href = 'login.html';
+        if (!user) {
+            // Если не авторизован, перенаправляем на вход
+            window.location.href = 'login.html';
+        }
 
+        // Превью изображений
         document.getElementById('images').addEventListener('change', function(e) {
             const preview = document.getElementById('preview');
             preview.innerHTML = '';
@@ -92,6 +184,7 @@
             const newItemRef = push(ref(db, 'items'));
             const itemId = newItemRef.key;
 
+            // Загружаем изображения
             const imageUrls = [];
             for (let i = 0; i < Math.min(files.length, 3); i++) {
                 const file = files[i];
@@ -101,7 +194,7 @@
                     const url = await getDownloadURL(imgRef);
                     imageUrls.push(url);
                 } catch (e) {
-                    console.error('Ошибка загрузки', e);
+                    console.error('Ошибка загрузки изображения', e);
                 }
             }
 
