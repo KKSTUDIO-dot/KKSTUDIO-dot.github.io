@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Новое объявление | Arzmob Store</title>
-    <!-- Telegram Web App -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Стили для прелоадера (если отсутствуют в style.css) */
         #preloader {
             position: fixed;
             top: 0;
@@ -35,25 +33,19 @@
     </style>
 </head>
 <body>
-    <!-- Прелоадер -->
-    <div id="preloader">
-        <div class="spinner"></div>
-    </div>
+    <div id="preloader"><div class="spinner"></div></div>
 
     <div class="container" style="display: flex; justify-content: center; flex-direction: column; align-items: center;">
-        <!-- Шапка с кнопкой назад и логотипом -->
         <div class="header" style="width: 100%;">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <button class="icon-btn" onclick="history.back()" title="Назад"><i class="fas fa-arrow-left"></i></button>
                 <div class="logo"><i class="fas fa-store"></i> Arzmob</div>
             </div>
             <div class="header-actions">
-                <!-- Кнопка закрытия Telegram (будет показана только внутри Telegram) -->
                 <button class="icon-btn" id="closeTelegramBtn" title="Закрыть" style="display: none;"><i class="fas fa-times"></i></button>
             </div>
         </div>
 
-        <!-- Форма добавления товара -->
         <div class="form-container">
             <h1><i class="fas fa-plus-circle"></i> Создать объявление</h1>
             <div class="subtitle">Заполните информацию о товаре или услуге</div>
@@ -93,6 +85,13 @@
                 <textarea id="desc" placeholder="Состояние, характеристики..."></textarea>
             </div>
 
+            <!-- Новое поле: Telegram контакт -->
+            <div class="form-group">
+                <label>Telegram для связи (необязательно)</label>
+                <input type="text" id="telegram" placeholder="@username или номер телефона">
+                <small style="color:#6c757d;">Укажите контакт, чтобы покупатели могли связаться</small>
+            </div>
+
             <div class="form-group">
                 <label>Изображения (до 3 шт)</label>
                 <input type="file" id="images" accept="image/*" multiple>
@@ -102,44 +101,29 @@
             <button class="btn-primary" id="publishBtn"><i class="fas fa-cloud-upload-alt"></i> Опубликовать</button>
         </div>
 
-        <!-- Водяной знак -->
-        <div class="watermark">
-            <i class="fas fa-store"></i> Arzmob Store 2026 — площадка для игроков Arizona Mobile
-        </div>
+        <div class="watermark"><i class="fas fa-store"></i> Arzmob Store 2026</div>
     </div>
 
-    <!-- Скрипт для Telegram и прелоадера -->
     <script>
         (function() {
-            // Инициализация Telegram
             if (window.Telegram && Telegram.WebApp) {
                 Telegram.WebApp.ready();
-                Telegram.WebApp.expand(); // развернуть на весь экран
-                // Показать кнопку закрытия
+                Telegram.WebApp.expand();
                 const closeBtn = document.getElementById('closeTelegramBtn');
                 if (closeBtn) {
                     closeBtn.style.display = 'inline-flex';
                     closeBtn.addEventListener('click', () => Telegram.WebApp.close());
                 }
-                // Настройка цветов (опционально)
                 Telegram.WebApp.setHeaderColor('#6c757d');
                 Telegram.WebApp.setBackgroundColor('#e9ecef');
             }
-
-            // Скрыть прелоадер после полной загрузки
-            window.addEventListener('load', function() {
-                const preloader = document.getElementById('preloader');
-                if (preloader) {
-                    preloader.style.opacity = '0';
-                    setTimeout(() => {
-                        preloader.style.display = 'none';
-                    }, 300);
-                }
+            window.addEventListener('load', () => {
+                document.getElementById('preloader').style.opacity = '0';
+                setTimeout(() => document.getElementById('preloader').style.display = 'none', 300);
             });
         })();
     </script>
 
-    <!-- Модуль с логикой страницы -->
     <script type="module">
         import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
@@ -147,12 +131,9 @@
         import { db, storage } from './firebase-config.js';
 
         const user = getCurrentUser();
-        if (!user) {
-            // Если не авторизован, перенаправляем на вход
-            window.location.href = 'login.html';
-        }
+        if (!user) window.location.href = 'login.html';
 
-        // Превью изображений
+        // Превью
         document.getElementById('images').addEventListener('change', function(e) {
             const preview = document.getElementById('preview');
             preview.innerHTML = '';
@@ -174,6 +155,7 @@
             const category = document.getElementById('category').value;
             const type = document.getElementById('type').value;
             const desc = document.getElementById('desc').value.trim();
+            const telegram = document.getElementById('telegram').value.trim().replace('@', '');
             const files = document.getElementById('images').files;
 
             if (!name || !price) {
@@ -210,7 +192,8 @@
                 status: 'pending',
                 views: 0,
                 images: imageUrls,
-                server: 'Arizona Mobile 1'
+                server: 'Arizona Mobile 1',
+                contact: telegram || '' // сохраняем контакт
             });
 
             alert('Объявление отправлено на модерацию');

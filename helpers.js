@@ -36,7 +36,14 @@ export async function isAdmin(userId) {
     return snap.val() === 'admin';
 }
 
-// ------ Избранное (localStorage) ------
+// Получить данные пользователя (ник, telegram)
+export async function getUserData(userId) {
+    const db = getDatabase();
+    const snap = await get(ref(db, `users/${userId}`));
+    return snap.val();
+}
+
+// ------ Избранное ------
 export function getFavorites() {
     const fav = localStorage.getItem('favorites');
     return fav ? JSON.parse(fav) : [];
@@ -60,10 +67,9 @@ export function isFavorite(itemId) {
     return getFavorites().includes(itemId);
 }
 
-// ------ История просмотров (localStorage) ------
+// ------ История просмотров ------
 export function addToHistory(itemId) {
     let history = JSON.parse(localStorage.getItem('history')) || [];
-    // Убираем дубликаты и сохраняем последние 20
     history = history.filter(id => id !== itemId);
     history.unshift(itemId);
     if (history.length > 20) history.pop();

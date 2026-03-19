@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Мой профиль | Arzmob Store</title>
-    <!-- Telegram Web App -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Прелоадер (на случай, если в style.css не определён) */
         #preloader {
             position: fixed;
             top: 0;
@@ -35,49 +33,48 @@
     </style>
 </head>
 <body>
-    <!-- Прелоадер -->
-    <div id="preloader">
-        <div class="spinner"></div>
-    </div>
+    <div id="preloader"><div class="spinner"></div></div>
 
     <div class="container">
-        <!-- Шапка с кнопкой назад -->
         <div class="header">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <button class="icon-btn" onclick="history.back()" title="Назад"><i class="fas fa-arrow-left"></i></button>
                 <div class="logo"><i class="fas fa-store"></i> Arzmob</div>
             </div>
             <div class="header-actions">
-                <!-- Кнопка закрытия Telegram (видна только внутри Telegram) -->
                 <button class="icon-btn" id="closeTelegramBtn" title="Закрыть" style="display: none;"><i class="fas fa-times"></i></button>
             </div>
         </div>
 
-        <!-- Информация о пользователе -->
         <div class="profile-header">
             <h2><i class="fas fa-user-circle"></i> <span id="userNick"></span></h2>
             <button class="btn-secondary" id="logoutBtn">Выйти</button>
         </div>
 
-        <!-- Вкладки -->
+        <!-- Форма для Telegram -->
+        <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 24px; border: 1px solid #dee2e6;">
+            <h3><i class="fab fa-telegram"></i> Контакт в Telegram</h3>
+            <p>Укажите ваш Telegram username (без @), чтобы покупатели могли связаться с вами.</p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="text" id="telegramInput" placeholder="username" style="flex: 1; padding: 10px; border: 1px solid #ced4da; border-radius: 40px;">
+                <button class="btn-primary" id="saveTelegramBtn" style="width: auto;">Сохранить</button>
+            </div>
+            <div id="telegramStatus" style="margin-top: 10px; color: #28a745;"></div>
+        </div>
+
         <div class="tabs">
             <button class="tab-btn active" data-tab="my">Мои объявления</button>
             <button class="tab-btn" data-tab="favorites">Избранное</button>
             <button class="tab-btn" data-tab="history">История</button>
         </div>
 
-        <!-- Содержимое вкладок -->
         <div id="myItems" class="items-grid" style="display: grid;"></div>
         <div id="favoritesItems" class="items-grid" style="display: none;"></div>
         <div id="historyItems" class="items-grid" style="display: none;"></div>
 
-        <!-- Водяной знак -->
-        <div class="watermark">
-            <i class="fas fa-store"></i> Arzmob Store 2026 — площадка для игроков Arizona Mobile
-        </div>
+        <div class="watermark"><i class="fas fa-store"></i> Arzmob Store 2026</div>
     </div>
 
-    <!-- Скрипт для Telegram и прелоадера -->
     <script>
         (function() {
             if (window.Telegram && Telegram.WebApp) {
@@ -91,32 +88,39 @@
                 Telegram.WebApp.setHeaderColor('#6c757d');
                 Telegram.WebApp.setBackgroundColor('#e9ecef');
             }
-
-            window.addEventListener('load', function() {
-                const preloader = document.getElementById('preloader');
-                if (preloader) {
-                    preloader.style.opacity = '0';
-                    setTimeout(() => {
-                        preloader.style.display = 'none';
-                    }, 300);
-                }
+            window.addEventListener('load', () => {
+                document.getElementById('preloader').style.opacity = '0';
+                setTimeout(() => document.getElementById('preloader').style.display = 'none', 300);
             });
         })();
     </script>
 
-    <!-- Основной модуль профиля -->
     <script type="module">
-        import { getDatabase, ref, query, orderByChild, equalTo, onValue, remove, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, query, orderByChild, equalTo, onValue, remove, get, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getCurrentUser, logout, getFavorites, getHistory, addToHistory } from './helpers.js';
         import { db } from './firebase-config.js';
 
         const user = getCurrentUser();
-        if (!user) {
-            window.location.href = 'login.html';
-        }
+        if (!user) window.location.href = 'login.html';
 
         document.getElementById('userNick').textContent = user.userNick;
         document.getElementById('logoutBtn').addEventListener('click', logout);
+
+        // Загрузка текущего Telegram пользователя
+        const userRef = ref(db, `users/${user.userId}`);
+        const userSnap = await get(userRef);
+        const userData = userSnap.val() || {};
+        if (userData.telegram) {
+            document.getElementById('telegramInput').value = userData.telegram;
+        }
+
+        // Сохранение Telegram
+        document.getElementById('saveTelegramBtn').addEventListener('click', async () => {
+            const telegram = document.getElementById('telegramInput').value.trim().replace('@', '');
+            await update(userRef, { telegram });
+            document.getElementById('telegramStatus').textContent = 'Сохранено!';
+            setTimeout(() => document.getElementById('telegramStatus').textContent = '', 2000);
+        });
 
         // Вкладки
         const tabs = document.querySelectorAll('.tab-btn');
@@ -137,7 +141,7 @@
             });
         });
 
-        // Загрузка моих объявлений
+        // Мои объявления
         const itemsRef = ref(db, 'items');
         const userItemsQuery = query(itemsRef, orderByChild('userId'), equalTo(user.userId));
         onValue(userItemsQuery, (snapshot) => {
@@ -170,7 +174,6 @@
             }
             myDiv.innerHTML = html;
 
-            // Обработчики удаления
             for (let id in data) {
                 document.getElementById(`del-${id}`)?.addEventListener('click', async (e) => {
                     e.stopPropagation();
@@ -181,7 +184,7 @@
             }
         });
 
-        // Загрузка избранного
+        // Избранное
         async function loadFavorites() {
             const favIds = getFavorites();
             if (favIds.length === 0) {
@@ -211,7 +214,7 @@
             });
         }
 
-        // Загрузка истории просмотров
+        // История
         async function loadHistory() {
             const histIds = getHistory();
             if (histIds.length === 0) {
