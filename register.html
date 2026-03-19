@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Регистрация | Arzmob Store</title>
-    <!-- Telegram Web App -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Дополнительные стили для прелоадера (на случай, если в style.css не хватает) */
         #preloader {
             position: fixed;
             top: 0;
@@ -41,14 +39,13 @@
     </div>
 
     <div class="container" style="display: flex; justify-content: center; flex-direction: column; align-items: center;">
-        <!-- Шапка с кнопкой назад и логотипом -->
+        <!-- Шапка с кнопкой назад -->
         <div class="header" style="width: 100%;">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <button class="icon-btn" onclick="history.back()" title="Назад"><i class="fas fa-arrow-left"></i></button>
                 <div class="logo"><i class="fas fa-store"></i> Arzmob</div>
             </div>
             <div class="header-actions">
-                <!-- Кнопка закрытия Telegram -->
                 <button class="icon-btn" id="closeTelegramBtn" title="Закрыть" style="display: none;"><i class="fas fa-times"></i></button>
             </div>
         </div>
@@ -71,6 +68,10 @@
             <button class="btn-primary" id="registerBtn"><i class="fas fa-check"></i> Зарегистрироваться</button>
             <div class="error" id="errorMsg"></div>
             <div class="link">Уже есть аккаунт? <a href="login.html">Войти</a></div>
+            <hr style="margin: 20px 0; border: 1px solid #dee2e6;">
+            <div style="text-align: center; color: #6c757d;">
+                <i class="fab fa-telegram"></i> Если вы открыли сайт в Telegram, вы будете авторизованы автоматически.
+            </div>
         </div>
 
         <!-- Водяной знак -->
@@ -79,7 +80,7 @@
         </div>
     </div>
 
-    <!-- Скрипт для Telegram и прелоадера -->
+    <!-- Скрипт для Telegram, прелоадера и авто-авторизации -->
     <script>
         (function() {
             if (window.Telegram && Telegram.WebApp) {
@@ -94,19 +95,35 @@
                 Telegram.WebApp.setBackgroundColor('#e9ecef');
             }
 
-            window.addEventListener('load', function() {
+            window.addEventListener('load', async function() {
+                // Скрыть прелоадер
                 const preloader = document.getElementById('preloader');
                 if (preloader) {
                     preloader.style.opacity = '0';
-                    setTimeout(() => {
-                        preloader.style.display = 'none';
-                    }, 300);
+                    setTimeout(() => preloader.style.display = 'none', 300);
+                }
+
+                // Если уже авторизован (в том числе через Telegram), редирект на главную
+                if (localStorage.getItem('userId')) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                // Пробуем авторизоваться через Telegram (это создаст пользователя, если его нет)
+                try {
+                    const { telegramAuth } = await import('./helpers.js');
+                    const user = await telegramAuth();
+                    if (user) {
+                        window.location.href = 'index.html';
+                    }
+                } catch (e) {
+                    console.warn('Telegram auth error', e);
                 }
             });
         })();
     </script>
 
-    <!-- Модуль регистрации -->
+    <!-- Модуль регистрации (обычная регистрация) -->
     <script type="module">
         import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { hashPassword } from './helpers.js';
@@ -141,7 +158,7 @@
             }
 
             const hashed = await hashPassword(pass);
-            const newUserRef = ref(db, 'users/' + Date.now());
+            const newUserRef = push(ref(db, 'users')); // создаём новый ключ
             await set(newUserRef, {
                 nick: nick,
                 password: hashed,
@@ -154,4 +171,4 @@
         });
     </script>
 </body>
-</html> 
+</html>

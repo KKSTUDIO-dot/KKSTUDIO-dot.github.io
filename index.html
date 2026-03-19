@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Прелоадер (дублируется на случай, если в style.css не хватает) */
+        /* Прелоадер (на случай, если в style.css не хватает) */
         #preloader {
             position: fixed;
             top: 0;
@@ -117,7 +117,7 @@
         </div>
     </div>
 
-    <!-- Скрипт для Telegram и прелоадера -->
+    <!-- Скрипт для Telegram, прелоадера и авторизации -->
     <script>
         (function() {
             if (window.Telegram && Telegram.WebApp) {
@@ -132,13 +132,27 @@
                 Telegram.WebApp.setBackgroundColor('#e9ecef');
             }
 
-            window.addEventListener('load', function() {
+            window.addEventListener('load', async function() {
+                // Скрыть прелоадер
                 const preloader = document.getElementById('preloader');
                 if (preloader) {
                     preloader.style.opacity = '0';
-                    setTimeout(() => {
-                        preloader.style.display = 'none';
-                    }, 300);
+                    setTimeout(() => preloader.style.display = 'none', 300);
+                }
+
+                // Telegram-авторизация (если не авторизован)
+                if (!localStorage.getItem('userId')) {
+                    try {
+                        // Динамический импорт helpers.js
+                        const { telegramAuth } = await import('./helpers.js');
+                        const user = await telegramAuth();
+                        if (user) {
+                            // Успешно авторизовались через Telegram — перезагружаем страницу, чтобы меню обновилось
+                            location.reload();
+                        }
+                    } catch (e) {
+                        console.warn('Telegram auth error', e);
+                    }
                 }
             });
         })();
