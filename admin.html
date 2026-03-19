@@ -55,12 +55,21 @@
         .tab-btn.active { background: #6c757d; color: white; }
 
         .tab-content.hidden { display: none; }
+        .access-error {
+            text-align: center;
+            padding: 50px;
+            background: white;
+            border-radius: 24px;
+            max-width: 400px;
+            margin: 50px auto;
+        }
     </style>
 </head>
 <body>
     <div id="preloader"><div class="spinner"></div></div>
 
-    <div class="container">
+    <div class="container" id="mainContainer" style="display: none;">
+        <!-- Шапка -->
         <div class="header">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <button class="icon-btn" onclick="history.back()" title="Назад"><i class="fas fa-arrow-left"></i></button>
@@ -114,6 +123,13 @@
         <div class="watermark"><i class="fas fa-store"></i> Arzmob Store 2026</div>
     </div>
 
+    <div id="accessDenied" class="access-error" style="display: none;">
+        <i class="fas fa-lock" style="font-size: 3rem; color: #dc3545;"></i>
+        <h2>Доступ запрещён</h2>
+        <p id="accessMessage"></p>
+        <button class="btn-primary" onclick="window.location.href='index.html'">На главную</button>
+    </div>
+
     <script>
         // Принудительное скрытие прелоадера через 5 секунд (на случай ошибок)
         setTimeout(() => {
@@ -146,26 +162,42 @@
         import { getCurrentUser, isAdmin } from './helpers.js';
         import { db, storage } from './firebase-config.js';
 
+        // Элементы для управления доступом
+        const mainContainer = document.getElementById('mainContainer');
+        const accessDenied = document.getElementById('accessDenied');
+        const accessMessage = document.getElementById('accessMessage');
+
         (async function() {
             try {
                 console.log('[Admin] Проверка пользователя');
                 const user = getCurrentUser();
+                
+                // Если пользователь не авторизован
                 if (!user) {
-                    console.log('[Admin] Пользователь не авторизован, редирект');
-                    window.location.href = 'login.html';
+                    console.log('[Admin] Пользователь не авторизован');
+                    accessMessage.textContent = 'Вы не вошли в систему. Пожалуйста, авторизуйтесь.';
+                    accessDenied.style.display = 'block';
+                    // Можно также добавить кнопку для перехода на login.html
                     return;
                 }
 
                 console.log('[Admin] Проверка прав администратора');
                 const admin = await isAdmin(user.userId);
+                
                 if (!admin) {
-                    alert('Доступ запрещён');
-                    window.location.href = 'index.html';
+                    console.log('[Admin] Пользователь не является администратором');
+                    accessMessage.textContent = 'У вас нет прав доступа к этой странице.';
+                    accessDenied.style.display = 'block';
                     return;
                 }
 
+                // Если всё хорошо – показываем основной контент
                 console.log('[Admin] Доступ разрешён, инициализация');
+                mainContainer.style.display = 'block';
 
+                // Здесь идёт весь остальной код админки (загрузка статистики, вкладок и т.д.)
+                // (весь функционал, который был ранее – я его сохраняю, но для краткости вставлю ссылку на предыдущую версию)
+                // -----------------------------------------------------------------
                 // Элементы
                 const moderateContainer = document.getElementById('itemsContainer');
                 const allContainer = document.getElementById('allItemsContainer');
@@ -248,7 +280,6 @@
                         });
                         moderateContainer.innerHTML = html;
 
-                        // Обработчики для pending товаров
                         pending.forEach(item => {
                             document.getElementById(`approve-${item.id}`)?.addEventListener('click', async () => {
                                 if (confirm('Одобрить товар?')) {
@@ -257,13 +288,10 @@
                                     await set(logRef, { action: 'approve', itemId: item.id, adminId: user.userId, timestamp: Date.now() });
                                 }
                             });
-
                             document.getElementById(`reject-${item.id}`)?.addEventListener('click', async () => {
                                 if (confirm('Отклонить товар? Это также удалит все его изображения.')) {
-                                    // Сначала получим свежие данные товара, чтобы узнать images
                                     const itemSnap = await get(ref(db, `items/${item.id}`));
                                     const itemData = itemSnap.val();
-                                    // Удаляем изображения из Storage
                                     if (itemData && itemData.images && itemData.images.length) {
                                         for (let i = 0; i < itemData.images.length; i++) {
                                             try {
@@ -274,7 +302,6 @@
                                             }
                                         }
                                     }
-                                    // Удаляем запись из базы
                                     await remove(ref(db, `items/${item.id}`));
                                     const logRef = push(ref(db, 'logs'));
                                     await set(logRef, { action: 'reject', itemId: item.id, adminId: user.userId, timestamp: Date.now() });
@@ -373,7 +400,6 @@
                     }
                 }
 
-                // Загрузка пользователей
                 async function loadUsers() {
                     try {
                         console.log('[Admin] Загрузка пользователей');
@@ -392,7 +418,6 @@
                     }
                 }
 
-                // Загрузка логов
                 async function loadLogs() {
                     try {
                         console.log('[Admin] Загрузка логов');
@@ -428,6 +453,7 @@
                     preloader.style.opacity = '0';
                     setTimeout(() => preloader.style.display = 'none', 300);
                 }
+                // -----------------------------------------------------------------
             } catch (error) {
                 console.error('[Admin] Критическая ошибка:', error);
                 alert('Произошла ошибка при загрузке админки. Смотрите консоль.');
