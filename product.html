@@ -2,27 +2,99 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Товар | Arzmob Store</title>
+    <!-- Telegram Web App -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Прелоадер (на случай отсутствия в style.css) */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.3s;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #dee2e6;
+            border-top-color: #6c757d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
+    <!-- Прелоадер -->
+    <div id="preloader">
+        <div class="spinner"></div>
+    </div>
+
     <div class="container">
+        <!-- Шапка с кнопкой назад и логотипом -->
         <div class="header">
-            <div class="logo"><i class="fas fa-store"></i> Arzmob</div>
-            <a href="javascript:history.back()" class="btn-secondary"><i class="fas fa-arrow-left"></i> Назад</a>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button class="icon-btn" onclick="history.back()" title="Назад"><i class="fas fa-arrow-left"></i></button>
+                <div class="logo"><i class="fas fa-store"></i> Arzmob</div>
+            </div>
+            <div class="header-actions">
+                <!-- Кнопка закрытия Telegram (видна только внутри Telegram) -->
+                <button class="icon-btn" id="closeTelegramBtn" title="Закрыть" style="display: none;"><i class="fas fa-times"></i></button>
+            </div>
         </div>
 
-        <div id="productContainer" style="background:white; border-radius:20px; padding:30px; border:1px solid #dee2e6;">
-            <div class="loading"><i class="fas fa-spinner fa-pulse"></i> Загрузка...</div>
+        <!-- Контейнер для товара (заполняется динамически) -->
+        <div id="productContainer" style="background: white; border-radius: 20px; padding: 30px; border: 1px solid #dee2e6; margin-bottom: 20px;">
+            <div class="loading" style="text-align: center; padding: 40px;">
+                <i class="fas fa-spinner fa-pulse" style="font-size: 2rem; color: #6c757d;"></i>
+                <p>Загрузка...</p>
+            </div>
         </div>
 
+        <!-- Водяной знак -->
         <div class="watermark">
-            <i class="fas fa-store"></i> Arzmob Store 2026
+            <i class="fas fa-store"></i> Arzmob Store 2026 — площадка для игроков Arizona Mobile
         </div>
     </div>
 
+    <!-- Скрипт для Telegram и прелоадера -->
+    <script>
+        (function() {
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+                const closeBtn = document.getElementById('closeTelegramBtn');
+                if (closeBtn) {
+                    closeBtn.style.display = 'inline-flex';
+                    closeBtn.addEventListener('click', () => Telegram.WebApp.close());
+                }
+                Telegram.WebApp.setHeaderColor('#6c757d');
+                Telegram.WebApp.setBackgroundColor('#e9ecef');
+            }
+
+            window.addEventListener('load', function() {
+                const preloader = document.getElementById('preloader');
+                if (preloader) {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => {
+                        preloader.style.display = 'none';
+                    }, 300);
+                }
+            });
+        })();
+    </script>
+
+    <!-- Модуль загрузки и отображения товара -->
     <script type="module">
         import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getCurrentUser, addToHistory } from './helpers.js';
@@ -41,12 +113,14 @@
             if (!data) {
                 container.innerHTML = '<div class="error">Товар не найден</div>';
             } else {
+                // Увеличиваем просмотры
                 await update(itemRef, { views: (data.views || 0) + 1 });
                 addToHistory(itemId);
 
                 const price = data.price.toLocaleString();
                 const date = new Date(data.timestamp).toLocaleString();
 
+                // Определяем тип сделки
                 let typeClass, typeIcon, typeLabel;
                 switch (data.type) {
                     case 'sale': typeClass = 'type-sale'; typeIcon = 'fa-tag'; typeLabel = 'Продажа'; break;
@@ -56,17 +130,20 @@
                     default: typeClass = ''; typeIcon = 'fa-question'; typeLabel = data.type;
                 }
 
+                // Категория
                 let categoryLabel = '';
                 switch (data.category) {
                     case 'accessories': categoryLabel = 'Аксессуары'; break;
                     case 'resources': categoryLabel = 'Ресурсы'; break;
                     case 'realty': categoryLabel = 'Недвижимость'; break;
                     case 'transport': categoryLabel = 'Транспорт'; break;
+                    default: categoryLabel = data.category;
                 }
 
+                // Изображения
                 let imagesHtml = '';
                 if (data.images && data.images.length) {
-                    imagesHtml = '<div style="display:flex; gap:10px; overflow-x:auto; margin-bottom:20px;">' +
+                    imagesHtml = '<div style="display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px;">' +
                         data.images.map(url => `<img src="${url}" style="width:200px; height:200px; object-fit:cover; border-radius:12px;">`).join('') +
                         '</div>';
                 }
@@ -79,7 +156,9 @@
                     <span class="item-type ${typeClass}" style="font-size:1rem; padding:8px 20px;"><i class="fas ${typeIcon}"></i> ${typeLabel}</span>
                     <h1 style="font-size:2rem; margin:15px 0;">${escapeHtml(data.name)}</h1>
                     <div style="font-size:2rem; color:#28a745; font-weight:700; margin-bottom:20px;"><i class="fas fa-coins"></i> ${price}</div>
-                    <div style="font-size:1.1rem; line-height:1.6; margin:25px 0; padding:20px 0; border-top:1px solid #dee2e6; border-bottom:1px solid #dee2e6;">${escapeHtml(data.description) || 'Нет описания'}</div>
+                    <div style="font-size:1.1rem; line-height:1.6; margin:25px 0; padding:20px 0; border-top:1px solid #dee2e6; border-bottom:1px solid #dee2e6;">
+                        ${escapeHtml(data.description) || 'Нет описания'}
+                    </div>
                     <div style="color:#6c757d; display:flex; gap:20px; flex-wrap:wrap;">
                         <span><i class="fas fa-tags"></i> ${categoryLabel}</span>
                         <span><i class="far fa-user"></i> Продавец: ${data.userNick || 'Неизвестно'}</span>
@@ -90,8 +169,8 @@
                 `;
                 container.innerHTML = html;
 
-                if (user) {
-                    document.getElementById('contactBtn')?.addEventListener('click', () => {
+                if (user && document.getElementById('contactBtn')) {
+                    document.getElementById('contactBtn').addEventListener('click', () => {
                         alert(`Свяжитесь с продавцом ${data.userNick} через личные сообщения (функция в разработке)`);
                     });
                 }
