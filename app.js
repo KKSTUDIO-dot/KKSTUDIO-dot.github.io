@@ -1,11 +1,11 @@
 import { db, storage } from './firebase-config.js';
-import { ref, push, onValue, remove, update, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+import { ref, push, onValue, remove, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
 // ========== Инициализация Telegram ==========
 const tg = window.Telegram.WebApp;
-tg.expand();                         // Развернуть на весь экран
-tg.enableClosingConfirmation();      // Подтверждение при закрытии
+tg.expand();                         // развернуть на весь экран
+tg.enableClosingConfirmation();      // подтверждение при закрытии
 
 // Данные пользователя
 const user = tg.initDataUnsafe?.user;
@@ -14,15 +14,27 @@ const userName = user?.first_name || (user?.username ? '@' + user.username : 'Г
 const userPhoto = user?.photo_url || null;
 
 // ========== DOM элементы ==========
+// Шапка и меню
 const sidebar = document.getElementById('sidebar');
 const burgerBtn = document.getElementById('burger-menu');
 const closeSidebar = document.getElementById('close-sidebar');
+const logoLink = document.getElementById('logo-link');
+
+// Навигация
+const navItems = document.querySelectorAll('.nav-item');
+
+// Страницы
+const homePage = document.getElementById('home-page');
 const goodsPage = document.getElementById('goods-page');
 const profilePage = document.getElementById('profile-page');
 const goodsList = document.querySelector('.goods-list');
 const profileInfo = document.querySelector('.profile-info');
 const profileAdsList = document.querySelector('.profile-ads-list');
+
+// Кнопка добавления
 const addAdBtn = document.getElementById('add-ad-btn');
+
+// Модальное окно
 const modal = document.getElementById('add-modal');
 const adText = document.getElementById('ad-text');
 const adImage = document.getElementById('ad-image');
@@ -34,22 +46,41 @@ const adsRef = ref(db, 'ads');               // все объявления
 const userAdsRef = ref(db, `users/${userId}/ads`); // объявления пользователя
 
 // ========== Состояние ==========
-let currentPage = 'goods';   // 'goods' или 'profile'
+let currentPage = 'home';   // 'home', 'goods', 'profile'
 
 // ========== Функции навигации ==========
 function navigateTo(page) {
     currentPage = page;
-    if (page === 'goods') {
+
+    // Скрыть все страницы
+    homePage.classList.remove('active');
+    goodsPage.classList.remove('active');
+    profilePage.classList.remove('active');
+
+    // Показать нужную
+    if (page === 'home') {
+        homePage.classList.add('active');
+        addAdBtn.style.display = 'none';
+        // Можно загрузить рекомендации на главной, пока просто приветствие
+    } else if (page === 'goods') {
         goodsPage.classList.add('active');
-        profilePage.classList.remove('active');
         addAdBtn.style.display = 'flex';
-        loadGoods();              // загружаем объявления при переходе
-    } else {
-        goodsPage.classList.remove('active');
+        loadGoods(); // загружаем объявления при переходе
+    } else if (page === 'profile') {
         profilePage.classList.add('active');
         addAdBtn.style.display = 'none';
-        loadProfile();           // загружаем профиль и свои объявления
+        loadProfile(); // загружаем профиль и свои объявления
     }
+
+    // Обновить активный пункт в нижнем меню
+    navItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.nav === page) {
+            item.classList.add('active');
+        }
+    });
+
+    // Закрыть бургер-меню, если открыто
     closeSidebarMenu();
 }
 
@@ -73,7 +104,6 @@ function closeSidebarMenu() {
 
 // ========== Загрузка всех объявлений ==========
 function loadGoods() {
-    // Показываем индикатор загрузки
     goodsList.innerHTML = '<div class="loading">Загрузка...</div>';
 
     onValue(adsRef, (snapshot) => {
@@ -118,7 +148,7 @@ function loadProfile() {
     });
 }
 
-// ========== Отрисовка карточки объявления на главной ==========
+// ========== Отрисовка карточки объявления на главной (товары) ==========
 function renderGoodCard(ad, container) {
     const card = document.createElement('div');
     card.className = 'good-card';
@@ -131,9 +161,6 @@ function renderGoodCard(ad, container) {
     if (ad.imageUrl) {
         const img = document.createElement('img');
         img.src = ad.imageUrl;
-        img.style.maxWidth = '100%';
-        img.style.borderRadius = '8px';
-        img.style.marginTop = '8px';
         card.appendChild(img);
     }
 
@@ -158,9 +185,6 @@ function renderProfileAdCard(ad, container) {
     if (ad.imageUrl) {
         const img = document.createElement('img');
         img.src = ad.imageUrl;
-        img.style.maxWidth = '100%';
-        img.style.borderRadius = '8px';
-        img.style.marginTop = '8px';
         card.appendChild(img);
     }
 
@@ -185,20 +209,18 @@ async function deleteAd(adId, imageUrl) {
     if (!confirmed) return;
 
     try {
-        // Удаляем из базы
+        // Удаляем из базы (общей)
         const adRef = ref(db, `ads/${adId}`);
         await remove(adRef);
         // Удаляем из пользовательского списка
         const userAdRef = ref(db, `users/${userId}/ads/${adId}`);
         await remove(userAdRef);
 
-        // Если есть картинка, удаляем из Storage
+        // Если есть картинка, пытаемся удалить из Storage
         if (imageUrl) {
-            // Из URL получаем путь. Для Firebase Storage URL вида:
-            // https://firebasestorage.googleapis.com/v0/b/.../o/...?alt=media
-            // Проще сохранять путь при создании, но для удаления можно вытащить.
-            // Упростим: при создании будем сохранять storagePath.
-            // Пока оставим удаление только из базы, а фото останется – для простоты.
+            // Упрощённо: при создании мы сохраняли storagePath, но для удаления из Storage нужно получить путь.
+            // Для простоты опустим удаление фото из Storage, оставим только базу данных.
+            // Если нужно строгое удаление, нужно сохранять storagePath в объекте ad и использовать deleteObject.
         }
 
         tg.showAlert('Объявление удалено');
@@ -293,16 +315,31 @@ modal.addEventListener('click', (e) => {
     if (e.target === modal) closeModal();
 });
 
-// Обработка кликов по пунктам меню
+// Обработка кликов по пунктам бургер-меню
 document.querySelectorAll('.sidebar-menu a').forEach(link => {
     link.addEventListener('click', (e) => {
         e.preventDefault();
         const page = link.dataset.page;
         if (page === 'goods') navigateTo('goods');
         else if (page === 'profile') navigateTo('profile');
+        closeSidebarMenu();
     });
 });
 
+// Обработка кликов по нижней навигации
+navItems.forEach(item => {
+    item.addEventListener('click', () => {
+        const page = item.dataset.nav;
+        navigateTo(page);
+    });
+});
+
+// Клик по логотипу – на главную
+logoLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    navigateTo('home');
+});
+
 // ========== Запуск ==========
-// При запуске показываем страницу товаров
-navigateTo('goods');
+// При запуске показываем главную страницу
+navigateTo('home');
