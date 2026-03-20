@@ -1,6 +1,6 @@
 import { db, storage } from './firebase-config.js';
 import { ref, onValue, push, update, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-import { ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
 // ========== Инициализация Telegram ==========
 const tg = window.Telegram.WebApp;
@@ -8,14 +8,29 @@ tg.expand();
 tg.enableClosingConfirmation();
 
 const user = tg.initDataUnsafe?.user;
-const userId = user?.id ? user.id.toString() : 'guest_' + Date.now();
-const userName = user?.first_name || (user?.username ? '@' + user.username : 'Гость');
-const userPhoto = user?.photo_url || null;
+let userId;
+let userName;
+let userPhoto;
+
+if (user?.id) {
+    userId = user.id.toString();
+    userName = user.first_name || (user.username ? '@' + user.username : 'Гость');
+    userPhoto = user.photo_url || null;
+} else {
+    // Гость — сохраняем ID в localStorage
+    userId = localStorage.getItem('guestId');
+    if (!userId) {
+        userId = 'guest_' + Date.now();
+        localStorage.setItem('guestId', userId);
+    }
+    userName = 'Гость';
+    userPhoto = null;
+}
 
 // ========== Определяем текущую страницу ==========
 const isGoodsPage = window.location.pathname.includes('tovars.html');
 const isProfilePage = window.location.pathname.includes('profile.html');
-const isHomePage = !isGoodsPage && !isProfilePage; // index.html
+const isHomePage = !isGoodsPage && !isProfilePage;
 
 // ========== Общие Firebase ссылки ==========
 const adsRef = ref(db, 'ads');
@@ -80,6 +95,21 @@ async function addAd() {
         tg.showAlert('Введите текст или выберите фото');
         return;
     }
+
+    // Валидация файла
+    if (file) {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            tg.showAlert('Можно загружать только JPEG, PNG или WEBP');
+            return;
+        }
+        const maxSize = 5 * 1024 * 1024; // 5 MB
+        if (file.size > maxSize) {
+            tg.showAlert('Файл не должен превышать 5 МБ');
+            return;
+        }
+    }
+
     submitAdd.disabled = true;
     submitAdd.textContent = 'Публикация...';
     try {
@@ -165,17 +195,16 @@ function loadProfile() {
             }
             const deleteBtn = document.createElement('button');
             deleteBtn.textContent = 'Удалить';
-            deleteBtn.style.marginTop = '8px';
-            deleteBtn.style.backgroundColor = 'var(--destructive)';
-            deleteBtn.style.color = 'white';
-            deleteBtn.style.border = 'none';
-            deleteBtn.style.padding = '6px 12px';
-            deleteBtn.style.borderRadius = '8px';
-            deleteBtn.style.cursor = 'pointer';
+            deleteBtn.className = 'delete-btn';
             deleteBtn.addEventListener('click', async () => {
                 const confirmed = await tg.showConfirm('Удалить объявление?');
                 if (!confirmed) return;
                 try {
+                    // Удаляем из Storage, если есть изображение
+                    if (ad.storagePath) {
+                        const fileRef = storageRef(storage, ad.storagePath);
+                        await deleteObject(fileRef).catch(console.warn);
+                    }
                     await remove(ref(db, `ads/${ad.id}`));
                     await remove(ref(db, `users/${userId}/ads/${ad.id}`));
                     tg.showAlert('Объявление удалено');
@@ -196,6 +225,6 @@ if (isGoodsPage) {
 } else if (isProfilePage) {
     initProfilePage();
 } else {
-    // Главная страница – просто приветствие, ничего дополнительно не нужно
+    // Главная страница — пустая, ничего не делаем
     console.log('Главная страница');
 }
