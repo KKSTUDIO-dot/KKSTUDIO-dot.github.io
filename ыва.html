@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Назначение супер-админа</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #121212;
+            color: white;
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .card {
+            background: #1e1e1e;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: #121212;
+            color: white;
+            font-size: 16px;
+        }
+        button {
+            background: #2ecc71;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background: #27ae60;
+        }
+        .result {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .success {
+            background: rgba(46,204,113,0.2);
+            color: #2ecc71;
+        }
+        .error {
+            background: rgba(255,71,87,0.2);
+            color: #ff4757;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Назначение супер-админа</h2>
+        <p>Введите Telegram ID пользователя, который станет супер-администратором.</p>
+        <input type="text" id="userId" placeholder="Telegram ID (например, 123456789)" required>
+        <input type="text" id="userName" placeholder="Имя (необязательно)">
+        <button id="setSuperAdmin">Назначить супер-админом</button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAQECyI2wLqHF0BzletUPiG3ryOqWROPOE",
+            databaseURL: "https://ds-studio-app-default-rtdb.firebaseio.com",
+            projectId: "ds-studio-app",
+            storageBucket: "ds-studio-app.appspot.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        document.getElementById('setSuperAdmin').addEventListener('click', async () => {
+            const userId = document.getElementById('userId').value.trim();
+            const userName = document.getElementById('userName').value.trim();
+            const resultDiv = document.getElementById('result');
+
+            if (!userId) {
+                resultDiv.innerHTML = '<div class="error">Введите Telegram ID</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="loading">Проверка...</div>';
+            try {
+                const userRef = ref(db, `users/${userId}`);
+                const snapshot = await get(userRef);
+                if (snapshot.exists()) {
+                    // Обновляем существующего пользователя
+                    await set(ref(db, `users/${userId}/role`), 'superadmin');
+                    if (userName) {
+                        await set(ref(db, `users/${userId}/nick`), userName);
+                    }
+                    resultDiv.innerHTML = '<div class="success">✅ Пользователь уже существовал, теперь он супер-администратор.</div>';
+                } else {
+                    // Создаём нового пользователя с ролью superadmin
+                    await set(userRef, {
+                        nick: userName || 'Супер-админ',
+                        role: 'superadmin',
+                        registered: Date.now()
+                    });
+                    resultDiv.innerHTML = '<div class="success">✅ Новый пользователь создан и назначен супер-администратором.</div>';
+                }
+            } catch (error) {
+                console.error(error);
+                resultDiv.innerHTML = `<div class="error">❌ Ошибка: ${error.message}</div>`;
+            }
+        });
+    </script>
+</body>
+</html>
