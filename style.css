@@ -1,4 +1,3 @@
-/* Основные переменные для Telegram темы (тёмная тема по умолчанию) */
 :root {
     --bg-color: #121212;
     --text-color: #ffffff;
@@ -8,22 +7,6 @@
     --button-text: #ffffff;
     --destructive: #ff4757;
     --border-color: rgba(255, 255, 255, 0.1);
-    --header-bg: #2c2c2c;               /* серый фон шапки */
-    --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-/* Если Telegram передаёт свои цвета, используем их */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg-color: var(--tg-theme-bg-color, #121212);
-        --text-color: var(--tg-theme-text-color, #ffffff);
-        --secondary-bg: var(--tg-theme-secondary-bg-color, #1e1e1e);
-        --hint-color: var(--tg-theme-hint-color, #8e8e8e);
-        --button-color: var(--tg-theme-button-color, #2ecc71);
-        --button-text: var(--tg-theme-button-text-color, #ffffff);
-        --destructive: var(--tg-theme-destructive-text-color, #ff4757);
-        --header-bg: #2c2c2c;          /* серый фон шапки, не зависит от темы */
-    }
 }
 
 * {
@@ -33,7 +16,7 @@
 }
 
 body {
-    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     background: var(--bg-color);
     color: var(--text-color);
     line-height: 1.5;
@@ -48,163 +31,27 @@ body {
     background: var(--bg-color);
 }
 
-/* ========== ШАПКА С ЗАКРУГЛЕНИЕМ, ОТСТУПАМИ, СЕРЫМ ФОНОМ И БЕЛЫМ ТЕКСТОМ ========== */
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 20px;
-    margin: 12px 12px 0 12px;
-    background: var(--header-bg);
-    border-radius: 24px;
-    backdrop-filter: blur(10px);
-    box-shadow: var(--shadow);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    position: sticky;
-    top: 12px;
-    z-index: 100;
-}
-
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.logo-link {
-    display: flex;
-    text-decoration: none;
-}
-
-.logo-img {
-    height: 36px;
-    width: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-}
-
-.logo-text {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #ffffff;          /* белый цвет текста */
-    white-space: nowrap;
-}
-
-.burger-menu {
-    cursor: pointer;
-    font-size: 24px;
-    color: #ffffff;          /* иконка бургера белая */
-    transition: transform 0.2s;
-    padding: 8px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.burger-menu:hover {
-    transform: scale(1.05);
-    background: rgba(255, 255, 255, 0.1);
-}
-
-/* ========== БОКОВОЕ МЕНЮ ========== */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: -280px;
-    width: 280px;
-    height: 100%;
-    background: rgba(30, 30, 30, 0.95);
-    backdrop-filter: blur(20px);
-    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.3);
-    transition: left 0.3s ease;
-    z-index: 200;
-    display: flex;
-    flex-direction: column;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.sidebar.open {
-    left: 0;
-}
-
-.sidebar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid var(--border-color);
-    font-weight: bold;
-    font-size: 18px;
-}
-
-.sidebar-header i {
-    cursor: pointer;
-    font-size: 20px;
-    transition: transform 0.2s;
-}
-
-.sidebar-header i:hover {
-    transform: rotate(90deg);
-}
-
-.sidebar-menu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.sidebar-menu li a {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 20px;
-    color: var(--text-color);
-    text-decoration: none;
-    font-size: 16px;
-    transition: all 0.2s;
-}
-
-.sidebar-menu li a:hover {
-    background: rgba(255, 255, 255, 0.1);
-    padding-left: 28px;
-}
-
-.sidebar-menu li a i {
-    width: 24px;
-    text-align: center;
-}
-
-/* Оверлей при открытом меню */
-.sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    z-index: 150;
-    display: none;
-}
-
-.sidebar-overlay.active {
-    display: block;
-}
-
-/* ========== ОСНОВНОЙ КОНТЕНТ ========== */
 #main-content {
     padding: 20px 16px 80px 16px;
 }
 
-/* Страницы */
-.page {
-    display: none;
+/* Приветствие на главной */
+.welcome {
+    text-align: center;
+    padding: 40px 20px;
 }
 
-.page.active {
-    display: block;
+.welcome h2 {
+    margin-bottom: 16px;
+    font-size: 1.8rem;
 }
 
-/* ========== КАРТОЧКИ ТОВАРОВ ========== */
+.welcome p {
+    margin-bottom: 12px;
+    color: var(--hint-color);
+}
+
+/* Карточки товаров */
 .goods-list {
     display: flex;
     flex-direction: column;
@@ -216,13 +63,12 @@ body {
     border-radius: 20px;
     padding: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s;
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .good-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 .good-text {
@@ -246,7 +92,7 @@ body {
     gap: 6px;
 }
 
-/* ========== ПРОФИЛЬ ========== */
+/* Профиль */
 .profile-info {
     background: var(--secondary-bg);
     border-radius: 24px;
@@ -261,19 +107,9 @@ body {
     margin: 8px 0;
 }
 
-.profile-info img {
-    border: 3px solid var(--button-color);
-    margin-top: 12px;
-}
-
-.profile-ads {
-    margin-top: 20px;
-}
-
 .profile-ads h3 {
     margin-bottom: 16px;
     font-size: 1.2rem;
-    font-weight: 500;
 }
 
 .profile-ads-list {
@@ -282,7 +118,7 @@ body {
     gap: 12px;
 }
 
-/* ========== МОДАЛЬНОЕ ОКНО ========== */
+/* Модальное окно */
 .modal {
     position: fixed;
     bottom: 0;
@@ -334,7 +170,6 @@ body {
     border: none;
     font-weight: 600;
     cursor: pointer;
-    transition: opacity 0.2s;
 }
 
 .modal-buttons button:first-child {
@@ -347,14 +182,10 @@ body {
     color: var(--button-text);
 }
 
-.modal-buttons button:active {
-    opacity: 0.8;
-}
-
-/* ========== ПЛАВАЮЩАЯ КНОПКА ========== */
+/* Плавающая кнопка */
 .fab {
     position: fixed;
-    bottom: 24px;
+    bottom: 80px;
     right: 20px;
     width: 56px;
     height: 56px;
@@ -368,56 +199,15 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: transform 0.2s;
     z-index: 100;
 }
 
 .fab:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
-/* ========== ВСПОМОГАТЕЛЬНЫЕ КЛАССЫ ========== */
-.loading,
-.empty {
-    text-align: center;
-    color: var(--hint-color);
-    padding: 40px;
-    font-style: italic;
-}
-
-/* ========== АДАПТИВНОСТЬ ========== */
-@media (max-width: 600px) {
-    .app {
-        max-width: 100%;
-    }
-
-    .sidebar {
-        width: 260px;
-    }
-
-    .header {
-        margin: 10px 10px 0 10px;
-        padding: 10px 16px;
-    }
-}
-
-@media (max-width: 480px) {
-    .logo-text {
-        font-size: 1rem;
-    }
-
-    .logo-img {
-        height: 32px;
-    }
-
-    .header {
-        margin: 8px 8px 0 8px;
-        padding: 8px 14px;
-    }
-}
-
-/* ========== НИЖНЯЯ НАВИГАЦИЯ ========== */
+/* Нижняя навигация */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -438,7 +228,7 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    cursor: pointer;
+    text-decoration: none;
     transition: all 0.2s;
     color: var(--hint-color);
     font-size: 12px;
@@ -457,7 +247,15 @@ body {
     font-weight: 500;
 }
 
-/* Корректируем отступ основного контента, чтобы не перекрывался панелью */
-#main-content {
-    padding: 20px 16px 80px 16px;
+.loading,
+.empty {
+    text-align: center;
+    color: var(--hint-color);
+    padding: 40px;
+}
+
+@media (max-width: 600px) {
+    .fab {
+        bottom: 70px;
+    }
 }
