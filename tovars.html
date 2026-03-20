@@ -11,6 +11,14 @@
 <body>
     <div class="app">
         <main id="main-content">
+            <!-- Табы категорий -->
+            <div class="categories-tabs">
+                <button class="tab-btn active" data-cat="sale">Продажа</button>
+                <button class="tab-btn" data-cat="buy">Покупка</button>
+                <button class="tab-btn" data-cat="rent">Аренда</button>
+                <button class="tab-btn" data-cat="ad">Реклама</button>
+            </div>
+            <!-- Список объявлений -->
             <div class="goods-list"></div>
         </main>
 
@@ -31,7 +39,14 @@
             </a>
         </nav>
 
+        <!-- Модальное окно добавления объявления -->
         <div id="add-modal" class="modal">
+            <select id="ad-category">
+                <option value="sale">Продажа</option>
+                <option value="buy">Покупка</option>
+                <option value="rent">Аренда</option>
+                <option value="ad">Реклама</option>
+            </select>
             <textarea id="ad-text" placeholder="Описание товара..." rows="4"></textarea>
             <input type="file" id="ad-image" accept="image/jpeg,image/png,image/webp">
             <div class="modal-buttons">

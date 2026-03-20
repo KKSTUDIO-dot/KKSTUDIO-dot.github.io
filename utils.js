@@ -27,7 +27,7 @@ export function getUserData() {
 }
 
 // Публикация объявления
-export async function publishAd(text, file, userId, userName) {
+export async function publishAd(text, file, userId, userName, category = 'sale') {
     if (!text && !file) {
         throw new Error('Введите текст или выберите фото');
     }
@@ -60,7 +60,8 @@ export async function publishAd(text, file, userId, userName) {
         storagePath,
         authorId: userId,
         authorName: userName,
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        category
     };
     await update(newAdRef, adData);
 
@@ -69,7 +70,8 @@ export async function publishAd(text, file, userId, userName) {
         text: text || '',
         imageUrl,
         storagePath,
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        category
     });
     return newAdRef.key;
 }

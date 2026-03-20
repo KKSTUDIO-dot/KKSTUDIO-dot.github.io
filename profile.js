@@ -21,8 +21,20 @@ function initProfilePage() {
 function loadProfile() {
     try {
         if (!user?.id) {
-            console.log('Гостевой режим, user.id отсутствует');
-            // ... (гостевой код)
+            // Гостевой режим
+            profileInfo.innerHTML = `
+                <div class="profile-guest">
+                    <div class="profile-guest-icon">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <h2>Гость</h2>
+                    <p class="profile-guest-id">ID: ${userId}</p>
+                    <div class="profile-guest-note">
+                        <i class="fas fa-info-circle"></i> Вы вошли как гость. Объявления сохраняются в браузере.
+                    </div>
+                </div>
+            `;
+            profileAdsList.innerHTML = '<div class="empty">У вас пока нет объявлений</div>';
             return;
         }
 
