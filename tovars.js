@@ -1,28 +1,19 @@
 import { db } from './firebase-config.js';
 import { ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-import { getUserData, publishAd } from './utils.js';
+import { getUserData } from './utils.js';
 
-const { userId, userName, tg } = getUserData();
+const { tg } = getUserData();
 tg.expand();
 tg.enableClosingConfirmation();
 
-let goodsList, addAdBtn, modal, adCategory, adText, adImage, cancelAdd, submitAdd;
+let goodsList;
 let allAds = [];
 let currentCategory = 'sale';
 
 function initGoodsPage() {
     goodsList = document.querySelector('.goods-list');
-    addAdBtn = document.getElementById('add-ad-btn');
-    modal = document.getElementById('add-modal');
-    adCategory = document.getElementById('ad-category');
-    adText = document.getElementById('ad-text');
-    adImage = document.getElementById('ad-image');
-    cancelAdd = document.getElementById('cancel-add');
-    submitAdd = document.getElementById('submit-add');
-
     if (!goodsList) return;
 
-    // Инициализация табов
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -34,10 +25,6 @@ function initGoodsPage() {
     });
 
     loadGoods();
-    addAdBtn?.addEventListener('click', openModal);
-    cancelAdd?.addEventListener('click', closeModal);
-    submitAdd?.addEventListener('click', handleAddAd);
-    modal?.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 }
 
 function loadGoods() {
@@ -86,45 +73,6 @@ function filterAds() {
         card.appendChild(authorDiv);
         goodsList.appendChild(card);
     });
-}
-
-async function handleAddAd() {
-    const category = adCategory.value;
-    const text = adText.value.trim();
-    const file = adImage.files[0];
-    
-    if (!text && !file) {
-        tg.showAlert('Введите текст или выберите фото');
-        return;
-    }
-    
-    submitAdd.disabled = true;
-    submitAdd.textContent = 'Публикация...';
-    try {
-        await publishAd(text, file, userId, userName, category);
-        adText.value = '';
-        adImage.value = '';
-        adCategory.value = 'sale';
-        closeModal();
-        tg.showAlert('Объявление опубликовано!');
-    } catch (error) {
-        console.error(error);
-        tg.showAlert(error.message || 'Ошибка публикации');
-    } finally {
-        submitAdd.disabled = false;
-        submitAdd.textContent = 'Опубликовать';
-    }
-}
-
-function openModal() {
-    modal.classList.add('open');
-}
-
-function closeModal() {
-    modal.classList.remove('open');
-    adText.value = '';
-    adImage.value = '';
-    adCategory.value = 'sale';
 }
 
 initGoodsPage();

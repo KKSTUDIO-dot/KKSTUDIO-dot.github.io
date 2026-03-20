@@ -11,49 +11,31 @@
 <body>
     <div class="app">
         <main id="main-content">
-            <!-- Табы категорий -->
             <div class="categories-tabs">
                 <button class="tab-btn active" data-cat="sale">Продажа</button>
                 <button class="tab-btn" data-cat="buy">Покупка</button>
                 <button class="tab-btn" data-cat="rent">Аренда</button>
                 <button class="tab-btn" data-cat="ad">Реклама</button>
             </div>
-            <!-- Список объявлений -->
             <div class="goods-list"></div>
         </main>
 
-        <button id="add-ad-btn" class="fab">+</button>
+        <a href="publick.html" class="fab">+</a>
 
         <nav class="bottom-nav">
-            <a href="index.html" class="nav-item" data-nav="home">
+            <a href="index.html" class="nav-item">
                 <i class="fas fa-home"></i>
                 <span>Главная</span>
             </a>
-            <a href="tovars.html" class="nav-item active" data-nav="goods">
+            <a href="tovars.html" class="nav-item active">
                 <i class="fas fa-store"></i>
                 <span>Товары</span>
             </a>
-            <a href="profile.html" class="nav-item" data-nav="profile">
+            <a href="profile.html" class="nav-item">
                 <i class="fas fa-user"></i>
                 <span>Профиль</span>
             </a>
         </nav>
-
-        <!-- Модальное окно добавления объявления -->
-        <div id="add-modal" class="modal">
-            <select id="ad-category">
-                <option value="sale">Продажа</option>
-                <option value="buy">Покупка</option>
-                <option value="rent">Аренда</option>
-                <option value="ad">Реклама</option>
-            </select>
-            <textarea id="ad-text" placeholder="Описание товара..." rows="4"></textarea>
-            <input type="file" id="ad-image" accept="image/jpeg,image/png,image/webp">
-            <div class="modal-buttons">
-                <button id="cancel-add">Отмена</button>
-                <button id="submit-add">Опубликовать</button>
-            </div>
-        </div>
     </div>
 
     <script type="module" src="tovars.js"></script>

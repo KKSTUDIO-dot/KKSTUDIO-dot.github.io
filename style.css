@@ -553,3 +553,127 @@ body {
         font-size: 1.4rem;
     }
 }
+
+/* Страница публикации */
+.publish-container {
+    max-width: 500px;
+    margin: 0 auto;
+    background: var(--secondary-bg);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.publish-container h1 {
+    font-size: 1.8rem;
+    margin-bottom: 24px;
+    text-align: center;
+    background: linear-gradient(135deg, #fff, var(--button-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--hint-color);
+    font-weight: 500;
+}
+
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 16px;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-group input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    background: var(--bg-color);
+    border-radius: 12px;
+    color: var(--text-color);
+}
+
+.image-preview {
+    margin-top: 12px;
+    text-align: center;
+}
+
+.image-preview img {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.form-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 12px 24px;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--button-color);
+    color: var(--button-text);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+    transform: scale(1.02);
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.status-message {
+    margin-top: 20px;
+    text-align: center;
+    padding: 10px;
+    border-radius: 12px;
+}
+
+.status-message .success {
+    color: var(--button-color);
+}
+
+.status-message .error {
+    color: var(--destructive);
+}
+
+.status-message .info {
+    color: var(--hint-color);
+}
