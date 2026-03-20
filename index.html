@@ -2,116 +2,47 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Arzmob Store — Arizona RP Market</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Объявления</title>
+    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Font Awesome для иконок (опционально) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="preloader">
-        <div class="spinner"></div>
+    <div class="app">
+        <!-- Шапка -->
+        <header class="header">
+            <div class="logo">
+                <img src="logotip.png" alt="Logo" class="logo-img">
+            </div>
+            <div class="burger-menu" id="burger-menu">
+                <i class="fas fa-bars"></i>
+            </div>
+        </header>
+
+        <!-- Боковое меню (бургер) -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <span>Меню</span>
+                <i class="fas fa-times" id="close-sidebar"></i>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" data-page="goods"><i class="fas fa-store"></i> Товары</a></li>
+                <li><a href="#" data-page="profile"><i class="fas fa-user"></i> Профиль</a></li>
+            </ul>
+        </div>
+
+        <!-- Основной контент -->
+        <main id="main-content">
+            <!-- Здесь будут подгружаться страницы -->
+        </main>
+
+        <!-- Плавающая кнопка для добавления объявления (видна на странице товаров) -->
+        <button id="add-ad-btn" class="fab">+</button>
     </div>
 
-    <div class="container">
-        <!-- Шапка в стиле Arizona RP -->
-        <div class="profile-header">
-            <div class="profile-avatar">
-                <i class="fas fa-user-circle"></i>
-            </div>
-            <div class="profile-info">
-                <div class="profile-name">
-                    <span id="userNickDisplay">Загрузка...</span>
-                    <span class="vip-badge">VIP Premium</span>
-                </div>
-                <div class="profile-stats">
-                    <div class="stat-item">
-                        <i class="fas fa-heartbeat"></i>
-                        <span>98 / 108</span>
-                    </div>
-                    <div class="stat-item">
-                        <i class="fas fa-utensils"></i>
-                        <span>100 / 100</span>
-                    </div>
-                    <div class="stat-item">
-                        <i class="fas fa-briefcase"></i>
-                        <span>Дальнобойщик</span>
-                    </div>
-                </div>
-                <div class="profile-contact">
-                    <span><i class="fas fa-phone"></i> ______</span>
-                    <span><i class="fas fa-envelope"></i> ______</span>
-                </div>
-                <div class="profile-balance">
-                    <i class="fas fa-coins"></i>
-                    <span id="userBalance">1 625 081 190</span> $
-                </div>
-            </div>
-            <div class="profile-actions">
-                <a href="tovar.html" class="add-btn"><i class="fas fa-plus-circle"></i> Добавить</a>
-                <div id="guestMenu">
-                    <a href="login.html" class="icon-btn" title="Войти"><i class="fas fa-sign-in-alt"></i></a>
-                    <a href="register.html" class="icon-btn" title="Регистрация"><i class="fas fa-user-plus"></i></a>
-                </div>
-                <div id="userMenu" style="display: none;">
-                    <span class="user-nick" id="userNickDisplaySmall"></span>
-                    <a href="profile.html" class="icon-btn" title="Профиль"><i class="fas fa-user"></i></a>
-                    <a href="admin.html" class="icon-btn" title="Админка" id="adminLink" style="display: none;"><i class="fas fa-cog"></i></a>
-                    <button class="icon-btn" id="logoutBtn" title="Выйти"><i class="fas fa-sign-out-alt"></i></button>
-                </div>
-                <button class="icon-btn" id="closeTelegramBtn" title="Закрыть" style="display: none;"><i class="fas fa-times"></i></button>
-            </div>
-        </div>
-
-        <!-- Фильтры (стилизованы под интерфейс Arizona) -->
-        <div class="filter-card">
-            <div class="filter-bar">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Поиск по названию...">
-                </div>
-                <div class="sort-box">
-                    <select id="categorySelect">
-                        <option value="all">Все категории</option>
-                        <option value="accessories">Аксессуары</option>
-                        <option value="resources">Ресурсы</option>
-                        <option value="realty">Недвижимость</option>
-                        <option value="transport">Транспорт</option>
-                    </select>
-                </div>
-                <div class="sort-box">
-                    <select id="sortSelect">
-                        <option value="dateDesc">🕒 Сначала новые</option>
-                        <option value="priceAsc">💰 Сначала дешёвые</option>
-                        <option value="priceDesc">💰 Сначала дорогие</option>
-                        <option value="viewsDesc">👁 Самые активные</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- Список товаров (карточки) -->
-        <div id="itemsContainer" class="items-grid">
-            <div class="no-items"><i class="fas fa-spinner fa-pulse"></i><br>Загрузка...</div>
-        </div>
-
-        <!-- Пагинация -->
-        <div class="pagination">
-            <button id="prevPage" disabled><i class="fas fa-chevron-left"></i> Назад</button>
-            <span id="pageInfo">Страница 1</span>
-            <button id="nextPage">Вперёд <i class="fas fa-chevron-right"></i></button>
-        </div>
-
-        <!-- Водяной знак -->
-        <div class="watermark">
-            <i class="fas fa-store"></i> Arzmob Store 2026 — Arizona RP Market
-        </div>
-    </div>
-
-    <!-- Скрипты (остаются без изменений, но подгружают новые элементы) -->
-    <script>
-        // Telegram и прелоадер (как было)
-    </script>
-    <script type="module" src="index.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
