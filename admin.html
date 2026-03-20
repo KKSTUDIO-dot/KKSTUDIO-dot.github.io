@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ArzMob - Главная</title>
+    <title>ArzMob - Админка</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -11,11 +11,17 @@
 <body>
     <div class="app">
         <main id="main-content">
-            <!-- Пустая главная страница -->
+            <h1>Админ-панель</h1>
+            <div class="admin-tabs">
+                <button id="tab-pending" class="admin-tab active">На модерации</button>
+                <button id="tab-users" class="admin-tab">Пользователи</button>
+            </div>
+            <div id="pending-list" class="admin-list"></div>
+            <div id="users-list" class="admin-list hidden"></div>
         </main>
 
         <nav class="bottom-nav">
-            <a href="index.html" class="nav-item active">
+            <a href="index.html" class="nav-item">
                 <i class="fas fa-home"></i>
                 <span>Главная</span>
             </a>
@@ -30,6 +36,6 @@
         </nav>
     </div>
 
-    <script type="module" src="main.js"></script>
+    <script type="module" src="admin.js"></script>
 </body>
 </html>

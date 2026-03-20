@@ -85,3 +85,9 @@ export async function deleteAd(adId, storagePath, userId) {
     await remove(ref(db, `ads/${adId}`));
     await remove(ref(db, `users/${userId}/ads/${adId}`));
 }
+
+export async function getUserRole(userId) {
+    const userRef = ref(db, `users/${userId}/role`);
+    const snapshot = await get(userRef);
+    return snapshot.val() || 'user';
+}

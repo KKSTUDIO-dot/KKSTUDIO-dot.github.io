@@ -17,10 +17,31 @@
                 <button class="tab-btn" data-cat="rent">Аренда</button>
                 <button class="tab-btn" data-cat="ad">Реклама</button>
             </div>
+            
+            <!-- Кнопка добавления -->
+            <button id="show-add-form" class="add-btn">+ Добавить объявление</button>
+            
+            <!-- Форма добавления (скрыта по умолчанию) -->
+            <div id="add-form" class="add-form hidden">
+                <h3>Новое объявление</h3>
+                <select id="ad-category">
+                    <option value="sale">Продажа</option>
+                    <option value="buy">Покупка</option>
+                    <option value="rent">Аренда</option>
+                    <option value="ad">Реклама</option>
+                </select>
+                <input type="text" id="ad-title" placeholder="Название" required>
+                <textarea id="ad-description" placeholder="Описание" rows="4" required></textarea>
+                <input type="url" id="ad-image-url" placeholder="Ссылка на фото (необязательно)">
+                <div class="form-buttons">
+                    <button id="cancel-add" class="btn-secondary">Отмена</button>
+                    <button id="submit-add" class="btn-primary">Отправить на модерацию</button>
+                </div>
+                <div id="add-status"></div>
+            </div>
+            
             <div class="goods-list"></div>
         </main>
-
-        <a href="publick.html" class="fab">+</a>
 
         <nav class="bottom-nav">
             <a href="index.html" class="nav-item">

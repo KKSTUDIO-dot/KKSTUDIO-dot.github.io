@@ -133,3 +133,19 @@ function escapeHtml(str) {
 }
 
 initProfilePage();
+
+// Проверка роли для отображения ссылки на админку
+const userRoleRef = ref(db, `users/${userId}/role`);
+onValue(userRoleRef, (snapshot) => {
+    const role = snapshot.val();
+    if (role === 'admin' || role === 'superadmin') {
+        const adminLink = document.createElement('a');
+        adminLink.href = 'admin.html';
+        adminLink.textContent = '🔧 Админ-панель';
+        adminLink.className = 'admin-link';
+        adminLink.style.display = 'block';
+        adminLink.style.marginTop = '16px';
+        adminLink.style.textAlign = 'center';
+        profileInfo.appendChild(adminLink);
+    }
+});
