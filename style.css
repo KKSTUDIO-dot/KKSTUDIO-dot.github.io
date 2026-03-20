@@ -7,7 +7,7 @@
     --button-color: var(--tg-theme-button-color, #2481cc);
     --button-text: var(--tg-theme-button-text-color, #ffffff);
     --destructive: var(--tg-theme-destructive-text-color, #ff3b30);
-    --border-color: rgba(0,0,0,0.1);
+    --border-color: rgba(0, 0, 0, 0.1);
 }
 
 * {
@@ -32,7 +32,7 @@ body {
     background: var(--bg-color);
 }
 
-/* Шапка */
+/* ========== ШАПКА С ЗАКРУГЛЕНИЕМ ========== */
 .header {
     display: flex;
     justify-content: space-between;
@@ -40,9 +40,22 @@ body {
     padding: 12px 16px;
     background: var(--secondary-bg);
     border-bottom: 1px solid var(--border-color);
+    border-radius: 0 0 20px 20px;    /* закругление нижних углов */
+    overflow: hidden;                 /* чтобы содержимое не выходило за границы */
     position: sticky;
     top: 0;
     z-index: 100;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo-link {
+    display: flex;
+    text-decoration: none;
 }
 
 .logo-img {
@@ -51,13 +64,20 @@ body {
     object-fit: contain;
 }
 
+.logo-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-color);
+    white-space: nowrap;
+}
+
 .burger-menu {
     cursor: pointer;
     font-size: 24px;
     color: var(--text-color);
 }
 
-/* Боковое меню */
+/* ========== БОКОВОЕ МЕНЮ ========== */
 .sidebar {
     position: fixed;
     top: 0;
@@ -65,7 +85,7 @@ body {
     width: 280px;
     height: 100%;
     background: var(--secondary-bg);
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     transition: left 0.3s ease;
     z-index: 200;
     display: flex;
@@ -109,7 +129,7 @@ body {
 }
 
 .sidebar-menu li a:hover {
-    background: rgba(0,0,0,0.05);
+    background: rgba(0, 0, 0, 0.05);
 }
 
 .sidebar-menu li a i {
@@ -124,7 +144,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
     z-index: 150;
     display: none;
 }
@@ -133,7 +153,7 @@ body {
     display: block;
 }
 
-/* Основной контент */
+/* ========== ОСНОВНОЙ КОНТЕНТ ========== */
 #main-content {
     padding: 16px;
 }
@@ -147,7 +167,7 @@ body {
     display: block;
 }
 
-/* Карточки товаров */
+/* ========== КАРТОЧКИ ТОВАРОВ ========== */
 .goods-list {
     display: flex;
     flex-direction: column;
@@ -158,7 +178,12 @@ body {
     background: var(--secondary-bg);
     border-radius: 12px;
     padding: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.good-text {
+    font-size: 16px;
+    word-break: break-word;
 }
 
 .good-card img {
@@ -167,18 +192,13 @@ body {
     margin-top: 8px;
 }
 
-.good-text {
-    font-size: 16px;
-    word-break: break-word;
-}
-
 .good-author {
     font-size: 12px;
     color: var(--hint-color);
     margin-top: 8px;
 }
 
-/* Профиль */
+/* ========== ПРОФИЛЬ ========== */
 .profile-info {
     background: var(--secondary-bg);
     border-radius: 12px;
@@ -199,7 +219,13 @@ body {
     margin-bottom: 12px;
 }
 
-/* Форма добавления товара */
+.profile-ads-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* ========== МОДАЛЬНОЕ ОКНО ========== */
 .modal {
     position: fixed;
     bottom: 0;
@@ -208,7 +234,7 @@ body {
     background: var(--bg-color);
     border-radius: 20px 20px 0 0;
     padding: 20px;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
     z-index: 300;
     transform: translateY(100%);
     transition: transform 0.3s ease;
@@ -259,7 +285,7 @@ body {
     color: var(--button-text);
 }
 
-/* Плавающая кнопка */
+/* ========== ПЛАВАЮЩАЯ КНОПКА ========== */
 .fab {
     position: fixed;
     bottom: 20px;
@@ -272,7 +298,7 @@ body {
     border: none;
     font-size: 24px;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -284,12 +310,31 @@ body {
     transform: scale(1.05);
 }
 
-/* Адаптивность */
+/* ========== ВСПОМОГАТЕЛЬНЫЕ КЛАССЫ ========== */
+.loading,
+.empty {
+    text-align: center;
+    color: var(--hint-color);
+    padding: 40px;
+}
+
+/* ========== АДАПТИВНОСТЬ ========== */
 @media (max-width: 600px) {
     .app {
         max-width: 100%;
     }
+
     .sidebar {
         width: 260px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-text {
+        font-size: 0.9rem;
+    }
+
+    .logo-img {
+        height: 28px;
     }
 }
