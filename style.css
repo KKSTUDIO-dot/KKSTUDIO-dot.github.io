@@ -8,7 +8,7 @@
     --button-text: #ffffff;
     --destructive: #ff4757;
     --border-color: rgba(255, 255, 255, 0.1);
-    --header-bg: linear-gradient(135deg, #1a1a2e, #16213e);
+    --header-bg: #2c2c2c;               /* серый фон шапки */
     --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
@@ -22,6 +22,7 @@
         --button-color: var(--tg-theme-button-color, #2ecc71);
         --button-text: var(--tg-theme-button-text-color, #ffffff);
         --destructive: var(--tg-theme-destructive-text-color, #ff4757);
+        --header-bg: #2c2c2c;          /* серый фон шапки, не зависит от темы */
     }
 }
 
@@ -47,14 +48,14 @@ body {
     background: var(--bg-color);
 }
 
-/* ========== ШАПКА С ЗАКРУГЛЕНИЕМ, ОТСТУПАМИ И ГРАДИЕНТОМ ========== */
+/* ========== ШАПКА С ЗАКРУГЛЕНИЕМ, ОТСТУПАМИ, СЕРЫМ ФОНОМ И БЕЛЫМ ТЕКСТОМ ========== */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 12px 20px;
-    margin: 12px 12px 0 12px;  /* отступ от краёв экрана */
-    background: var(--header-bg, var(--secondary-bg));
+    margin: 12px 12px 0 12px;
+    background: var(--header-bg);
     border-radius: 24px;
     backdrop-filter: blur(10px);
     box-shadow: var(--shadow);
@@ -85,17 +86,14 @@ body {
 .logo-text {
     font-size: 1.2rem;
     font-weight: 600;
-    background: linear-gradient(135deg, #fff, #a0a0ff);
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
+    color: #ffffff;          /* белый цвет текста */
     white-space: nowrap;
 }
 
 .burger-menu {
     cursor: pointer;
     font-size: 24px;
-    color: var(--text-color);
+    color: #ffffff;          /* иконка бургера белая */
     transition: transform 0.2s;
     padding: 8px;
     border-radius: 50%;
