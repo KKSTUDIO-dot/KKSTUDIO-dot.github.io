@@ -16,7 +16,7 @@
         <header class="header">
             <div class="logo-container">
                 <a href="#" id="logo-link" class="logo-link">
-                    <img src="https://arizona-rp.com/_next/static/media/logo_icon.cf0942cc.png" alt="Logo" class="logo-img">
+                    <img src="logotip.png" alt="Logo" class="logo-img">
                 </a>
                 <span class="logo-text">ArzMob - Маркет</span>
             </div>
@@ -39,7 +39,16 @@
 
         <!-- Основной контент -->
         <main id="main-content">
-            <!-- Страница товаров -->
+            <!-- Страница Главная -->
+            <div id="home-page" class="page">
+                <div class="welcome">
+                    <h2>Добро пожаловать!</h2>
+                    <p>Здесь будут лучшие предложения</p>
+                    <!-- Можно добавить рекомендуемые объявления -->
+                </div>
+            </div>
+
+            <!-- Страница товаров (объявлений) -->
             <div id="goods-page" class="page">
                 <div class="goods-list"></div>
             </div>
@@ -54,8 +63,24 @@
             </div>
         </main>
 
-        <!-- Плавающая кнопка добавления объявления -->
+        <!-- Плавающая кнопка добавления объявления (только на странице товаров) -->
         <button id="add-ad-btn" class="fab">+</button>
+
+        <!-- Нижняя навигационная панель -->
+        <nav class="bottom-nav">
+            <div class="nav-item" data-nav="home">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </div>
+            <div class="nav-item" data-nav="goods">
+                <i class="fas fa-store"></i>
+                <span>Товары</span>
+            </div>
+            <div class="nav-item" data-nav="profile">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </div>
+        </nav>
 
         <!-- Модальное окно добавления объявления -->
         <div id="add-modal" class="modal">
