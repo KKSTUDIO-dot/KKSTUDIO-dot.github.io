@@ -7,21 +7,44 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <style> /* прелоадер тот же */ </style>
+    <style>
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.3s;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #dee2e6;
+            border-top-color: #6c757d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
     <div id="preloader"><div class="spinner"></div></div>
 
     <div class="page-container">
+        <!-- Кнопка "Назад" -->
         <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i></a>
 
         <div class="container">
             <div class="profile-header">
                 <h2><i class="fas fa-user-circle"></i> <span id="userNick"></span></h2>
-                <!-- Кнопка выхода удалена -->
             </div>
 
-            <!-- Форма Telegram -->
+            <!-- Форма для Telegram -->
             <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 24px; border: 1px solid #dee2e6;">
                 <h3><i class="fab fa-telegram"></i> Контакт в Telegram</h3>
                 <p>Укажите ваш Telegram username (без @), чтобы покупатели могли связаться с вами.</p>
@@ -45,6 +68,7 @@
             <div class="watermark"><i class="fas fa-store"></i> Arzmob Store 2026</div>
         </div>
 
+        <!-- Нижняя панель -->
         <div class="bottom-nav">
             <a href="index.html" class="bottom-nav-item">
                 <i class="fas fa-store"></i>
@@ -58,21 +82,209 @@
     </div>
 
     <script>
-        // ... (код Telegram и прелоадер как раньше)
+        (function() {
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+                Telegram.WebApp.setHeaderColor('#6c757d');
+                Telegram.WebApp.setBackgroundColor('#e9ecef');
+                // Кнопка закрытия Telegram
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'icon-btn';
+                closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                closeBtn.title = 'Закрыть';
+                closeBtn.style.position = 'fixed';
+                closeBtn.style.top = 'calc(12px + env(safe-area-inset-top, 0px))';
+                closeBtn.style.right = '12px';
+                closeBtn.style.zIndex = '1002';
+                closeBtn.onclick = () => Telegram.WebApp.close();
+                document.body.appendChild(closeBtn);
+            }
+
+            window.addEventListener('load', () => {
+                // Прелоадер скроем после загрузки контента
+                const preloader = document.getElementById('preloader');
+                if (preloader) {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => preloader.style.display = 'none', 300);
+                }
+            });
+        })();
     </script>
 
     <script type="module">
         import { getDatabase, ref, query, orderByChild, equalTo, onValue, remove, get, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getStorage, ref as storageRef, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-        import { getCurrentUser, getFavorites, getHistory, addToHistory, requireAuth } from './helpers.js';
+        import { requireAuth, getFavorites, getHistory, addToHistory } from './helpers.js';
         import { db, storage } from './firebase-config.js';
 
-        const user = requireAuth(); // Если нет авторизации, редирект на главную
-        if (!user) window.location.href = 'index.html'; // на всякий случай
+        // Проверка авторизации
+        const user = requireAuth();
+        if (!user) {
+            window.location.href = 'index.html';
+            return;
+        }
 
         document.getElementById('userNick').textContent = user.userNick;
 
-        // ... (остальной код profile.html без изменений, кроме удаления logout)
+        // Загрузка текущего Telegram пользователя
+        const userRef = ref(db, `users/${user.userId}`);
+        const userSnap = await get(userRef);
+        const userData = userSnap.val() || {};
+        if (userData.telegram) {
+            document.getElementById('telegramInput').value = userData.telegram;
+        }
+
+        // Сохранение Telegram
+        document.getElementById('saveTelegramBtn').addEventListener('click', async () => {
+            const telegram = document.getElementById('telegramInput').value.trim().replace('@', '');
+            await update(userRef, { telegram });
+            document.getElementById('telegramStatus').textContent = 'Сохранено!';
+            setTimeout(() => document.getElementById('telegramStatus').textContent = '', 2000);
+        });
+
+        // Вкладки
+        const tabs = document.querySelectorAll('.tab-btn');
+        const myDiv = document.getElementById('myItems');
+        const favDiv = document.getElementById('favoritesItems');
+        const histDiv = document.getElementById('historyItems');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const which = tab.dataset.tab;
+                myDiv.style.display = which === 'my' ? 'grid' : 'none';
+                favDiv.style.display = which === 'favorites' ? 'grid' : 'none';
+                histDiv.style.display = which === 'history' ? 'grid' : 'none';
+                if (which === 'favorites') loadFavorites();
+                if (which === 'history') loadHistory();
+            });
+        });
+
+        // Мои объявления
+        const itemsRef = ref(db, 'items');
+        const userItemsQuery = query(itemsRef, orderByChild('userId'), equalTo(user.userId));
+        onValue(userItemsQuery, (snapshot) => {
+            const data = snapshot.val();
+            if (!data) {
+                myDiv.innerHTML = '<p>У вас пока нет объявлений. <a href="tovar.html">Добавить</a></p>';
+                return;
+            }
+
+            let html = '';
+            for (let id in data) {
+                const item = data[id];
+                const price = item.price.toLocaleString();
+                let statusText = '';
+                if (item.status === 'approved') statusText = '✅ Одобрено';
+                else if (item.status === 'pending') statusText = '⏳ На модерации';
+                else statusText = item.status;
+
+                html += `
+                    <div class="item-card" data-id="${id}">
+                        <h3 class="item-title">${escapeHtml(item.name)}</h3>
+                        <div class="item-price">💰 ${price}</div>
+                        <div class="status" style="font-size:0.9rem; color:#6c757d;">${statusText}</div>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <a href="edit.html?id=${id}" class="btn-primary" style="padding:8px 16px; font-size:0.9rem;">Редактировать</a>
+                            <button class="btn-primary" style="background:#dc3545; padding:8px 16px;" data-id="${id}" id="del-${id}">Удалить</button>
+                        </div>
+                    </div>
+                `;
+            }
+            myDiv.innerHTML = html;
+
+            for (let id in data) {
+                document.getElementById(`del-${id}`)?.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    if (confirm('Удалить объявление?')) {
+                        const item = data[id];
+                        if (item && item.images && item.images.length) {
+                            for (let i = 0; i < item.images.length; i++) {
+                                try {
+                                    const imgRef = storageRef(storage, `items/${item.id}/${i}`);
+                                    await deleteObject(imgRef);
+                                } catch (err) { console.warn(err); }
+                            }
+                        }
+                        await remove(ref(db, `items/${id}`));
+                    }
+                });
+            }
+        });
+
+        // Избранное
+        async function loadFavorites() {
+            const favIds = getFavorites();
+            if (favIds.length === 0) {
+                favDiv.innerHTML = '<p>Нет избранных товаров</p>';
+                return;
+            }
+
+            const snap = await get(ref(db, 'items'));
+            const items = snap.val() || {};
+            let html = '';
+            for (let id in items) {
+                if (favIds.includes(id) && items[id].status === 'approved') {
+                    const item = items[id];
+                    html += `
+                        <div class="item-card" data-id="${id}">
+                            <h3 class="item-title">${escapeHtml(item.name)}</h3>
+                            <div class="item-price">💰 ${item.price.toLocaleString()}</div>
+                        </div>
+                    `;
+                }
+            }
+            favDiv.innerHTML = html || '<p>Нет доступных товаров</p>';
+            document.querySelectorAll('#favoritesItems .item-card').forEach(c => {
+                c.addEventListener('click', () => {
+                    addToHistory(c.dataset.id);
+                    window.location.href = `product.html?id=${c.dataset.id}`;
+                });
+            });
+        }
+
+        // История
+        async function loadHistory() {
+            const histIds = getHistory();
+            if (histIds.length === 0) {
+                histDiv.innerHTML = '<p>История пуста</p>';
+                return;
+            }
+
+            const snap = await get(ref(db, 'items'));
+            const items = snap.val() || {};
+            let html = '';
+            for (let id in items) {
+                if (histIds.includes(id)) {
+                    const item = items[id];
+                    html += `
+                        <div class="item-card" data-id="${id}">
+                            <h3 class="item-title">${escapeHtml(item.name)}</h3>
+                            <div class="item-price">💰 ${item.price.toLocaleString()}</div>
+                        </div>
+                    `;
+                }
+            }
+            histDiv.innerHTML = html || '<p>Нет доступных товаров</p>';
+            document.querySelectorAll('#historyItems .item-card').forEach(c => {
+                c.addEventListener('click', () => {
+                    addToHistory(c.dataset.id);
+                    window.location.href = `product.html?id=${c.dataset.id}`;
+                });
+            });
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe.replace(/[&<>"]/g, m => {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                if (m === '"') return '&quot;';
+                return m;
+            });
+        }
     </script>
 </body>
 </html>
