@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Админка | Arzmob Store</title>
+    <title>РђРґРјРёРЅРєР° | Arzmob Store</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -68,90 +68,104 @@
 <body>
     <div id="preloader"><div class="spinner"></div></div>
 
-    <!-- Основной контент (скрыт до проверки прав) -->
-    <div class="container" id="mainContainer" style="display: none;">
-        <div class="header">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <button class="icon-btn" onclick="history.back()" title="Назад"><i class="fas fa-arrow-left"></i></button>
-                <div class="logo"><i class="fas fa-shield-alt"></i> Arzmob Admin</div>
+    <div class="page-container">
+        <!-- РљРЅРѕРїРєР° "РќР°Р·Р°Рґ" -->
+        <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i></a>
+
+        <!-- РћСЃРЅРѕРІРЅРѕР№ РєРѕРЅС‚РµРЅС‚ (РёР·РЅР°С‡Р°Р»СЊРЅРѕ СЃРєСЂС‹С‚, РїРѕРєР°Р·С‹РІР°РµС‚СЃСЏ РїРѕСЃР»Рµ РїСЂРѕРІРµСЂРєРё РїСЂР°РІ) -->
+        <div class="container" id="mainContainer" style="display: none;">
+            <!-- РЎС‚Р°С‚РёСЃС‚РёРєР° -->
+            <div class="stats-grid">
+                <div class="stat-card"><i class="fas fa-box"></i><div class="stat-value" id="totalItems">0</div><div class="stat-label">Р’СЃРµРіРѕ С‚РѕРІР°СЂРѕРІ</div></div>
+                <div class="stat-card"><i class="fas fa-clock"></i><div class="stat-value" id="pendingItems">0</div><div class="stat-label">РќР° РјРѕРґРµСЂР°С†РёРё</div></div>
+                <div class="stat-card"><i class="fas fa-check-circle"></i><div class="stat-value" id="approvedItems">0</div><div class="stat-label">РћРґРѕР±СЂРµРЅРѕ</div></div>
+                <div class="stat-card"><i class="fas fa-users"></i><div class="stat-value" id="totalUsers">0</div><div class="stat-label">РџРѕР»СЊР·РѕРІР°С‚РµР»РµР№</div></div>
             </div>
-            <div class="header-actions">
-                <button class="icon-btn" id="closeTelegramBtn" title="Закрыть" style="display: none;"><i class="fas fa-times"></i></button>
+
+            <!-- Р’РєР»Р°РґРєРё -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="moderate">РњРѕРґРµСЂР°С†РёСЏ</button>
+                <button class="tab-btn" data-tab="all">Р’СЃРµ С‚РѕРІР°СЂС‹</button>
+                <button class="tab-btn" data-tab="users">РџРѕР»СЊР·РѕРІР°С‚РµР»Рё</button>
+                <button class="tab-btn" data-tab="logs">Р›РѕРіРё</button>
             </div>
+
+            <!-- Р’РєР»Р°РґРєР° РњРѕРґРµСЂР°С†РёСЏ -->
+            <div id="tab-moderate" class="tab-content">
+                <h2><i class="fas fa-clock"></i> РќР° РјРѕРґРµСЂР°С†РёРё</h2>
+                <div id="itemsContainer" class="items-grid"><div class="no-items"><i class="fas fa-spinner fa-pulse"></i> Р—Р°РіСЂСѓР·РєР°...</div></div>
+            </div>
+
+            <!-- Р’РєР»Р°РґРєР° Р’СЃРµ С‚РѕРІР°СЂС‹ -->
+            <div id="tab-all" class="tab-content hidden">
+                <h2><i class="fas fa-boxes"></i> Р’СЃРµ С‚РѕРІР°СЂС‹</h2>
+                <div id="allItemsContainer" class="items-grid"><div class="no-items"><i class="fas fa-spinner fa-pulse"></i> Р—Р°РіСЂСѓР·РєР°...</div></div>
+            </div>
+
+            <!-- Р’РєР»Р°РґРєР° РџРѕР»СЊР·РѕРІР°С‚РµР»Рё -->
+            <div id="tab-users" class="tab-content hidden">
+                <h2><i class="fas fa-users"></i> РџРѕР»СЊР·РѕРІР°С‚РµР»Рё</h2>
+                <div id="usersList" style="background:white; border-radius:16px; padding:20px; border:1px solid #dee2e6;"></div>
+            </div>
+
+            <!-- Р’РєР»Р°РґРєР° Р›РѕРіРё -->
+            <div id="tab-logs" class="tab-content hidden">
+                <h2><i class="fas fa-history"></i> РџРѕСЃР»РµРґРЅРёРµ РґРµР№СЃС‚РІРёСЏ</h2>
+                <div class="logs-section"><div id="logsList" class="logs-list"></div></div>
+            </div>
+
+            <div class="watermark"><i class="fas fa-store"></i> Arzmob Store 2026</div>
         </div>
 
-        <!-- Статистика -->
-        <div class="stats-grid">
-            <div class="stat-card"><i class="fas fa-box"></i><div class="stat-value" id="totalItems">0</div><div class="stat-label">Всего товаров</div></div>
-            <div class="stat-card"><i class="fas fa-clock"></i><div class="stat-value" id="pendingItems">0</div><div class="stat-label">На модерации</div></div>
-            <div class="stat-card"><i class="fas fa-check-circle"></i><div class="stat-value" id="approvedItems">0</div><div class="stat-label">Одобрено</div></div>
-            <div class="stat-card"><i class="fas fa-users"></i><div class="stat-value" id="totalUsers">0</div><div class="stat-label">Пользователей</div></div>
+        <!-- Р‘Р»РѕРє РѕС‚РєР°Р·Р° РІ РґРѕСЃС‚СѓРїРµ -->
+        <div id="accessDenied" class="access-error" style="display: none;">
+            <i class="fas fa-lock" style="font-size: 3rem; color: #dc3545;"></i>
+            <h2>Р”РѕСЃС‚СѓРї Р·Р°РїСЂРµС‰С‘РЅ</h2>
+            <p id="accessMessage"></p>
+            <button class="btn-primary" onclick="window.location.href='index.html'">РќР° РіР»Р°РІРЅСѓСЋ</button>
         </div>
 
-        <!-- Вкладки -->
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="moderate">Модерация</button>
-            <button class="tab-btn" data-tab="all">Все товары</button>
-            <button class="tab-btn" data-tab="users">Пользователи</button>
-            <button class="tab-btn" data-tab="logs">Логи</button>
+        <!-- РќРёР¶РЅСЏСЏ РїР°РЅРµР»СЊ (СЂС‹РЅРѕРє, РїСЂРѕС„РёР»СЊ) -->
+        <div class="bottom-nav">
+            <a href="index.html" class="bottom-nav-item">
+                <i class="fas fa-store"></i>
+                <span>Р С‹РЅРѕРє</span>
+            </a>
+            <a href="profile.html" class="bottom-nav-item">
+                <i class="fas fa-user"></i>
+                <span>РџСЂРѕС„РёР»СЊ</span>
+            </a>
         </div>
-
-        <!-- Вкладка Модерация -->
-        <div id="tab-moderate" class="tab-content">
-            <h2><i class="fas fa-clock"></i> На модерации</h2>
-            <div id="itemsContainer" class="items-grid"><div class="no-items"><i class="fas fa-spinner fa-pulse"></i> Загрузка...</div></div>
-        </div>
-
-        <!-- Вкладка Все товары -->
-        <div id="tab-all" class="tab-content hidden">
-            <h2><i class="fas fa-boxes"></i> Все товары</h2>
-            <div id="allItemsContainer" class="items-grid"><div class="no-items"><i class="fas fa-spinner fa-pulse"></i> Загрузка...</div></div>
-        </div>
-
-        <!-- Вкладка Пользователи -->
-        <div id="tab-users" class="tab-content hidden">
-            <h2><i class="fas fa-users"></i> Пользователи</h2>
-            <div id="usersList" style="background:white; border-radius:16px; padding:20px; border:1px solid #dee2e6;"></div>
-        </div>
-
-        <!-- Вкладка Логи -->
-        <div id="tab-logs" class="tab-content hidden">
-            <h2><i class="fas fa-history"></i> Последние действия</h2>
-            <div class="logs-section"><div id="logsList" class="logs-list"></div></div>
-        </div>
-
-        <div class="watermark"><i class="fas fa-store"></i> Arzmob Store 2026</div>
-    </div>
-
-    <!-- Блок отказа в доступе -->
-    <div id="accessDenied" class="access-error" style="display: none;">
-        <i class="fas fa-lock" style="font-size: 3rem; color: #dc3545;"></i>
-        <h2>Доступ запрещён</h2>
-        <p id="accessMessage"></p>
-        <button class="btn-primary" onclick="window.location.href='index.html'">На главную</button>
     </div>
 
     <script>
-        setTimeout(() => {
-            const preloader = document.getElementById('preloader');
-            if (preloader) {
-                preloader.style.opacity = '0';
-                setTimeout(() => preloader.style.display = 'none', 300);
-            }
-        }, 5000);
-
+        // Telegram Рё РїСЂРµР»РѕР°РґРµСЂ
         (function() {
             if (window.Telegram && Telegram.WebApp) {
                 Telegram.WebApp.ready();
                 Telegram.WebApp.expand();
-                const closeBtn = document.getElementById('closeTelegramBtn');
-                if (closeBtn) {
-                    closeBtn.style.display = 'inline-flex';
-                    closeBtn.addEventListener('click', () => Telegram.WebApp.close());
-                }
                 Telegram.WebApp.setHeaderColor('#6c757d');
                 Telegram.WebApp.setBackgroundColor('#e9ecef');
+                // РљРЅРѕРїРєР° Р·Р°РєСЂС‹С‚РёСЏ Telegram
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'icon-btn';
+                closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                closeBtn.title = 'Р—Р°РєСЂС‹С‚СЊ';
+                closeBtn.style.position = 'fixed';
+                closeBtn.style.top = 'calc(12px + env(safe-area-inset-top, 0px))';
+                closeBtn.style.right = '12px';
+                closeBtn.style.zIndex = '1002';
+                closeBtn.onclick = () => Telegram.WebApp.close();
+                document.body.appendChild(closeBtn);
             }
+
+            window.addEventListener('load', () => {
+                const preloader = document.getElementById('preloader');
+                if (preloader) {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => preloader.style.display = 'none', 300);
+                }
+            });
         })();
     </script>
 
@@ -165,23 +179,24 @@
         const accessDenied = document.getElementById('accessDenied');
         const accessMessage = document.getElementById('accessMessage');
 
-        // Telegram ID, которому разрешён доступ (можно заменить)
+        // Telegram ID, РєРѕС‚РѕСЂРѕРјСѓ СЂР°Р·СЂРµС€С‘РЅ РґРѕСЃС‚СѓРї (РјРѕР¶РЅРѕ Р·Р°РјРµРЅРёС‚СЊ)
         const ALLOWED_TELEGRAM_ID = 8169971367;
 
         (async function() {
             try {
-                // 1. Если не авторизован – пробуем войти через Telegram
+                // 1. Р•СЃР»Рё РЅРµ Р°РІС‚РѕСЂРёР·РѕРІР°РЅ вЂ“ РїСЂРѕР±СѓРµРј РІРѕР№С‚Рё С‡РµСЂРµР· Telegram
                 if (!getCurrentUser()) {
                     await telegramAuth();
                 }
 
                 const user = getCurrentUser();
                 if (!user) {
-                    window.location.href = 'login.html';
+                    // РЎС‚СЂР°РЅРёС†С‹ login.html Р±РѕР»СЊС€Рµ РЅРµС‚, РїРµСЂРµРЅР°РїСЂР°РІР»СЏРµРј РЅР° РіР»Р°РІРЅСѓСЋ
+                    window.location.href = 'index.html';
                     return;
                 }
 
-                // 2. Проверяем права
+                // 2. РџСЂРѕРІРµСЂСЏРµРј РїСЂР°РІР°
                 const admin = await isAdmin(user.userId);
                 if (admin) {
                     mainContainer.style.display = 'block';
@@ -190,13 +205,13 @@
                     if (userData && Number(userData.telegramId) === ALLOWED_TELEGRAM_ID) {
                         mainContainer.style.display = 'block';
                     } else {
-                        accessMessage.textContent = 'У вас нет прав доступа к этой странице.';
+                        accessMessage.textContent = 'РЈ РІР°СЃ РЅРµС‚ РїСЂР°РІ РґРѕСЃС‚СѓРїР° Рє СЌС‚РѕР№ СЃС‚СЂР°РЅРёС†Рµ.';
                         accessDenied.style.display = 'block';
                         return;
                     }
                 }
 
-                // ========== КОД АДМИНКИ (статистика, вкладки, модерация) ==========
+                // ========== РљРћР” РђР”РњРРќРљР (СЃС‚Р°С‚РёСЃС‚РёРєР°, РІРєР»Р°РґРєРё, РјРѕРґРµСЂР°С†РёСЏ) ==========
                 const moderateContainer = document.getElementById('itemsContainer');
                 const allContainer = document.getElementById('allItemsContainer');
                 const usersList = document.getElementById('usersList');
@@ -206,7 +221,7 @@
                 const approvedSpan = document.getElementById('approvedItems');
                 const usersSpan = document.getElementById('totalUsers');
 
-                // Переключение вкладок
+                // РџРµСЂРµРєР»СЋС‡РµРЅРёРµ РІРєР»Р°РґРѕРє
                 const tabs = document.querySelectorAll('.tab-btn');
                 const contents = {
                     moderate: document.getElementById('tab-moderate'),
@@ -228,7 +243,7 @@
                     });
                 });
 
-                // Статистика и модерация
+                // РЎС‚Р°С‚РёСЃС‚РёРєР° Рё РјРѕРґРµСЂР°С†РёСЏ
                 const itemsRef = ref(db, 'items');
                 onValue(itemsRef, (snapshot) => {
                     const data = snapshot.val() || {};
@@ -240,7 +255,7 @@
 
                     const pending = items.filter(i => i.status === 'pending');
                     if (pending.length === 0) {
-                        moderateContainer.innerHTML = '<div class="no-items"><i class="fas fa-check-circle"></i> Новых товаров нет</div>';
+                        moderateContainer.innerHTML = '<div class="no-items"><i class="fas fa-check-circle"></i> РќРѕРІС‹С… С‚РѕРІР°СЂРѕРІ РЅРµС‚</div>';
                     } else {
                         let html = '';
                         pending.forEach(item => {
@@ -250,10 +265,10 @@
 
                             let typeClass, typeIcon, typeLabel;
                             switch (item.type) {
-                                case 'sale': typeClass = 'type-sale'; typeIcon = 'fa-tag'; typeLabel = 'Продажа'; break;
-                                case 'buy': typeClass = 'type-buy'; typeIcon = 'fa-cart-shopping'; typeLabel = 'Покупка'; break;
-                                case 'rent': typeClass = 'type-rent'; typeIcon = 'fa-hand-holding-dollar'; typeLabel = 'Аренда'; break;
-                                case 'ad': typeClass = 'type-ad'; typeIcon = 'fa-bullhorn'; typeLabel = 'Реклама'; break;
+                                case 'sale': typeClass = 'type-sale'; typeIcon = 'fa-tag'; typeLabel = 'РџСЂРѕРґР°Р¶Р°'; break;
+                                case 'buy': typeClass = 'type-buy'; typeIcon = 'fa-cart-shopping'; typeLabel = 'РџРѕРєСѓРїРєР°'; break;
+                                case 'rent': typeClass = 'type-rent'; typeIcon = 'fa-hand-holding-dollar'; typeLabel = 'РђСЂРµРЅРґР°'; break;
+                                case 'ad': typeClass = 'type-ad'; typeIcon = 'fa-bullhorn'; typeLabel = 'Р РµРєР»Р°РјР°'; break;
                                 default: typeClass = ''; typeIcon = 'fa-question'; typeLabel = item.type;
                             }
 
@@ -261,15 +276,15 @@
                                 <div class="item-card" data-id="${item.id}">
                                     <span class="item-type ${typeClass}"><i class="fas ${typeIcon}"></i> ${typeLabel}</span>
                                     <h3 class="item-title">${escapeHtml(item.name)}</h3>
-                                    <div class="item-price"> ${price}</div>
+                                    <div class="item-price">рџ’° ${price}</div>
                                     <div class="item-description">${escapeHtml(desc)}</div>
                                     <div class="item-footer">
-                                        <span><i class="far fa-user"></i> ${item.userNick || 'Неизвестно'}</span>
+                                        <span><i class="far fa-user"></i> ${item.userNick || 'РќРµРёР·РІРµСЃС‚РЅРѕ'}</span>
                                         <span><i class="far fa-clock"></i> ${date}</span>
                                     </div>
                                     <div style="display: flex; gap: 10px; margin-top: 10px;">
-                                        <button class="btn-primary" style="background:#28a745; flex:1;" data-id="${item.id}" id="approve-${item.id}"><i class="fas fa-check"></i> Принять</button>
-                                        <button class="btn-primary" style="background:#dc3545; flex:1;" data-id="${item.id}" id="reject-${item.id}"><i class="fas fa-times"></i> Отклонить</button>
+                                        <button class="btn-primary" style="background:#28a745; flex:1;" data-id="${item.id}" id="approve-${item.id}"><i class="fas fa-check"></i> РџСЂРёРЅСЏС‚СЊ</button>
+                                        <button class="btn-primary" style="background:#dc3545; flex:1;" data-id="${item.id}" id="reject-${item.id}"><i class="fas fa-times"></i> РћС‚РєР»РѕРЅРёС‚СЊ</button>
                                     </div>
                                 </div>
                             `;
@@ -278,14 +293,14 @@
 
                         pending.forEach(item => {
                             document.getElementById(`approve-${item.id}`)?.addEventListener('click', async () => {
-                                if (confirm('Одобрить товар?')) {
+                                if (confirm('РћРґРѕР±СЂРёС‚СЊ С‚РѕРІР°СЂ?')) {
                                     await update(ref(db, `items/${item.id}`), { status: 'approved' });
                                     const logRef = push(ref(db, 'logs'));
                                     await set(logRef, { action: 'approve', itemId: item.id, adminId: user.userId, timestamp: Date.now() });
                                 }
                             });
                             document.getElementById(`reject-${item.id}`)?.addEventListener('click', async () => {
-                                if (confirm('Отклонить товар? Это также удалит все его изображения.')) {
+                                if (confirm('РћС‚РєР»РѕРЅРёС‚СЊ С‚РѕРІР°СЂ? Р­С‚Рѕ С‚Р°РєР¶Рµ СѓРґР°Р»РёС‚ РІСЃРµ РµРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ.')) {
                                     const itemSnap = await get(ref(db, `items/${item.id}`));
                                     const itemData = itemSnap.val();
                                     if (itemData && itemData.images && itemData.images.length) {
@@ -315,7 +330,7 @@
                     const data = snap.val() || {};
                     const items = Object.entries(data).map(([id, val]) => ({ id, ...val }));
                     if (items.length === 0) {
-                        allContainer.innerHTML = '<div class="no-items"><i class="fas fa-box-open"></i> Нет товаров</div>';
+                        allContainer.innerHTML = '<div class="no-items"><i class="fas fa-box-open"></i> РќРµС‚ С‚РѕРІР°СЂРѕРІ</div>';
                         return;
                     }
                     let html = '';
@@ -323,14 +338,14 @@
                         const price = item.price.toLocaleString();
                         const desc = item.description || '';
                         const date = new Date(item.timestamp).toLocaleString();
-                        const status = item.status === 'approved' ? ' Одобрено' : item.status === 'pending' ? ' Ожидает' : item.status;
+                        const status = item.status === 'approved' ? 'вњ… РћРґРѕР±СЂРµРЅРѕ' : item.status === 'pending' ? 'вЏі РћР¶РёРґР°РµС‚' : item.status;
 
                         let typeClass, typeIcon, typeLabel;
                         switch (item.type) {
-                            case 'sale': typeClass = 'type-sale'; typeIcon = 'fa-tag'; typeLabel = 'Продажа'; break;
-                            case 'buy': typeClass = 'type-buy'; typeIcon = 'fa-cart-shopping'; typeLabel = 'Покупка'; break;
-                            case 'rent': typeClass = 'type-rent'; typeIcon = 'fa-hand-holding-dollar'; typeLabel = 'Аренда'; break;
-                            case 'ad': typeClass = 'type-ad'; typeIcon = 'fa-bullhorn'; typeLabel = 'Реклама'; break;
+                            case 'sale': typeClass = 'type-sale'; typeIcon = 'fa-tag'; typeLabel = 'РџСЂРѕРґР°Р¶Р°'; break;
+                            case 'buy': typeClass = 'type-buy'; typeIcon = 'fa-cart-shopping'; typeLabel = 'РџРѕРєСѓРїРєР°'; break;
+                            case 'rent': typeClass = 'type-rent'; typeIcon = 'fa-hand-holding-dollar'; typeLabel = 'РђСЂРµРЅРґР°'; break;
+                            case 'ad': typeClass = 'type-ad'; typeIcon = 'fa-bullhorn'; typeLabel = 'Р РµРєР»Р°РјР°'; break;
                             default: typeClass = ''; typeIcon = 'fa-question'; typeLabel = item.type;
                         }
 
@@ -338,15 +353,15 @@
                             <div class="item-card" data-id="${item.id}">
                                 <span class="item-type ${typeClass}"><i class="fas ${typeIcon}"></i> ${typeLabel}</span>
                                 <h3 class="item-title">${escapeHtml(item.name)}</h3>
-                                <div class="item-price"> ${price}</div>
+                                <div class="item-price">рџ’° ${price}</div>
                                 <div class="item-description">${escapeHtml(desc)}</div>
                                 <div class="item-footer">
-                                    <span><i class="far fa-user"></i> ${item.userNick || 'Неизвестно'}</span>
+                                    <span><i class="far fa-user"></i> ${item.userNick || 'РќРµРёР·РІРµСЃС‚РЅРѕ'}</span>
                                     <span><i class="far fa-clock"></i> ${date}</span>
                                 </div>
                                 <div style="display: flex; gap: 10px; margin-top: 10px;">
                                     <span style="background:#6c757d; color:white; padding:4px 12px; border-radius:30px; font-size:0.8rem;">${status}</span>
-                                    <button class="btn-primary" style="background:#dc3545; padding:4px 12px;" data-id="${item.id}" id="del-all-${item.id}"><i class="fas fa-trash"></i> Удалить</button>
+                                    <button class="btn-primary" style="background:#dc3545; padding:4px 12px;" data-id="${item.id}" id="del-all-${item.id}"><i class="fas fa-trash"></i> РЈРґР°Р»РёС‚СЊ</button>
                                 </div>
                             </div>
                         `;
@@ -355,7 +370,7 @@
                     items.forEach(item => {
                         document.getElementById(`del-all-${item.id}`)?.addEventListener('click', async (e) => {
                             e.stopPropagation();
-                            if (confirm(`Удалить товар "${item.name}"? Это действие необратимо.`)) {
+                            if (confirm(`РЈРґР°Р»РёС‚СЊ С‚РѕРІР°СЂ "${item.name}"? Р­С‚Рѕ РґРµР№СЃС‚РІРёРµ РЅРµРѕР±СЂР°С‚РёРјРѕ.`)) {
                                 if (item.images && item.images.length) {
                                     for (let i = 0; i < item.images.length; i++) {
                                         try {
@@ -375,7 +390,7 @@
                 async function loadUsers() {
                     const snap = await get(usersRef);
                     const users = snap.val() || {};
-                    let html = '<table style="width:100%; border-collapse:collapse;"><tr><th>Ник</th><th>Роль</th><th>Дата рег.</th></tr>';
+                    let html = '<table style="width:100%; border-collapse:collapse;"><tr><th>РќРёРє</th><th>Р РѕР»СЊ</th><th>Р”Р°С‚Р° СЂРµРі.</th></tr>';
                     for (let id in users) {
                         const u = users[id];
                         html += `<tr><td>${escapeHtml(u.nick)}</td><td>${u.role || 'user'}</td><td>${new Date(u.registered).toLocaleDateString()}</td></tr>`;
@@ -391,10 +406,10 @@
                     let html = '';
                     for (let [id, log] of sorted) {
                         const date = new Date(log.timestamp).toLocaleString();
-                        const action = log.action === 'approve' ? ' Одобрил' : (log.action === 'reject' ? ' Отклонил' : ' Удалил');
-                        html += `<div class="log-item">${date} - ${action} товар ${log.itemId}</div>`;
+                        const action = log.action === 'approve' ? 'вњ… РћРґРѕР±СЂРёР»' : (log.action === 'reject' ? 'вќЊ РћС‚РєР»РѕРЅРёР»' : 'рџ—‘пёЏ РЈРґР°Р»РёР»');
+                        html += `<div class="log-item">${date} - ${action} С‚РѕРІР°СЂ ${log.itemId}</div>`;
                     }
-                    logsList.innerHTML = html || '<div class="log-item">Нет записей</div>';
+                    logsList.innerHTML = html || '<div class="log-item">РќРµС‚ Р·Р°РїРёСЃРµР№</div>';
                 }
 
                 function escapeHtml(unsafe) {
@@ -407,7 +422,7 @@
                     });
                 }
 
-                // Скрываем прелоадер
+                // РЈР±РёСЂР°РµРј РїСЂРµР»РѕР°РґРµСЂ
                 const preloader = document.getElementById('preloader');
                 if (preloader) {
                     preloader.style.opacity = '0';
@@ -415,8 +430,8 @@
                 }
 
             } catch (error) {
-                console.error('[Admin] Критическая ошибка:', error);
-                alert('Произошла ошибка при загрузке админки. Смотрите консоль.');
+                console.error('[Admin] РљСЂРёС‚РёС‡РµСЃРєР°СЏ РѕС€РёР±РєР°:', error);
+                alert('РџСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР° РїСЂРё Р·Р°РіСЂСѓР·РєРµ Р°РґРјРёРЅРєРё. РЎРјРѕС‚СЂРёС‚Рµ РєРѕРЅСЃРѕР»СЊ.');
             }
         })();
     </script>

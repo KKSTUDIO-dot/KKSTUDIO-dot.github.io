@@ -35,73 +35,79 @@
 <body>
     <div id="preloader"><div class="spinner"></div></div>
 
-    <div class="container" style="display: flex; justify-content: center; flex-direction: column; align-items: center;">
-        <div class="header" style="width: 100%;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <button class="icon-btn" onclick="history.back()" title="Назад"><i class="fas fa-arrow-left"></i></button>
-                <div class="logo"><i class="fas fa-store"></i> Arzmob</div>
+    <div class="page-container">
+        <!-- Кнопка "Назад" -->
+        <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i></a>
+
+        <div class="container" style="display: flex; justify-content: center; flex-direction: column; align-items: center;">
+            <div class="form-container">
+                <h1><i class="fas fa-plus-circle"></i> Создать объявление</h1>
+                <div class="subtitle">Заполните информацию о товаре или услуге</div>
+
+                <div class="form-group">
+                    <label>Название предмета</label>
+                    <input type="text" id="name" placeholder="Например: M4A1, Бронежилет">
+                </div>
+
+                <div class="form-group">
+                    <label>Цена</label>
+                    <input type="number" id="price" min="0" step="1" placeholder="0">
+                </div>
+
+                <div class="form-group">
+                    <label>Категория</label>
+                    <select id="category">
+                        <option value="accessories">Аксессуары</option>
+                        <option value="resources">Ресурсы</option>
+                        <option value="realty">Недвижимость</option>
+                        <option value="transport">Транспорт</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Тип сделки</label>
+                    <select id="type">
+                        <option value="sale">Продажа</option>
+                        <option value="buy">Покупка</option>
+                        <option value="rent">Аренда</option>
+                        <option value="ad">Реклама</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Описание (необязательно)</label>
+                    <textarea id="desc" placeholder="Состояние, характеристики..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Telegram для связи (необязательно)</label>
+                    <input type="text" id="telegram" placeholder="@username или номер телефона">
+                    <small style="color:#6c757d;">Укажите контакт, чтобы покупатели могли связаться</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Изображения (до 3 шт)</label>
+                    <input type="file" id="images" accept="image/*" multiple>
+                    <div id="preview"></div>
+                </div>
+
+                <button class="btn-primary" id="publishBtn"><i class="fas fa-cloud-upload-alt"></i> Опубликовать</button>
             </div>
-            <div class="header-actions">
-                <button class="icon-btn" id="closeTelegramBtn" title="Закрыть" style="display: none;"><i class="fas fa-times"></i></button>
-            </div>
+
+            <div class="watermark"><i class="fas fa-store"></i> Arzmob Store 2026</div>
         </div>
 
-        <div class="form-container">
-            <h1><i class="fas fa-plus-circle"></i> Создать объявление</h1>
-            <div class="subtitle">Заполните информацию о товаре или услуге</div>
-
-            <div class="form-group">
-                <label>Название предмета</label>
-                <input type="text" id="name" placeholder="Например: M4A1, Бронежилет">
-            </div>
-
-            <div class="form-group">
-                <label>Цена</label>
-                <input type="number" id="price" min="0" step="1" placeholder="0">
-            </div>
-
-            <div class="form-group">
-                <label>Категория</label>
-                <select id="category">
-                    <option value="accessories">Аксессуары</option>
-                    <option value="resources">Ресурсы</option>
-                    <option value="realty">Недвижимость</option>
-                    <option value="transport">Транспорт</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Тип сделки</label>
-                <select id="type">
-                    <option value="sale">Продажа</option>
-                    <option value="buy">Покупка</option>
-                    <option value="rent">Аренда</option>
-                    <option value="ad">Реклама</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Описание (необязательно)</label>
-                <textarea id="desc" placeholder="Состояние, характеристики..."></textarea>
-            </div>
-
-            <!-- Новое поле: Telegram контакт -->
-            <div class="form-group">
-                <label>Telegram для связи (необязательно)</label>
-                <input type="text" id="telegram" placeholder="@username или номер телефона">
-                <small style="color:#6c757d;">Укажите контакт, чтобы покупатели могли связаться</small>
-            </div>
-
-            <div class="form-group">
-                <label>Изображения (до 3 шт)</label>
-                <input type="file" id="images" accept="image/*" multiple>
-                <div id="preview"></div>
-            </div>
-
-            <button class="btn-primary" id="publishBtn"><i class="fas fa-cloud-upload-alt"></i> Опубликовать</button>
+        <!-- Нижняя панель (рынок, профиль) -->
+        <div class="bottom-nav">
+            <a href="index.html" class="bottom-nav-item">
+                <i class="fas fa-store"></i>
+                <span>Рынок</span>
+            </a>
+            <a href="profile.html" class="bottom-nav-item">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </a>
         </div>
-
-        <div class="watermark"><i class="fas fa-store"></i> Arzmob Store 2026</div>
     </div>
 
     <script>
@@ -109,31 +115,44 @@
             if (window.Telegram && Telegram.WebApp) {
                 Telegram.WebApp.ready();
                 Telegram.WebApp.expand();
-                const closeBtn = document.getElementById('closeTelegramBtn');
-                if (closeBtn) {
-                    closeBtn.style.display = 'inline-flex';
-                    closeBtn.addEventListener('click', () => Telegram.WebApp.close());
-                }
                 Telegram.WebApp.setHeaderColor('#6c757d');
                 Telegram.WebApp.setBackgroundColor('#e9ecef');
+                // Кнопка закрытия Telegram
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'icon-btn';
+                closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                closeBtn.title = 'Закрыть';
+                closeBtn.style.position = 'fixed';
+                closeBtn.style.top = 'calc(12px + env(safe-area-inset-top, 0px))';
+                closeBtn.style.right = '12px';
+                closeBtn.style.zIndex = '1002';
+                closeBtn.onclick = () => Telegram.WebApp.close();
+                document.body.appendChild(closeBtn);
             }
             window.addEventListener('load', () => {
-                document.getElementById('preloader').style.opacity = '0';
-                setTimeout(() => document.getElementById('preloader').style.display = 'none', 300);
+                const preloader = document.getElementById('preloader');
+                if (preloader) {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => preloader.style.display = 'none', 300);
+                }
             });
         })();
     </script>
 
     <script type="module">
-        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { ref, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-        import { getCurrentUser } from './helpers.js';
+        import { requireAuth } from './helpers.js';
         import { db, storage } from './firebase-config.js';
 
-        const user = getCurrentUser();
-        if (!user) window.location.href = 'login.html';
+        // Проверяем авторизацию (только Telegram)
+        const user = requireAuth();
+        if (!user) {
+            // requireAuth уже перенаправит на главную, но на всякий случай
+            window.location.href = 'index.html';
+        }
 
-        // Превью
+        // Превью изображений
         document.getElementById('images').addEventListener('change', function(e) {
             const preview = document.getElementById('preview');
             preview.innerHTML = '';
@@ -150,54 +169,83 @@
         });
 
         document.getElementById('publishBtn').addEventListener('click', async () => {
-            const name = document.getElementById('name').value.trim();
-            const price = document.getElementById('price').value.trim();
-            const category = document.getElementById('category').value;
-            const type = document.getElementById('type').value;
-            const desc = document.getElementById('desc').value.trim();
-            const telegram = document.getElementById('telegram').value.trim().replace('@', '');
-            const files = document.getElementById('images').files;
+            const btn = document.getElementById('publishBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Публикация...';
 
-            if (!name || !price) {
-                alert('Заполните название и цену');
-                return;
-            }
+            try {
+                const name = document.getElementById('name').value.trim();
+                const price = document.getElementById('price').value.trim();
+                const category = document.getElementById('category').value;
+                const type = document.getElementById('type').value;
+                const desc = document.getElementById('desc').value.trim();
+                const telegram = document.getElementById('telegram').value.trim().replace('@', '');
+                const files = document.getElementById('images').files;
 
-            const newItemRef = push(ref(db, 'items'));
-            const itemId = newItemRef.key;
+                if (!name || !price) {
+                    alert('Заполните название и цену');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Опубликовать';
+                    return;
+                }
 
-            // Загружаем изображения
-            const imageUrls = [];
-            for (let i = 0; i < Math.min(files.length, 3); i++) {
-                const file = files[i];
-                const imgRef = storageRef(storage, `items/${itemId}/${i}`);
-                try {
+                if (files.length > 3) {
+                    alert('Максимум 3 изображения');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Опубликовать';
+                    return;
+                }
+                for (let i = 0; i < files.length; i++) {
+                    if (!files[i].type.startsWith('image/')) {
+                        alert('Разрешены только изображения');
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Опубликовать';
+                        return;
+                    }
+                    if (files[i].size > 5 * 1024 * 1024) {
+                        alert('Размер каждого изображения не должен превышать 5 МБ');
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Опубликовать';
+                        return;
+                    }
+                }
+
+                const newItemRef = push(ref(db, 'items'));
+                const itemId = newItemRef.key;
+
+                const imageUrls = [];
+                for (let i = 0; i < Math.min(files.length, 3); i++) {
+                    const file = files[i];
+                    const imgRef = storageRef(storage, `items/${itemId}/${i}`);
                     await uploadBytes(imgRef, file);
                     const url = await getDownloadURL(imgRef);
                     imageUrls.push(url);
-                } catch (e) {
-                    console.error('Ошибка загрузки изображения', e);
                 }
+
+                await set(newItemRef, {
+                    name,
+                    price: Number(price),
+                    category,
+                    type,
+                    description: desc,
+                    userId: user.userId,
+                    userNick: user.userNick,
+                    timestamp: Date.now(),
+                    status: 'pending',
+                    views: 0,
+                    images: imageUrls,
+                    server: 'Arizona Mobile 1',
+                    contact: telegram || ''
+                });
+
+                alert('Объявление отправлено на модерацию');
+                window.location.href = 'index.html';
+            } catch (err) {
+                console.error(err);
+                alert('Ошибка: ' + err.message);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Опубликовать';
             }
-
-            await set(newItemRef, {
-                name,
-                price: Number(price),
-                category,
-                type,
-                description: desc,
-                userId: user.userId,
-                userNick: user.userNick,
-                timestamp: Date.now(),
-                status: 'pending',
-                views: 0,
-                images: imageUrls,
-                server: 'Arizona Mobile 1',
-                contact: telegram || '' // сохраняем контакт
-            });
-
-            alert('Объявление отправлено на модерацию');
-            window.location.href = 'index.html';
         });
     </script>
 </body>

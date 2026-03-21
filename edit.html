@@ -35,76 +35,85 @@
 <body>
     <div id="preloader"><div class="spinner"></div></div>
 
-    <div class="container" style="display: flex; justify-content: center; flex-direction: column; align-items: center;">
-        <div class="header" style="width: 100%;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <button class="icon-btn" onclick="history.back()" title="Назад"><i class="fas fa-arrow-left"></i></button>
-                <div class="logo"><i class="fas fa-store"></i> Arzmob</div>
+    <div class="page-container">
+        <!-- Кнопка "Назад" -->
+        <a href="profile.html" class="back-button"><i class="fas fa-arrow-left"></i></a>
+
+        <div class="container" style="display: flex; justify-content: center; flex-direction: column; align-items: center;">
+            <div class="form-container">
+                <h1><i class="fas fa-edit"></i> Редактировать</h1>
+                <div class="subtitle">Измените данные объявления</div>
+
+                <div class="form-group">
+                    <label>Название предмета</label>
+                    <input type="text" id="name">
+                </div>
+
+                <div class="form-group">
+                    <label>Цена</label>
+                    <input type="number" id="price" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label>Категория</label>
+                    <select id="category">
+                        <option value="accessories">Аксессуары</option>
+                        <option value="resources">Ресурсы</option>
+                        <option value="realty">Недвижимость</option>
+                        <option value="transport">Транспорт</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Тип сделки</label>
+                    <select id="type">
+                        <option value="sale">Продажа</option>
+                        <option value="buy">Покупка</option>
+                        <option value="rent">Аренда</option>
+                        <option value="ad">Реклама</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Описание</label>
+                    <textarea id="desc" rows="4"></textarea>
+                </div>
+
+                <!-- Поле Telegram -->
+                <div class="form-group">
+                    <label>Telegram для связи</label>
+                    <input type="text" id="telegram" placeholder="@username">
+                    <small style="color:#6c757d;">Контакт будет отображаться в объявлении</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Текущие изображения</label>
+                    <div id="currentImages" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Новые изображения (заменят старые, до 3 шт)</label>
+                    <input type="file" id="images" accept="image/*" multiple>
+                    <div id="newPreview" style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;"></div>
+                </div>
+
+                <button class="btn-primary" id="saveBtn"><i class="fas fa-save"></i> Сохранить изменения</button>
             </div>
-            <div class="header-actions">
-                <button class="icon-btn" id="closeTelegramBtn" title="Закрыть" style="display: none;"><i class="fas fa-times"></i></button>
-            </div>
+
+            <div class="watermark"><i class="fas fa-store"></i> Arzmob Store 2026</div>
         </div>
 
-        <div class="form-container">
-            <h1><i class="fas fa-edit"></i> Редактировать</h1>
-            <div class="subtitle">Измените данные объявления</div>
-
-            <div class="form-group">
-                <label>Название предмета</label>
-                <input type="text" id="name">
-            </div>
-
-            <div class="form-group">
-                <label>Цена</label>
-                <input type="number" id="price" min="0">
-            </div>
-
-            <div class="form-group">
-                <label>Категория</label>
-                <select id="category">
-                    <option value="accessories">Аксессуары</option>
-                    <option value="resources">Ресурсы</option>
-                    <option value="realty">Недвижимость</option>
-                    <option value="transport">Транспорт</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Тип сделки</label>
-                <select id="type">
-                    <option value="sale">Продажа</option>
-                    <option value="buy">Покупка</option>
-                    <option value="rent">Аренда</option>
-                    <option value="ad">Реклама</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Описание</label>
-                <textarea id="desc" rows="4"></textarea>
-            </div>
-
-            <!-- Поле Telegram -->
-            <div class="form-group">
-                <label>Telegram для связи</label>
-                <input type="text" id="telegram" placeholder="@username">
-            </div>
-
-            <div class="form-group">
-                <label>Текущие изображения</label>
-                <div id="currentImages" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
-            </div>
-
-            <div class="form-group">
-                <label>Новые изображения (заменят старые, до 3 шт)</label>
-                <input type="file" id="images" accept="image/*" multiple>
-            </div>
-
-            <button class="btn-primary" id="saveBtn"><i class="fas fa-save"></i> Сохранить</button>
+        <!-- Нижняя панель (рынок, профиль) -->
+        <div class="bottom-nav">
+            <a href="index.html" class="bottom-nav-item">
+                <i class="fas fa-store"></i>
+                <span>Рынок</span>
+            </a>
+            <a href="profile.html" class="bottom-nav-item">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </a>
         </div>
-
-        <div class="watermark"><i class="fas fa-store"></i> Arzmob Store 2026</div>
     </div>
 
     <script>
@@ -112,17 +121,26 @@
             if (window.Telegram && Telegram.WebApp) {
                 Telegram.WebApp.ready();
                 Telegram.WebApp.expand();
-                const closeBtn = document.getElementById('closeTelegramBtn');
-                if (closeBtn) {
-                    closeBtn.style.display = 'inline-flex';
-                    closeBtn.addEventListener('click', () => Telegram.WebApp.close());
-                }
                 Telegram.WebApp.setHeaderColor('#6c757d');
                 Telegram.WebApp.setBackgroundColor('#e9ecef');
+                // Кнопка закрытия Telegram
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'icon-btn';
+                closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                closeBtn.title = 'Закрыть';
+                closeBtn.style.position = 'fixed';
+                closeBtn.style.top = 'calc(12px + env(safe-area-inset-top, 0px))';
+                closeBtn.style.right = '12px';
+                closeBtn.style.zIndex = '1002';
+                closeBtn.onclick = () => Telegram.WebApp.close();
+                document.body.appendChild(closeBtn);
             }
             window.addEventListener('load', () => {
-                document.getElementById('preloader').style.opacity = '0';
-                setTimeout(() => document.getElementById('preloader').style.display = 'none', 300);
+                const preloader = document.getElementById('preloader');
+                if (preloader) {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => preloader.style.display = 'none', 300);
+                }
             });
         })();
     </script>
@@ -130,15 +148,21 @@
     <script type="module">
         import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-        import { getCurrentUser } from './helpers.js';
+        import { requireAuth } from './helpers.js';
         import { db, storage } from './firebase-config.js';
 
-        const user = getCurrentUser();
-        if (!user) window.location.href = 'login.html';
+        // Проверка авторизации
+        const user = requireAuth();
+        if (!user) {
+            window.location.href = 'index.html';
+        }
 
         const urlParams = new URLSearchParams(window.location.search);
         const itemId = urlParams.get('id');
-        if (!itemId) { alert('Товар не указан'); window.location.href = 'profile.html'; }
+        if (!itemId) {
+            alert('Товар не указан');
+            window.location.href = 'profile.html';
+        }
 
         const itemRef = ref(db, `items/${itemId}`);
         const itemSnap = await get(itemRef);
@@ -149,6 +173,7 @@
             window.location.href = 'profile.html';
         }
 
+        // Заполняем форму
         document.getElementById('name').value = itemData.name || '';
         document.getElementById('price').value = itemData.price || '';
         document.getElementById('category').value = itemData.category || 'accessories';
@@ -156,7 +181,7 @@
         document.getElementById('desc').value = itemData.description || '';
         document.getElementById('telegram').value = itemData.contact || '';
 
-        // Текущие изображения
+        // Отображаем текущие изображения
         const currentDiv = document.getElementById('currentImages');
         if (itemData.images && itemData.images.length) {
             itemData.images.forEach(url => {
@@ -172,48 +197,104 @@
             currentDiv.textContent = 'Нет изображений';
         }
 
+        // Превью новых изображений
+        document.getElementById('images').addEventListener('change', function(e) {
+            const preview = document.getElementById('newPreview');
+            preview.innerHTML = '';
+            for (let i = 0; i < Math.min(this.files.length, 3); i++) {
+                const file = this.files[i];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.width = '80px';
+                    img.style.height = '80px';
+                    img.style.objectFit = 'cover';
+                    img.style.borderRadius = '8px';
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
         document.getElementById('saveBtn').addEventListener('click', async () => {
-            const name = document.getElementById('name').value.trim();
-            const price = document.getElementById('price').value.trim();
-            const category = document.getElementById('category').value;
-            const type = document.getElementById('type').value;
-            const desc = document.getElementById('desc').value.trim();
-            const telegram = document.getElementById('telegram').value.trim().replace('@', '');
-            const files = document.getElementById('images').files;
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Сохранение...';
 
-            if (!name || !price) {
-                alert('Заполните название и цену');
-                return;
-            }
+            try {
+                const name = document.getElementById('name').value.trim();
+                const price = document.getElementById('price').value.trim();
+                const category = document.getElementById('category').value;
+                const type = document.getElementById('type').value;
+                const desc = document.getElementById('desc').value.trim();
+                const telegram = document.getElementById('telegram').value.trim().replace('@', '');
+                const files = document.getElementById('images').files;
 
-            let imageUrls = itemData.images || [];
-            if (files.length > 0) {
-                for (let i = 0; i < imageUrls.length; i++) {
-                    try {
-                        await deleteObject(storageRef(storage, `items/${itemId}/${i}`));
-                    } catch (e) {}
+                if (!name || !price) {
+                    alert('Заполните название и цену');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-save"></i> Сохранить изменения';
+                    return;
                 }
-                imageUrls = [];
-                for (let i = 0; i < Math.min(files.length, 3); i++) {
-                    const file = files[i];
-                    const imgRef = storageRef(storage, `items/${itemId}/${i}`);
-                    await uploadBytes(imgRef, file);
-                    imageUrls.push(await getDownloadURL(imgRef));
+
+                if (files.length > 3) {
+                    alert('Максимум 3 изображения');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-save"></i> Сохранить изменения';
+                    return;
                 }
+                for (let i = 0; i < files.length; i++) {
+                    if (!files[i].type.startsWith('image/')) {
+                        alert('Разрешены только изображения');
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-save"></i> Сохранить изменения';
+                        return;
+                    }
+                    if (files[i].size > 5 * 1024 * 1024) {
+                        alert('Размер каждого изображения не должен превышать 5 МБ');
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-save"></i> Сохранить изменения';
+                        return;
+                    }
+                }
+
+                let imageUrls = itemData.images || [];
+                if (files.length > 0) {
+                    // Удаляем старые изображения из Storage
+                    for (let i = 0; i < imageUrls.length; i++) {
+                        try {
+                            await deleteObject(storageRef(storage, `items/${itemId}/${i}`));
+                        } catch (e) { /* не критично */ }
+                    }
+                    imageUrls = [];
+                    // Загружаем новые
+                    for (let i = 0; i < Math.min(files.length, 3); i++) {
+                        const file = files[i];
+                        const imgRef = storageRef(storage, `items/${itemId}/${i}`);
+                        await uploadBytes(imgRef, file);
+                        imageUrls.push(await getDownloadURL(imgRef));
+                    }
+                }
+
+                await update(itemRef, {
+                    name,
+                    price: Number(price),
+                    category,
+                    type,
+                    description: desc,
+                    contact: telegram,
+                    images: imageUrls
+                });
+
+                alert('Изменения сохранены');
+                window.location.href = 'profile.html';
+            } catch (err) {
+                console.error(err);
+                alert('Ошибка: ' + err.message);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> Сохранить изменения';
             }
-
-            await update(itemRef, {
-                name,
-                price: Number(price),
-                category,
-                type,
-                description: desc,
-                contact: telegram,
-                images: imageUrls
-            });
-
-            alert('Изменения сохранены');
-            window.location.href = 'profile.html';
         });
     </script>
 </body>

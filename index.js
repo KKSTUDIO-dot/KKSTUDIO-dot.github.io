@@ -1,35 +1,9 @@
 import { getDatabase, ref, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import { getStorage, ref as storageRef, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-import { getCurrentUser, logout, isAdmin, getFavorites, addFavorite, removeFavorite, isFavorite, addToHistory, getUserData } from './helpers.js';
+import { getCurrentUser, isAdmin, getFavorites, addFavorite, removeFavorite, isFavorite, addToHistory } from './helpers.js';
 import { db, storage } from './firebase-config.js';
 
-// Пользовательское меню
-const user = getCurrentUser();
-if (user) {
-    document.getElementById('guestMenu').style.display = 'none';
-    document.getElementById('userMenu').style.display = 'flex';
-    document.getElementById('userNickDisplay').textContent = user.userNick;
-    document.getElementById('logoutBtn').addEventListener('click', logout);
-
-    // Проверка на отображение ссылки на админку
-    (async () => {
-        // 1. Обычная проверка через isAdmin
-        const admin = await isAdmin(user.userId);
-        if (admin) {
-            document.getElementById('adminLink').style.display = 'inline-flex';
-            return;
-        }
-
-        // 2. Если не админ, проверяем Telegram ID
-        const userData = await getUserData(user.userId);
-        // Замените число на нужный Telegram ID
-        if (userData && userData.telegramId === 8169971367) {
-            document.getElementById('adminLink').style.display = 'inline-flex';
-        }
-    })();
-}
-
-// Элементы
+// ========== ЭЛЕМЕНТЫ DOM ==========
 const container = document.getElementById('itemsContainer');
 const searchInput = document.getElementById('searchInput');
 const categorySelect = document.getElementById('categorySelect');
@@ -38,15 +12,17 @@ const prevBtn = document.getElementById('prevPage');
 const nextBtn = document.getElementById('nextPage');
 const pageInfo = document.getElementById('pageInfo');
 
-// Состояние
-let currentType = 'all';
+// ========== СОСТОЯНИЕ ==========
 let currentCategory = 'all';
 let currentSort = 'dateDesc';
 let currentPage = 1;
 let allItems = [];
 const pageSize = 6;
 
-// Подписка на изменения базы
+// ========== ПОЛЬЗОВАТЕЛЬ ==========
+const user = getCurrentUser();
+
+// ========== ПОДПИСКА НА БАЗУ ==========
 const itemsRef = ref(db, 'items');
 onValue(itemsRef, (snapshot) => {
     const data = snapshot.val();
@@ -64,14 +40,16 @@ onValue(itemsRef, (snapshot) => {
     renderPage();
 });
 
-// Фильтрация и сортировка
+// ========== ФИЛЬТРАЦИЯ И СОРТИРОВКА ==========
 function getFiltered() {
     let filtered = allItems;
-    if (currentType !== 'all') filtered = filtered.filter(i => i.type === currentType);
-    if (currentCategory !== 'all') filtered = filtered.filter(i => i.category === currentCategory);
+    if (currentCategory !== 'all') {
+        filtered = filtered.filter(i => i.category === currentCategory);
+    }
     const search = searchInput.value.toLowerCase().trim();
-    if (search) filtered = filtered.filter(i => i.name.toLowerCase().includes(search));
-    
+    if (search) {
+        filtered = filtered.filter(i => i.name.toLowerCase().includes(search));
+    }
     filtered.sort((a, b) => {
         if (currentSort === 'dateDesc') return b.timestamp - a.timestamp;
         if (currentSort === 'dateAsc') return a.timestamp - b.timestamp;
@@ -83,14 +61,12 @@ function getFiltered() {
     return filtered;
 }
 
+// ========== ОТРИСОВКА ТОВАРОВ ==========
 function renderPage() {
     const filtered = getFiltered();
     const total = filtered.length;
     const maxPage = Math.ceil(total / pageSize) || 1;
-    // Корректируем текущую страницу, если она выходит за пределы
-    if (currentPage > maxPage) {
-        currentPage = maxPage;
-    }
+    if (currentPage > maxPage) currentPage = maxPage;
     const start = (currentPage - 1) * pageSize;
     const end = start + pageSize;
     const pageItems = filtered.slice(start, end);
@@ -154,29 +130,31 @@ function renderPage() {
             card.addEventListener('click', (e) => {
                 if (e.target.closest('.favorite-btn') || e.target.closest('.delete-btn')) return;
                 const id = card.dataset.id;
-                addToHistory(id);
+                if (user) addToHistory(id);
                 window.location.href = `product.html?id=${id}`;
             });
         });
 
-        // Избранное
-        document.querySelectorAll('.favorite-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = btn.dataset.id;
-                if (btn.classList.contains('active')) {
-                    removeFavorite(id);
-                    btn.classList.remove('active');
-                    btn.innerHTML = '<i class="far fa-heart"></i>';
-                } else {
-                    addFavorite(id);
-                    btn.classList.add('active');
-                    btn.innerHTML = '<i class="fas fa-heart"></i>';
-                }
+        // Избранное (только если пользователь авторизован)
+        if (user) {
+            document.querySelectorAll('.favorite-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.dataset.id;
+                    if (btn.classList.contains('active')) {
+                        removeFavorite(id);
+                        btn.classList.remove('active');
+                        btn.innerHTML = '<i class="far fa-heart"></i>';
+                    } else {
+                        addFavorite(id);
+                        btn.classList.add('active');
+                        btn.innerHTML = '<i class="fas fa-heart"></i>';
+                    }
+                });
             });
-        });
+        }
 
-        // Удаление (только свои) с очисткой изображений
+        // Удаление (только свои)
         document.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
@@ -188,9 +166,7 @@ function renderPage() {
                             try {
                                 const imgRef = storageRef(storage, `items/${item.id}/${i}`);
                                 await deleteObject(imgRef);
-                            } catch (err) {
-                                console.warn('Ошибка удаления изображения', err);
-                            }
+                            } catch (err) {}
                         }
                     }
                     await remove(ref(db, `items/${id}`));
@@ -199,7 +175,6 @@ function renderPage() {
         });
     }
 
-    // Пагинация
     prevBtn.disabled = currentPage === 1;
     nextBtn.disabled = end >= total;
     pageInfo.textContent = `Страница ${currentPage}`;
@@ -215,20 +190,28 @@ function escapeHtml(unsafe) {
     });
 }
 
-// Обработчики фильтров
-searchInput.addEventListener('input', () => { currentPage = 1; renderPage(); });
-categorySelect.addEventListener('change', (e) => { currentCategory = e.target.value; currentPage = 1; renderPage(); });
-sortSelect.addEventListener('change', (e) => { currentSort = e.target.value; renderPage(); });
-document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentType = btn.dataset.type;
-        currentPage = 1;
-        renderPage();
-    });
+// ========== ОБРАБОТЧИКИ ФИЛЬТРОВ ==========
+searchInput.addEventListener('input', () => {
+    currentPage = 1;
+    renderPage();
+});
+categorySelect.addEventListener('change', (e) => {
+    currentCategory = e.target.value;
+    currentPage = 1;
+    renderPage();
+});
+sortSelect.addEventListener('change', (e) => {
+    currentSort = e.target.value;
+    renderPage();
 });
 
-// Пагинация
-prevBtn.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderPage(); } });
-nextBtn.addEventListener('click', () => { currentPage++; renderPage(); });
+prevBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+        currentPage--;
+        renderPage();
+    }
+});
+nextBtn.addEventListener('click', () => {
+    currentPage++;
+    renderPage();
+});
