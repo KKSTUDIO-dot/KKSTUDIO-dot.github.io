@@ -2,289 +2,97 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Мой профиль | Arzmob Store</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Профиль | Telegram App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    <style>
-        #preloader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.3s;
-        }
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #dee2e6;
-            border-top-color: #6c757d;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-    </style>
+    <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
-    <div id="preloader"><div class="spinner"></div></div>
-
-    <div class="page-container">
-        <!-- Кнопка "Назад" -->
-        <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i></a>
-
-        <div class="container">
-            <div class="profile-header">
-                <h2><i class="fas fa-user-circle"></i> <span id="userNick"></span></h2>
-            </div>
-
-            <!-- Форма для Telegram -->
-            <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 24px; border: 1px solid #dee2e6;">
-                <h3><i class="fab fa-telegram"></i> Контакт в Telegram</h3>
-                <p>Укажите ваш Telegram username (без @), чтобы покупатели могли связаться с вами.</p>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <input type="text" id="telegramInput" placeholder="username" style="flex: 1; padding: 10px; border: 1px solid #ced4da; border-radius: 40px;">
-                    <button class="btn-primary" id="saveTelegramBtn" style="width: auto;">Сохранить</button>
-                </div>
-                <div id="telegramStatus" style="margin-top: 10px; color: #28a745;"></div>
-            </div>
-
-            <div class="tabs">
-                <button class="tab-btn active" data-tab="my">Мои объявления</button>
-                <button class="tab-btn" data-tab="favorites">Избранное</button>
-                <button class="tab-btn" data-tab="history">История</button>
-            </div>
-
-            <div id="myItems" class="items-grid" style="display: grid;"></div>
-            <div id="favoritesItems" class="items-grid" style="display: none;"></div>
-            <div id="historyItems" class="items-grid" style="display: none;"></div>
-
-            <div class="watermark"><i class="fas fa-store"></i> Arzmob Store 2026</div>
-        </div>
-
-        <!-- Нижняя панель -->
-        <div class="bottom-nav">
-            <a href="index.html" class="bottom-nav-item">
-                <i class="fas fa-store"></i>
-                <span>Рынок</span>
-            </a>
-            <a href="profile.html" class="bottom-nav-item active">
-                <i class="fas fa-user"></i>
-                <span>Профиль</span>
-            </a>
+    <div class="container">
+        <div id="profile-container"></div>
+        <button id="close-btn" class="btn-secondary" style="width: 100%;">Закрыть приложение</button>
+        <div class="footer">
+            Telegram Mini App
         </div>
     </div>
 
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-store"></i>
+            <span>Магазин</span>
+        </a>
+        <a href="profile.html" class="nav-item active">
+            <i class="fas fa-user"></i>
+            <span>Профиль</span>
+        </a>
+    </div>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        (function() {
-            if (window.Telegram && Telegram.WebApp) {
-                Telegram.WebApp.ready();
-                Telegram.WebApp.expand();
-                Telegram.WebApp.setHeaderColor('#6c757d');
-                Telegram.WebApp.setBackgroundColor('#e9ecef');
-                // Кнопка закрытия Telegram
-                const closeBtn = document.createElement('button');
-                closeBtn.className = 'icon-btn';
-                closeBtn.innerHTML = '<i class="fas fa-times"></i>';
-                closeBtn.title = 'Закрыть';
-                closeBtn.style.position = 'fixed';
-                closeBtn.style.top = 'calc(12px + env(safe-area-inset-top, 0px))';
-                closeBtn.style.right = '12px';
-                closeBtn.style.zIndex = '1002';
-                closeBtn.onclick = () => Telegram.WebApp.close();
-                document.body.appendChild(closeBtn);
-            }
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.enableClosingConfirmation();
 
-            window.addEventListener('load', () => {
-                // Прелоадер скроем после загрузки контента
-                const preloader = document.getElementById('preloader');
-                if (preloader) {
-                    preloader.style.opacity = '0';
-                    setTimeout(() => preloader.style.display = 'none', 300);
-                }
-            });
-        })();
-    </script>
+        const user = tg.initDataUnsafe?.user || null;
+        const container = document.getElementById('profile-container');
 
-    <script type="module">
-        import { getDatabase, ref, query, orderByChild, equalTo, onValue, remove, get, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-        import { getStorage, ref as storageRef, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-        import { requireAuth, getFavorites, getHistory, addToHistory } from './helpers.js';
-        import { db, storage } from './firebase-config.js';
-
-        // Проверка авторизации
-        const user = requireAuth();
-        if (!user) {
-            window.location.href = 'index.html';
-            return;
-        }
-
-        document.getElementById('userNick').textContent = user.userNick;
-
-        // Загрузка текущего Telegram пользователя
-        const userRef = ref(db, `users/${user.userId}`);
-        const userSnap = await get(userRef);
-        const userData = userSnap.val() || {};
-        if (userData.telegram) {
-            document.getElementById('telegramInput').value = userData.telegram;
-        }
-
-        // Сохранение Telegram
-        document.getElementById('saveTelegramBtn').addEventListener('click', async () => {
-            const telegram = document.getElementById('telegramInput').value.trim().replace('@', '');
-            await update(userRef, { telegram });
-            document.getElementById('telegramStatus').textContent = 'Сохранено!';
-            setTimeout(() => document.getElementById('telegramStatus').textContent = '', 2000);
-        });
-
-        // Вкладки
-        const tabs = document.querySelectorAll('.tab-btn');
-        const myDiv = document.getElementById('myItems');
-        const favDiv = document.getElementById('favoritesItems');
-        const histDiv = document.getElementById('historyItems');
-
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                const which = tab.dataset.tab;
-                myDiv.style.display = which === 'my' ? 'grid' : 'none';
-                favDiv.style.display = which === 'favorites' ? 'grid' : 'none';
-                histDiv.style.display = which === 'history' ? 'grid' : 'none';
-                if (which === 'favorites') loadFavorites();
-                if (which === 'history') loadHistory();
-            });
-        });
-
-        // Мои объявления
-        const itemsRef = ref(db, 'items');
-        const userItemsQuery = query(itemsRef, orderByChild('userId'), equalTo(user.userId));
-        onValue(userItemsQuery, (snapshot) => {
-            const data = snapshot.val();
-            if (!data) {
-                myDiv.innerHTML = '<p>У вас пока нет объявлений. <a href="tovar.html">Добавить</a></p>';
-                return;
-            }
-
-            let html = '';
-            for (let id in data) {
-                const item = data[id];
-                const price = item.price.toLocaleString();
-                let statusText = '';
-                if (item.status === 'approved') statusText = '✅ Одобрено';
-                else if (item.status === 'pending') statusText = '⏳ На модерации';
-                else statusText = item.status;
-
-                html += `
-                    <div class="item-card" data-id="${id}">
-                        <h3 class="item-title">${escapeHtml(item.name)}</h3>
-                        <div class="item-price">💰 ${price}</div>
-                        <div class="status" style="font-size:0.9rem; color:#6c757d;">${statusText}</div>
-                        <div style="display: flex; gap: 10px; margin-top: 10px;">
-                            <a href="edit.html?id=${id}" class="btn-primary" style="padding:8px 16px; font-size:0.9rem;">Редактировать</a>
-                            <button class="btn-primary" style="background:#dc3545; padding:8px 16px;" data-id="${id}" id="del-${id}">Удалить</button>
-                        </div>
+        function renderProfile() {
+            if (!user) {
+                container.innerHTML = `
+                    <div class="card">
+                        <p style="text-align: center;">Данные пользователя недоступны.<br>Запустите приложение через Telegram.</p>
                     </div>
                 `;
-            }
-            myDiv.innerHTML = html;
-
-            for (let id in data) {
-                document.getElementById(`del-${id}`)?.addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    if (confirm('Удалить объявление?')) {
-                        const item = data[id];
-                        if (item && item.images && item.images.length) {
-                            for (let i = 0; i < item.images.length; i++) {
-                                try {
-                                    const imgRef = storageRef(storage, `items/${item.id}/${i}`);
-                                    await deleteObject(imgRef);
-                                } catch (err) { console.warn(err); }
-                            }
-                        }
-                        await remove(ref(db, `items/${id}`));
-                    }
-                });
-            }
-        });
-
-        // Избранное
-        async function loadFavorites() {
-            const favIds = getFavorites();
-            if (favIds.length === 0) {
-                favDiv.innerHTML = '<p>Нет избранных товаров</p>';
                 return;
             }
 
-            const snap = await get(ref(db, 'items'));
-            const items = snap.val() || {};
-            let html = '';
-            for (let id in items) {
-                if (favIds.includes(id) && items[id].status === 'approved') {
-                    const item = items[id];
-                    html += `
-                        <div class="item-card" data-id="${id}">
-                            <h3 class="item-title">${escapeHtml(item.name)}</h3>
-                            <div class="item-price">💰 ${item.price.toLocaleString()}</div>
-                        </div>
-                    `;
-                }
-            }
-            favDiv.innerHTML = html || '<p>Нет доступных товаров</p>';
-            document.querySelectorAll('#favoritesItems .item-card').forEach(c => {
-                c.addEventListener('click', () => {
-                    addToHistory(c.dataset.id);
-                    window.location.href = `product.html?id=${c.dataset.id}`;
+            const avatarLetter = (user.first_name ? user.first_name.charAt(0) : 'U').toUpperCase();
+            container.innerHTML = `
+                <div class="card">
+                    <div class="user-avatar">${avatarLetter}</div>
+                    <div class="user-name">${escapeHtml(user.first_name || '')} ${escapeHtml(user.last_name || '')}</div>
+                    <div class="user-username">${user.username ? '@' + escapeHtml(user.username) : 'Нет username'}</div>
+                    <div class="user-id">ID: ${user.id}</div>
+                    <div style="text-align: center; margin-bottom: 16px;">Язык: ${user.language_code || '—'}</div>
+                    <button id="send-profile-btn">Отправить данные профиля</button>
+                </div>
+            `;
+
+            const sendBtn = document.getElementById('send-profile-btn');
+            if (sendBtn) {
+                sendBtn.addEventListener('click', () => {
+                    const data = {
+                        action: 'profile_data',
+                        user: user,
+                        timestamp: Date.now()
+                    };
+                    tg.sendData(JSON.stringify(data));
+                    const statusDiv = document.createElement('div');
+                    statusDiv.className = 'status';
+                    statusDiv.textContent = '📤 Данные отправлены боту';
+                    container.appendChild(statusDiv);
+                    setTimeout(() => statusDiv.remove(), 3000);
                 });
-            });
+            }
         }
 
-        // История
-        async function loadHistory() {
-            const histIds = getHistory();
-            if (histIds.length === 0) {
-                histDiv.innerHTML = '<p>История пуста</p>';
-                return;
-            }
-
-            const snap = await get(ref(db, 'items'));
-            const items = snap.val() || {};
-            let html = '';
-            for (let id in items) {
-                if (histIds.includes(id)) {
-                    const item = items[id];
-                    html += `
-                        <div class="item-card" data-id="${id}">
-                            <h3 class="item-title">${escapeHtml(item.name)}</h3>
-                            <div class="item-price">💰 ${item.price.toLocaleString()}</div>
-                        </div>
-                    `;
-                }
-            }
-            histDiv.innerHTML = html || '<p>Нет доступных товаров</p>';
-            document.querySelectorAll('#historyItems .item-card').forEach(c => {
-                c.addEventListener('click', () => {
-                    addToHistory(c.dataset.id);
-                    window.location.href = `product.html?id=${c.dataset.id}`;
-                });
-            });
-        }
-
-        function escapeHtml(unsafe) {
-            return unsafe.replace(/[&<>"]/g, m => {
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
                 if (m === '&') return '&amp;';
                 if (m === '<') return '&lt;';
                 if (m === '>') return '&gt;';
-                if (m === '"') return '&quot;';
                 return m;
             });
         }
+
+        renderProfile();
+
+        document.getElementById('close-btn').addEventListener('click', () => {
+            tg.close();
+        });
+
+        tg.ready();
     </script>
 </body>
 </html>
