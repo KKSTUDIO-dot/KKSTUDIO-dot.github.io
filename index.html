@@ -2,150 +2,272 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Arzmob Store | Рынок</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Магазин | Telegram App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    <style>
-        #preloader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.3s;
-        }
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #dee2e6;
-            border-top-color: #6c757d;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        /* Скрываем кнопку добавления, если пользователь не авторизован */
-        .add-button.hidden {
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
-    <div id="preloader"><div class="spinner"></div></div>
-
-    <div class="page-container">
-        <!-- Плавающая кнопка добавления (будет показана, только если есть user) -->
-        <a href="tovar.html" class="add-button" id="addButton"><i class="fas fa-plus-circle"></i> Добавить</a>
-
-        <div class="container">
-            <!-- Фильтры -->
-            <div class="filter-card">
-                <div class="filter-bar">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="searchInput" placeholder="Поиск по названию...">
-                    </div>
-                    <div class="sort-box">
-                        <select id="categorySelect">
-                            <option value="all">Все категории</option>
-                            <option value="accessories">Аксессуары</option>
-                            <option value="resources">Ресурсы</option>
-                            <option value="realty">Недвижимость</option>
-                            <option value="transport">Транспорт</option>
-                        </select>
-                    </div>
-                    <div class="sort-box">
-                        <select id="sortSelect">
-                            <option value="dateDesc">🕒 Сначала новые</option>
-                            <option value="priceAsc">💰 Сначала дешёвые</option>
-                            <option value="priceDesc">💰 Сначала дорогие</option>
-                            <option value="viewsDesc">👁 Самые активные</option>
-                        </select>
-                    </div>
-                </div>
+    <div class="container">
+        <div class="card">
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                <button id="add-ad-btn" class="btn-add">
+                    <i class="fas fa-plus"></i> Добавить объявление
+                </button>
+            </div>
+            
+            <div class="category-tabs">
+                <button class="tab-btn active" data-category="sale">Продажа</button>
+                <button class="tab-btn" data-category="buy">Покупка</button>
+                <button class="tab-btn" data-category="rent">Аренда</button>
+                <button class="tab-btn" data-category="ad">Реклама</button>
             </div>
 
-            <!-- Товары -->
-            <div id="itemsContainer" class="items-grid">
-                <div class="no-items"><i class="fas fa-spinner fa-pulse"></i><br>Загрузка...</div>
+            <h2 style="margin-bottom: 16px;">Товары и услуги</h2>
+            <div id="products-container">
+                <div style="text-align: center; padding: 20px;">Загрузка...</div>
             </div>
-
-            <!-- Пагинация -->
-            <div class="pagination">
-                <button id="prevPage" disabled><i class="fas fa-chevron-left"></i> Назад</button>
-                <span id="pageInfo">Страница 1</span>
-                <button id="nextPage">Вперёд <i class="fas fa-chevron-right"></i></button>
-            </div>
-
-            <div class="watermark">
-                <i class="fas fa-store"></i> Arzmob Store 2026 — площадка для игроков Arizona Mobile
-            </div>
+            <div id="status" class="status"></div>
         </div>
-
-        <!-- Нижняя панель (рынок, профиль) -->
-        <div class="bottom-nav">
-            <a href="index.html" class="bottom-nav-item active">
-                <i class="fas fa-store"></i>
-                <span>Рынок</span>
-            </a>
-            <a href="profile.html" class="bottom-nav-item">
-                <i class="fas fa-user"></i>
-                <span>Профиль</span>
-            </a>
+        <div class="footer">
+            Telegram Mini App
         </div>
     </div>
 
-    <script>
-        (function() {
-            if (window.Telegram && Telegram.WebApp) {
-                Telegram.WebApp.ready();
-                Telegram.WebApp.expand();
-                Telegram.WebApp.setHeaderColor('#6c757d');
-                Telegram.WebApp.setBackgroundColor('#e9ecef');
-                // Кнопка закрытия Telegram
-                const closeBtn = document.createElement('button');
-                closeBtn.className = 'icon-btn';
-                closeBtn.innerHTML = '<i class="fas fa-times"></i>';
-                closeBtn.title = 'Закрыть';
-                closeBtn.style.position = 'fixed';
-                closeBtn.style.top = 'calc(12px + env(safe-area-inset-top, 0px))';
-                closeBtn.style.right = '12px';
-                closeBtn.style.zIndex = '1002';
-                closeBtn.onclick = () => Telegram.WebApp.close();
-                document.body.appendChild(closeBtn);
-            }
-            window.addEventListener('load', async function() {
-                const preloader = document.getElementById('preloader');
-                if (preloader) {
-                    preloader.style.opacity = '0';
-                    setTimeout(() => preloader.style.display = 'none', 300);
-                }
+    <!-- Модальное окно добавления объявления -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Новое объявление</h3>
+            <form id="add-form">
+                <label>Ваш ник (или оставьте пустым):</label>
+                <input type="text" id="ad-nickname" placeholder="Ваше имя в объявлении">
+                
+                <label>Категория:</label>
+                <select id="ad-category" required>
+                    <option value="sale">Продажа</option>
+                    <option value="buy">Покупка</option>
+                    <option value="rent">Аренда</option>
+                    <option value="ad">Реклама</option>
+                </select>
+                
+                <label>Название:</label>
+                <input type="text" id="ad-name" required>
+                
+                <label>Цена (₽):</label>
+                <input type="number" id="ad-price" required>
+                
+                <label>Описание:</label>
+                <textarea id="ad-desc" rows="3"></textarea>
+                
+                <label>Ссылка на фото (URL):</label>
+                <input type="url" id="ad-photo" placeholder="https://...">
+                
+                <button type="submit" class="btn-submit">Опубликовать</button>
+            </form>
+        </div>
+    </div>
 
-                // Автоматическая авторизация через Telegram
-                try {
-                    const { telegramAuth, getCurrentUser } = await import('./helpers.js');
-                    const user = await telegramAuth();
-                    if (user) {
-                        // Показываем кнопку добавления
-                        document.getElementById('addButton').classList.remove('hidden');
-                    } else {
-                        // Если не удалось авторизоваться (не в Telegram), скрываем кнопку добавления
-                        document.getElementById('addButton').classList.add('hidden');
-                    }
-                } catch (e) {
-                    console.warn('Telegram auth error', e);
-                    document.getElementById('addButton').classList.add('hidden');
-                }
-            });
-        })();
+    <!-- Нижняя навигация -->
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item active">
+            <i class="fas fa-store"></i>
+            <span>Магазин</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Профиль</span>
+        </a>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
+                "firebase/database": "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js",
+                "firebase/storage": "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"
+            }
+        }
     </script>
 
-    <script type="module" src="index.js"></script>
+    <script type="module">
+        import { initializeApp } from 'firebase/app';
+        import { getDatabase, ref, set, push, onValue } from 'firebase/database';
+        import { getStorage } from 'firebase/storage';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAQECyI2wLqHF0BzletUPiG3ryOqWROPOE",
+            databaseURL: "https://ds-studio-app-default-rtdb.firebaseio.com",
+            projectId: "ds-studio-app",
+            storageBucket: "ds-studio-app.appspot.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const storage = getStorage(app);
+        
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.enableClosingConfirmation();
+
+        const productsRef = ref(db, 'products');
+        let currentProducts = [];
+        let activeCategory = 'sale';
+
+        // Получаем данные пользователя Telegram
+        const tgUser = tg.initDataUnsafe?.user || null;
+
+        // Вкладки
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeCategory = btn.dataset.category;
+                renderProductsByCategory();
+            });
+        });
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function renderProductsByCategory() {
+            const container = document.getElementById('products-container');
+            const filtered = currentProducts.filter(p => p.category === activeCategory);
+            if (!filtered.length) {
+                container.innerHTML = '<div style="text-align: center; padding: 20px;">В этой категории пока нет объявлений</div>';
+                return;
+            }
+            container.innerHTML = '';
+            filtered.forEach(product => {
+                const productEl = document.createElement('div');
+                productEl.className = 'product';
+                
+                // Формируем HTML с фото, если есть
+                let photoHtml = '';
+                if (product.photoUrl) {
+                    photoHtml = `<img src="${escapeHtml(product.photoUrl)}" alt="${escapeHtml(product.name)}" class="product-image" onerror="this.style.display='none'">`;
+                }
+                
+                productEl.innerHTML = `
+                    <div class="product-content">
+                        ${photoHtml}
+                        <div class="product-info">
+                            <h3>${escapeHtml(product.name)}</h3>
+                            <p>${escapeHtml(product.description)}</p>
+                            ${product.nickname ? `<small class="product-author">👤 ${escapeHtml(product.nickname)}</small>` : ''}
+                        </div>
+                        <div class="product-actions">
+                            <span class="product-price">${product.price} ₽</span>
+                            <button data-id="${product.id}">Купить</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(productEl);
+            });
+
+            document.querySelectorAll('.product button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const productId = parseInt(btn.dataset.id);
+                    const product = currentProducts.find(p => p.id === productId);
+                    if (product) {
+                        const data = {
+                            action: 'purchase',
+                            product: product,
+                            user: tgUser,
+                            timestamp: Date.now()
+                        };
+                        tg.sendData(JSON.stringify(data));
+                        const statusDiv = document.getElementById('status');
+                        statusDiv.textContent = `✅ ${product.name} добавлен в заказ!`;
+                        setTimeout(() => { statusDiv.textContent = ''; }, 3000);
+                    }
+                });
+            });
+        }
+
+        function loadProducts() {
+            onValue(productsRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    currentProducts = Object.entries(data).map(([id, product]) => ({
+                        id: parseInt(id),
+                        ...product
+                    }));
+                } else {
+                    currentProducts = [];
+                }
+                renderProductsByCategory();
+            });
+        }
+
+        async function addAdvertisement(category, name, price, description, photoUrl, nickname) {
+            const newId = Date.now();
+            // Если ник не указан, используем данные Telegram
+            const finalNickname = nickname.trim() || (tgUser ? `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim() || tgUser.username : 'Аноним');
+            const newProduct = {
+                id: newId,
+                category: category,
+                name: name.trim(),
+                price: parseInt(price),
+                description: description.trim(),
+                photoUrl: photoUrl.trim() || null,
+                nickname: finalNickname,
+                userId: tgUser?.id || null,
+                timestamp: newId
+            };
+            await set(ref(db, `products/${newId}`), newProduct);
+            
+            const data = {
+                action: 'new_advertisement',
+                product: newProduct,
+                user: tgUser,
+                timestamp: Date.now()
+            };
+            tg.sendData(JSON.stringify(data));
+        }
+
+        // Модальное окно
+        const modal = document.getElementById('modal');
+        const addBtn = document.getElementById('add-ad-btn');
+        const closeSpan = document.querySelector('.close');
+
+        addBtn.onclick = () => modal.style.display = 'block';
+        closeSpan.onclick = () => modal.style.display = 'none';
+        window.onclick = (event) => {
+            if (event.target == modal) modal.style.display = 'none';
+        };
+
+        const form = document.getElementById('add-form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nickname = document.getElementById('ad-nickname').value;
+            const category = document.getElementById('ad-category').value;
+            const name = document.getElementById('ad-name').value.trim();
+            const price = document.getElementById('ad-price').value;
+            const desc = document.getElementById('ad-desc').value.trim();
+            const photo = document.getElementById('ad-photo').value;
+            
+            if (!name || !price) {
+                alert('Заполните название и цену');
+                return;
+            }
+            await addAdvertisement(category, name, price, desc, photo, nickname);
+            modal.style.display = 'none';
+            form.reset();
+            document.getElementById('status').textContent = '✅ Объявление добавлено!';
+            setTimeout(() => { document.getElementById('status').textContent = ''; }, 3000);
+        });
+
+        loadProducts();
+        tg.ready();
+    </script>
 </body>
 </html>
