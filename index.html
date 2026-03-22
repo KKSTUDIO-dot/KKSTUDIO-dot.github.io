@@ -84,8 +84,7 @@
         {
             "imports": {
                 "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
-                "firebase/database": "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js",
-                "firebase/storage": "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"
+                "firebase/database": "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"
             }
         }
     </script>
@@ -94,6 +93,8 @@
         import { initializeApp } from 'firebase/app';
         import { getDatabase, ref, set, onValue } from 'firebase/database';
 
+        console.log('🚀 Загрузка Firebase...');
+
         const firebaseConfig = {
             apiKey: "AIzaSyAQECyI2wLqHF0BzletUPiG3ryOqWROPOE",
             databaseURL: "https://ds-studio-app-default-rtdb.firebaseio.com",
@@ -101,14 +102,22 @@
             storageBucket: "ds-studio-app.appspot.com"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        
+        let db;
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getDatabase(app);
+            console.log('✅ Firebase инициализирован успешно');
+        } catch (error) {
+            console.error('❌ Ошибка инициализации Firebase:', error);
+            document.getElementById('products-container').innerHTML = 
+                '<div style="text-align: center; padding: 20px; color: red;">Ошибка подключения к базе данных. Проверьте консоль.</div>';
+        }
+
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.enableClosingConfirmation();
 
-        const productsRef = ref(db, 'products');
+        const productsRef = db ? ref(db, 'products') : null;
         let currentProducts = [];
         let activeCategory = 'sale';
 
@@ -137,6 +146,10 @@
 
         function renderProductsByCategory() {
             const container = document.getElementById('products-container');
+            if (!currentProducts.length) {
+                container.innerHTML = '<div style="text-align: center; padding: 20px;">Нет объявлений. Добавьте первое!</div>';
+                return;
+            }
             const filtered = currentProducts.filter(p => p.category === activeCategory);
             if (!filtered.length) {
                 container.innerHTML = '<div style="text-align: center; padding: 20px;">В этой категории пока нет объявлений</div>';
@@ -190,8 +203,13 @@
         }
 
         function loadProducts() {
+            if (!productsRef) {
+                console.error('❌ productsRef не определён');
+                return;
+            }
             onValue(productsRef, (snapshot) => {
                 const data = snapshot.val();
+                console.log('📦 Получены данные из Firebase:', data);
                 if (data) {
                     currentProducts = Object.entries(data).map(([id, product]) => ({
                         id: parseInt(id),
@@ -201,10 +219,18 @@
                     currentProducts = [];
                 }
                 renderProductsByCategory();
+            }, (error) => {
+                console.error('❌ Ошибка чтения Firebase:', error);
+                document.getElementById('products-container').innerHTML = 
+                    '<div style="text-align: center; padding: 20px; color: red;">Ошибка загрузки данных. Проверьте консоль.</div>';
             });
         }
 
         async function addAdvertisement(category, name, price, description, photoUrl, nickname) {
+            if (!productsRef) {
+                alert('Ошибка: база данных не инициализирована');
+                return;
+            }
             const newId = Date.now();
             const finalNickname = nickname.trim() || (tgUser ? `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim() || tgUser.username : 'Аноним');
             const newProduct = {
@@ -218,15 +244,22 @@
                 userId: tgUser?.id || null,
                 timestamp: newId
             };
-            await set(ref(db, `products/${newId}`), newProduct);
-            
-            const data = {
-                action: 'new_advertisement',
-                product: newProduct,
-                user: tgUser,
-                timestamp: Date.now()
-            };
-            tg.sendData(JSON.stringify(data));
+            try {
+                await set(ref(db, `products/${newId}`), newProduct);
+                console.log('✅ Объявление добавлено:', newProduct);
+                
+                const data = {
+                    action: 'new_advertisement',
+                    product: newProduct,
+                    user: tgUser,
+                    timestamp: Date.now()
+                };
+                tg.sendData(JSON.stringify(data));
+            } catch (error) {
+                console.error('❌ Ошибка при добавлении объявления:', error);
+                alert('Не удалось добавить объявление. Проверьте консоль.');
+                throw error;
+            }
         }
 
         // Модальное окно
@@ -261,7 +294,12 @@
             setTimeout(() => { document.getElementById('status').textContent = ''; }, 3000);
         });
 
-        loadProducts();
+        if (db) {
+            loadProducts();
+        } else {
+            document.getElementById('products-container').innerHTML = 
+                '<div style="text-align: center; padding: 20px; color: red;">Не удалось инициализировать базу данных. Проверьте консоль.</div>';
+        }
         tg.ready();
     </script>
 </body>
