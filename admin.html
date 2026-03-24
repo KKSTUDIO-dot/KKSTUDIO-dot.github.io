@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Arizona RP | Профиль</title>
+    <title>Arizona RP | Админ-панель</title>
     <link rel="stylesheet" href="style/main.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -18,15 +18,8 @@
 </head>
 <body>
     <div class="container">
-        <div id="profileInfo" class="form-card">
-            <h3><i class="fas fa-user-circle"></i> Ваш профиль</h3>
-            <p><strong>Имя:</strong> <span id="userName"></span></p>
-            <p><strong>Username:</strong> <span id="userUsername"></span></p>
-            <p><strong>ID Telegram:</strong> <span id="userId"></span></p>
-        </div>
-
-        <h3><i class="fas fa-list-ul"></i> Мои объявления</h3>
-        <div id="myAds" class="ads-grid"></div>
+        <h3><i class="fas fa-clock"></i> Ожидают модерации</h3>
+        <div id="pendingAds" class="ads-grid"></div>
     </div>
 
     <div class="bottom-nav">
@@ -34,15 +27,19 @@
             <i class="fas fa-home"></i>
             <span>Главная</span>
         </a>
-        <a href="profile.html" class="nav-item active">
+        <a href="profile.html" class="nav-item">
             <i class="fas fa-user"></i>
             <span>Профиль</span>
+        </a>
+        <a href="admin.html" class="nav-item active">
+            <i class="fas fa-shield-alt"></i>
+            <span>Админка</span>
         </a>
     </div>
 
     <script type="module">
         import { db } from "./firebase-config.js";
-        import { ensureUserProfile } from "./utils.js";
+        import { ensureUserProfile, moderateAd } from "./utils.js";
         import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const tg = window.Telegram.WebApp;
@@ -75,15 +72,14 @@
             });
         }
 
-        function renderUserAds(ads) {
-            const container = document.getElementById("myAds");
-            if (!currentUser) return;
-            const userAds = ads.filter(ad => ad.userId === currentUser.id);
-            if (userAds.length === 0) {
-                container.innerHTML = '<div class="empty-state">У вас пока нет объявлений</div>';
+        function renderPendingAds(ads) {
+            const container = document.getElementById("pendingAds");
+            const pending = ads.filter(ad => ad.status === "pending");
+            if (pending.length === 0) {
+                container.innerHTML = '<div class="empty-state">✅ Нет объявлений на модерацию</div>';
                 return;
             }
-            container.innerHTML = userAds.map(ad => `
+            container.innerHTML = pending.map(ad => `
                 <div class="ad-card">
                     <div class="ad-title"><i class="fas ${ad.icon || 'fa-tag'}"></i> ${escapeHtml(ad.title)}</div>
                     <div class="ad-price">${Number(ad.price).toLocaleString()} $</div>
@@ -91,26 +87,39 @@
                     <div class="ad-meta">
                         <span class="badge-category">${categoryNames[ad.category] || ad.category}</span>
                         <span class="badge-type">${typeNames[ad.type] || ad.type}</span>
-                        <span class="status-badge status-${ad.status}">${ad.status === 'pending' ? '⏳ На модерации' : ad.status === 'approved' ? '✅ Одобрено' : '❌ Отклонено'}</span>
-                        <span>📅 ${new Date(ad.createdAt).toLocaleDateString()}</span>
+                        <span>Пользователь: ${ad.userId}</span>
+                    </div>
+                    <div class="admin-actions">
+                        <button class="btn-approve" data-id="${ad.id}">✅ Одобрить</button>
+                        <button class="btn-reject" data-id="${ad.id}">❌ Отклонить</button>
                     </div>
                 </div>
             `).join('');
+
+            document.querySelectorAll('.btn-approve').forEach(btn => {
+                btn.addEventListener('click', () => moderate(btn.dataset.id, 'approved'));
+            });
+            document.querySelectorAll('.btn-reject').forEach(btn => {
+                btn.addEventListener('click', () => moderate(btn.dataset.id, 'rejected'));
+            });
+        }
+
+        async function moderate(adId, newStatus) {
+            if (!currentUser) return;
+            await moderateAd(adId, newStatus, currentUser.id);
+            tg.showPopup({
+                title: "Успешно",
+                message: `Объявление ${newStatus === 'approved' ? 'одобрено' : 'отклонено'}`,
+                buttons: [{ type: "ok" }]
+            });
         }
 
         async function init() {
             currentUser = await ensureUserProfile();
-            if (currentUser) {
-                document.getElementById("userName").innerText = `${currentUser.firstName} ${currentUser.lastName || ''}`;
-                document.getElementById("userUsername").innerText = currentUser.username || "—";
-                document.getElementById("userId").innerText = currentUser.id;
-            }
-
             const adsRef = ref(db, 'ads');
             onValue(adsRef, (snapshot) => {
                 const data = snapshot.val();
-                const adsArray = data ? Object.values(data) : [];
-                renderUserAds(adsArray);
+                renderPendingAds(data ? Object.values(data) : []);
             });
         }
 

@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Arizona RP Marketplace</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, 'Inter', 'Roboto', sans-serif;
+            background: var(--tg-theme-bg-color, #0a0a0f);
+            color: var(--tg-theme-text-color, #eef2ff);
+            transition: background 0.2s, color 0.2s;
+            padding-bottom: 70px;
+        }
+
+        :root {
+            --card-bg: var(--tg-theme-secondary-bg-color, #1f1f2a);
+            --accent: var(--tg-theme-button-color, #6c5ce7);
+            --accent-text: var(--tg-theme-button-text-color, #ffffff);
+            --border: var(--tg-theme-hint-color, #2c2c38);
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 16px;
+            padding-bottom: 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        .logo h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f5af19, #f12711);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .logo p {
+            font-size: 0.75rem;
+            color: var(--tg-theme-hint-color, #8e8e9e);
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Формы */
+        .form-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            background: var(--tg-theme-bg-color, #0f0f14);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            color: var(--tg-theme-text-color);
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: var(--accent);
+        }
+        .submit-btn {
+            background: var(--accent);
+            color: var(--accent-text);
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Сетка объявлений */
+        .ads-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 18px;
+            margin-top: 16px;
+        }
+        .ad-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 16px;
+            border: 1px solid var(--border);
+        }
+        .ad-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .ad-price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #f1c40f;
+            margin: 8px 0;
+        }
+        .ad-desc {
+            font-size: 0.85rem;
+            color: var(--tg-theme-hint-color);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        .ad-meta {
+            font-size: 0.7rem;
+            color: var(--tg-theme-hint-color);
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+            margin-top: 8px;
+        }
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+        .status-pending { background: var(--warning); color: #000; }
+        .status-approved { background: var(--success); color: #fff; }
+        .status-rejected { background: var(--danger); color: #fff; }
+
+        /* Админ-кнопки */
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .btn-approve {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 30px;
+            cursor: pointer;
+            flex: 1;
+        }
+        .btn-reject {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 30px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* Нижнее меню */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 16px 12px;
+            border-top: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
+            border: none;
+            color: var(--tg-theme-hint-color);
+            font-size: 0.8rem;
+            gap: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+            padding: 6px 12px;
+            border-radius: 30px;
+        }
+        .nav-item i {
+            font-size: 1.4rem;
+        }
+        .nav-item.active {
+            color: var(--accent);
+            background: rgba(108, 92, 231, 0.1);
+        }
+
+        /* Модальное окно пароля */
+        .password-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .password-box {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 32px;
+            width: 280px;
+            text-align: center;
+        }
+        .password-box input {
+            width: 100%;
+            padding: 12px;
+            margin: 16px 0;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            background: var(--tg-theme-bg-color);
+            color: inherit;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--tg-theme-hint-color);
+        }
+
+        /* Разделы */
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка -->
+        <div class="header">
+            <div class="logo">
+                <h1>Arizona RP</h1>
+                <p>официальный маркетплейс</p>
+            </div>
+            <div class="user-avatar" id="userAvatar">👤</div>
+        </div>
+
+        <!-- Раздел 1: Главная -->
+        <div id="homeSection" class="section active">
+            <!-- Форма подачи объявления -->
+            <div class="form-card">
+                <h3><i class="fas fa-plus-circle"></i> Подать объявление</h3>
+                <form id="adForm">
+                    <div class="form-group">
+                        <label>Название товара</label>
+                        <input type="text" id="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Категория</label>
+                        <select id="category">
+                            <option value="transport">🚗 Транспорт</option>
+                            <option value="realty">🏠 Недвижимость</option>
+                            <option value="weapon">🔫 Оружие</option>
+                            <option value="illegal">⚠️ Нелегальное</option>
+                            <option value="business">🏢 Бизнес</option>
+                            <option value="service">📄 Услуги</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Цена ($)</label>
+                        <input type="number" id="price" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Описание</label>
+                        <textarea id="description" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Иконка (Font Awesome class)</label>
+                        <input type="text" id="icon" placeholder="fa-car" value="fa-tag">
+                    </div>
+                    <button type="submit" class="submit-btn">Отправить на модерацию</button>
+                </form>
+            </div>
+
+            <h3><i class="fas fa-store"></i> Актуальные предложения</h3>
+            <div id="adsList" class="ads-grid"></div>
+        </div>
+
+        <!-- Раздел 2: Профиль -->
+        <div id="profileSection" class="section">
+            <div id="profileInfo" class="form-card">
+                <h3><i class="fas fa-user-circle"></i> Ваш профиль</h3>
+                <p><strong>Имя:</strong> <span id="userName"></span></p>
+                <p><strong>Username:</strong> <span id="userUsername"></span></p>
+                <p><strong>ID Telegram:</strong> <span id="userId"></span></p>
+            </div>
+            <h3><i class="fas fa-list-ul"></i> Мои объявления</h3>
+            <div id="myAds" class="ads-grid"></div>
+        </div>
+
+        <!-- Раздел 3: Админка -->
+        <div id="adminSection" class="section">
+            <div id="adminContent" style="display: none;">
+                <h3><i class="fas fa-clock"></i> Ожидают модерации</h3>
+                <div id="pendingAds" class="ads-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Нижнее меню -->
+    <div class="bottom-nav">
+        <button class="nav-item active" data-section="home">
+            <i class="fas fa-home"></i>
+            <span>Главная</span>
+        </button>
+        <button class="nav-item" data-section="profile">
+            <i class="fas fa-user"></i>
+            <span>Профиль</span>
+        </button>
+        <button class="nav-item" data-section="admin">
+            <i class="fas fa-shield-alt"></i>
+            <span>Админка</span>
+        </button>
+    </div>
+
+    <!-- Модалка пароля (изначально скрыта) -->
+    <div id="passwordModal" class="password-modal" style="display: none;">
+        <div class="password-box">
+            <h3>🔐 Доступ к админке</h3>
+            <input type="password" id="adminPassword" placeholder="Введите пароль">
+            <button id="checkPasswordBtn" class="submit-btn">Войти</button>
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+                "firebase/database": "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "firebase/app";
+        import { getDatabase, ref, set, get, push, update, onValue } from "firebase/database";
+
+        // Firebase конфиг
+        const firebaseConfig = {
+            apiKey: "AIzaSyAQECyI2wLqHF0BzletUPiG3ryOqWROPOE",
+            databaseURL: "https://ds-studio-app-default-rtdb.firebaseio.com",
+            projectId: "ds-studio-app",
+            storageBucket: "ds-studio-app.appspot.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Глобальные переменные
+        let currentUser = null;
+        let isAdmin = false; // флаг доступа к админке
+        let pendingAdsUnsubscribe = null; // для отписки
+
+        // Получить данные пользователя из Telegram
+        function getTelegramUser() {
+            return tg.initDataUnsafe?.user || null;
+        }
+
+        // Создать/получить пользователя
+        async function ensureUserProfile() {
+            const user = getTelegramUser();
+            if (!user) return null;
+            const userId = user.id.toString();
+            const userRef = ref(db, `users/${userId}`);
+            const snapshot = await get(userRef);
+            if (!snapshot.exists()) {
+                const userData = {
+                    id: userId,
+                    firstName: user.first_name || "",
+                    lastName: user.last_name || "",
+                    username: user.username || "",
+                    photoUrl: user.photo_url || "",
+                    createdAt: Date.now()
+                };
+                await set(userRef, userData);
+                return userData;
+            }
+            return snapshot.val();
+        }
+
+        // Создать объявление
+        async function createAd(adData) {
+            const adsRef = ref(db, 'ads');
+            const newAdRef = push(adsRef);
+            const adWithMeta = {
+                ...adData,
+                id: newAdRef.key,
+                status: "pending",
+                createdAt: Date.now(),
+                updatedAt: Date.now()
+            };
+            await set(newAdRef, adWithMeta);
+            return adWithMeta;
+        }
+
+        // Изменить статус объявления
+        async function moderateAd(adId, newStatus, adminId) {
+            const adRef = ref(db, `ads/${adId}`);
+            await update(adRef, {
+                status: newStatus,
+                moderatedBy: adminId,
+                moderatedAt: Date.now()
+            });
+        }
+
+        // Отображение ленты (одобренные)
+        function renderApprovedAds(ads) {
+            const container = document.getElementById("adsList");
+            const approved = ads.filter(ad => ad.status === "approved");
+            if (approved.length === 0) {
+                container.innerHTML = '<div class="empty-state">😢 Нет активных объявлений. Будьте первым!</div>';
+                return;
+            }
+            container.innerHTML = approved.map(ad => `
+                <div class="ad-card">
+                    <div class="ad-title"><i class="fas ${ad.icon || 'fa-tag'}"></i> ${escapeHtml(ad.title)}</div>
+                    <div class="ad-price">${Number(ad.price).toLocaleString()} $</div>
+                    <div class="ad-desc">${escapeHtml(ad.description)}</div>
+                    <div class="ad-meta">
+                        <span>${ad.category}</span>
+                        <span>📅 ${new Date(ad.createdAt).toLocaleDateString()}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Отображение объявлений пользователя
+        function renderUserAds(ads) {
+            const container = document.getElementById("myAds");
+            if (!currentUser) return;
+            const userAds = ads.filter(ad => ad.userId === currentUser.id);
+            if (userAds.length === 0) {
+                container.innerHTML = '<div class="empty-state">У вас пока нет объявлений</div>';
+                return;
+            }
+            container.innerHTML = userAds.map(ad => `
+                <div class="ad-card">
+                    <div class="ad-title"><i class="fas ${ad.icon || 'fa-tag'}"></i> ${escapeHtml(ad.title)}</div>
+                    <div class="ad-price">${Number(ad.price).toLocaleString()} $</div>
+                    <div class="ad-desc">${escapeHtml(ad.description)}</div>
+                    <div class="ad-meta">
+                        <span class="status-badge status-${ad.status}">${ad.status === 'pending' ? '⏳ На модерации' : ad.status === 'approved' ? '✅ Одобрено' : '❌ Отклонено'}</span>
+                        <span>📅 ${new Date(ad.createdAt).toLocaleDateString()}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Отображение ожидающих объявлений для админа
+        function renderPendingAds(ads) {
+            const container = document.getElementById("pendingAds");
+            const pending = ads.filter(ad => ad.status === "pending");
+            if (pending.length === 0) {
+                container.innerHTML = '<div class="empty-state">✅ Нет объявлений на модерацию</div>';
+                return;
+            }
+            container.innerHTML = pending.map(ad => `
+                <div class="ad-card">
+                    <div class="ad-title"><i class="fas ${ad.icon || 'fa-tag'}"></i> ${escapeHtml(ad.title)}</div>
+                    <div class="ad-price">${Number(ad.price).toLocaleString()} $</div>
+                    <div class="ad-desc">${escapeHtml(ad.description)}</div>
+                    <div class="ad-meta">
+                        <span>Пользователь: ${ad.userId}</span>
+                        <span>Категория: ${ad.category}</span>
+                    </div>
+                    <div class="admin-actions">
+                        <button class="btn-approve" data-id="${ad.id}">✅ Одобрить</button>
+                        <button class="btn-reject" data-id="${ad.id}">❌ Отклонить</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Навешиваем обработчики
+            document.querySelectorAll('.btn-approve').forEach(btn => {
+                btn.addEventListener('click', () => moderate(btn.dataset.id, 'approved'));
+            });
+            document.querySelectorAll('.btn-reject').forEach(btn => {
+                btn.addEventListener('click', () => moderate(btn.dataset.id, 'rejected'));
+            });
+        }
+
+        async function moderate(adId, newStatus) {
+            if (!currentUser) return;
+            await moderateAd(adId, newStatus, currentUser.id);
+            // Показываем уведомление через Telegram
+            tg.showPopup({
+                title: "Успешно",
+                message: `Объявление ${newStatus === 'approved' ? 'одобрено' : 'отклонено'}`,
+                buttons: [{ type: "ok" }]
+            });
+        }
+
+        // Подписка на все объявления для ленты и профиля
+        let allAdsUnsubscribe = null;
+        function subscribeToAllAds() {
+            const adsRef = ref(db, 'ads');
+            allAdsUnsubscribe = onValue(adsRef, (snapshot) => {
+                const data = snapshot.val();
+                const adsArray = data ? Object.values(data) : [];
+                renderApprovedAds(adsArray);
+                renderUserAds(adsArray);
+                if (isAdmin && document.getElementById("adminContent").style.display !== "none") {
+                    renderPendingAds(adsArray);
+                }
+            });
+        }
+
+        // Инициализация пользователя
+        async function initUser() {
+            currentUser = await ensureUserProfile();
+            if (!currentUser) {
+                alert("Не удалось получить данные Telegram. Перезагрузите страницу.");
+                return false;
+            }
+            // Обновляем аватар
+            const avatar = document.getElementById("userAvatar");
+            const initial = currentUser.firstName ? currentUser.firstName.charAt(0).toUpperCase() : "👤";
+            avatar.textContent = initial;
+            // Заполняем профиль
+            document.getElementById("userName").innerText = `${currentUser.firstName} ${currentUser.lastName || ''}`;
+            document.getElementById("userUsername").innerText = currentUser.username || "—";
+            document.getElementById("userId").innerText = currentUser.id;
+            return true;
+        }
+
+        // Переключение разделов
+        function switchSection(sectionId) {
+            // Скрыть все секции
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId + 'Section').classList.add('active');
+
+            // Обновить активный пункт меню
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.nav-item[data-section="${sectionId}"]`).classList.add('active');
+
+            // Если админка - проверяем доступ
+            if (sectionId === 'admin') {
+                if (!isAdmin) {
+                    // Показываем модалку с паролем
+                    const modal = document.getElementById("passwordModal");
+                    modal.style.display = "flex";
+                } else {
+                    // Показываем админ-контент
+                    document.getElementById("adminContent").style.display = "block";
+                    // Обновляем список ожидающих, если нужно
+                    const adsRef = ref(db, 'ads');
+                    get(adsRef).then(snap => {
+                        if (snap.exists()) {
+                            renderPendingAds(Object.values(snap.val()));
+                        } else {
+                            renderPendingAds([]);
+                        }
+                    });
+                }
+            } else {
+                // Если не админка, скрываем админ-контент (чтобы не светился)
+                document.getElementById("adminContent").style.display = "none";
+            }
+        }
+
+        // Обработка отправки формы
+        document.getElementById("adForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            if (!currentUser) {
+                alert("Пользователь не авторизован");
+                return;
+            }
+            const title = document.getElementById("title").value.trim();
+            const category = document.getElementById("category").value;
+            const price = parseFloat(document.getElementById("price").value);
+            const description = document.getElementById("description").value.trim();
+            const icon = document.getElementById("icon").value.trim() || "fa-tag";
+
+            if (!title || !price || !description) {
+                alert("Заполните все поля");
+                return;
+            }
+
+            try {
+                await createAd({
+                    userId: currentUser.id,
+                    title,
+                    category,
+                    price,
+                    description,
+                    icon,
+                });
+                tg.showPopup({
+                    title: "✅ Отправлено",
+                    message: "Ваше объявление отправлено на модерацию",
+                    buttons: [{ type: "ok" }]
+                });
+                document.getElementById("adForm").reset();
+            } catch (err) {
+                console.error(err);
+                alert("Ошибка при отправке");
+            }
+        });
+
+        // Проверка пароля для админки
+        document.getElementById("checkPasswordBtn").addEventListener("click", () => {
+            const pwd = document.getElementById("adminPassword").value;
+            if (pwd === "zxczxc") {
+                isAdmin = true;
+                document.getElementById("passwordModal").style.display = "none";
+                document.getElementById("adminContent").style.display = "block";
+                // Загружаем ожидающие объявления
+                const adsRef = ref(db, 'ads');
+                get(adsRef).then(snap => {
+                    if (snap.exists()) {
+                        renderPendingAds(Object.values(snap.val()));
+                    } else {
+                        renderPendingAds([]);
+                    }
+                });
+                // Подписываемся на обновления для админки
+                if (pendingAdsUnsubscribe) pendingAdsUnsubscribe();
+                pendingAdsUnsubscribe = onValue(adsRef, (snapshot) => {
+                    if (snapshot.exists() && isAdmin && document.getElementById("adminContent").style.display !== "none") {
+                        renderPendingAds(Object.values(snapshot.val()));
+                    }
+                });
+                tg.HapticFeedback.notificationOccurred("success");
+            } else {
+                tg.showPopup({
+                    title: "Ошибка",
+                    message: "Неверный пароль",
+                    buttons: [{ type: "ok" }]
+                });
+            }
+        });
+
+        // Закрыть модалку при клике вне (просто по кнопке)
+        document.getElementById("adminPassword").addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                document.getElementById("checkPasswordBtn").click();
+            }
+        });
+
+        // Обработчики нижнего меню
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const section = btn.dataset.section;
+                switchSection(section);
+            });
+        });
+
+        // Эскейп для HTML
+        function escapeHtml(str) {
+            if (!str) return "";
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Запуск
+        (async () => {
+            const ok = await initUser();
+            if (ok) {
+                subscribeToAllAds();
+                // По умолчанию показываем главную
+                switchSection('home');
+            }
+        })();
+    </script>
+</body>
+</html>

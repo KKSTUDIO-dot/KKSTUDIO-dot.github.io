@@ -2,77 +2,94 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>Магазин | Telegram App</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Arizona RP | Маркетплейс</title>
     <link rel="stylesheet" href="style/main.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+                "firebase/database": "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="container">
-        <div class="card">
-            <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
-                <button id="add-ad-btn" class="btn-add">
-                    <i class="fas fa-plus"></i> Добавить объявление
-                </button>
-            </div>
-            
-            <div class="category-tabs">
-                <button class="tab-btn active" data-category="sale">Продажа</button>
-                <button class="tab-btn" data-category="buy">Покупка</button>
-                <button class="tab-btn" data-category="rent">Аренда</button>
-                <button class="tab-btn" data-category="ad">Реклама</button>
-            </div>
-
-            <h2 style="margin-bottom: 16px;">Товары и услуги</h2>
-            <div id="products-container">
-                <div style="text-align: center; padding: 20px;">Загрузка...</div>
-            </div>
-            <div id="status" class="status"></div>
+        <div class="header-actions">
+            <h3><i class="fas fa-store"></i> Актуальные предложения</h3>
+            <button id="openModalBtn" class="add-btn"><i class="fas fa-plus-circle"></i> Подать объявление</button>
         </div>
-        <div class="footer">
-            Telegram Mini App
-        </div>
+        <div id="adsList" class="ads-grid"></div>
     </div>
 
-    <!-- Модальное окно добавления объявления -->
-    <div id="modal" class="modal">
+    <!-- Модальное окно для подачи объявления -->
+    <div id="adModal" class="modal" style="display: none;">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3>Новое объявление</h3>
-            <form id="add-form">
-                <label>Ваш ник (или оставьте пустым):</label>
-                <input type="text" id="ad-nickname" placeholder="Ваше имя в объявлении">
-                
-                <label>Категория:</label>
-                <select id="ad-category" required>
-                    <option value="sale">Продажа</option>
-                    <option value="buy">Покупка</option>
-                    <option value="rent">Аренда</option>
-                    <option value="ad">Реклама</option>
-                </select>
-                
-                <label>Название:</label>
-                <input type="text" id="ad-name" required>
-                
-                <label>Цена (₽):</label>
-                <input type="number" id="ad-price" required>
-                
-                <label>Описание:</label>
-                <textarea id="ad-desc" rows="3"></textarea>
-                
-                <label>Ссылка на фото (URL):</label>
-                <input type="url" id="ad-photo" placeholder="https://...">
-                
-                <button type="submit" class="btn-submit">Опубликовать</button>
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> Подать объявление</h3>
+                <button class="close-modal" id="closeModalBtn">&times;</button>
+            </div>
+            <form id="adForm">
+                <div class="form-group">
+                    <label>Название товара / услуги</label>
+                    <input type="text" id="title" required>
+                </div>
+                <div class="form-group">
+                    <label>Тип объявления</label>
+                    <select id="type">
+                        <option value="sale">💰 Продажа</option>
+                        <option value="purchase">🛍️ Покупка</option>
+                        <option value="rent">🏷️ Аренда</option>
+                        <option value="advertising">📢 Реклама</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Категория</label>
+                    <select id="category">
+                        <option value="transport">🚗 Транспорт</option>
+                        <option value="resources">⛏️ Ресурсы</option>
+                        <option value="houses">🏠 Дома</option>
+                        <option value="accessories">👕 Аксессуары</option>
+                        <option value="businesses">🏢 Бизнесы</option>
+                        <option value="advertising">📢 Реклама</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Цена ($)</label>
+                    <input type="number" id="price" required>
+                </div>
+                <div class="form-group">
+                    <label>Описание</label>
+                    <textarea id="description" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Иконка (Font Awesome class)</label>
+                    <input type="text" id="icon" placeholder="fa-car" value="fa-tag">
+                </div>
+                <button type="submit" class="submit-btn">Отправить на модерацию</button>
             </form>
         </div>
     </div>
 
-    <!-- Нижняя навигация -->
+    <!-- Модальное окно для деталей объявления -->
+    <div id="detailsModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="detailsTitle">Детали объявления</h3>
+                <button class="close-modal" id="closeDetailsBtn">&times;</button>
+            </div>
+            <div id="detailsContent"></div>
+        </div>
+    </div>
+
+    <!-- Нижнее меню -->
     <div class="bottom-nav">
         <a href="index.html" class="nav-item active">
-            <i class="fas fa-store"></i>
-            <span>Магазин</span>
+            <i class="fas fa-home"></i>
+            <span>Главная</span>
         </a>
         <a href="profile.html" class="nav-item">
             <i class="fas fa-user"></i>
@@ -80,62 +97,34 @@
         </a>
     </div>
 
-    <script type="importmap">
-        {
-            "imports": {
-                "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
-                "firebase/database": "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"
-            }
-        }
-    </script>
-
     <script type="module">
-        import { initializeApp } from 'firebase/app';
-        import { getDatabase, ref, set, onValue } from 'firebase/database';
-
-        console.log('🚀 Загрузка Firebase...');
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAQECyI2wLqHF0BzletUPiG3ryOqWROPOE",
-            databaseURL: "https://ds-studio-app-default-rtdb.firebaseio.com",
-            projectId: "ds-studio-app",
-            storageBucket: "ds-studio-app.appspot.com"
-        };
-
-        let db;
-        try {
-            const app = initializeApp(firebaseConfig);
-            db = getDatabase(app);
-            console.log('✅ Firebase инициализирован успешно');
-        } catch (error) {
-            console.error('❌ Ошибка инициализации Firebase:', error);
-            document.getElementById('products-container').innerHTML = 
-                '<div style="text-align: center; padding: 20px; color: red;">Ошибка подключения к базе данных. Проверьте консоль.</div>';
-        }
+        import { db } from "./firebase-config.js";
+        import { ensureUserProfile, createAd } from "./utils.js";
+        import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.enableClosingConfirmation();
 
-        const productsRef = db ? ref(db, 'products') : null;
-        let currentProducts = [];
-        let activeCategory = 'sale';
+        let currentUser = null;
+        let allAds = [];
 
-        const tgUser = tg.initDataUnsafe?.user || null;
-
-        // Вкладки
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                tabBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                activeCategory = btn.dataset.category;
-                renderProductsByCategory();
-            });
-        });
+        const typeNames = {
+            sale: "💰 Продажа",
+            purchase: "🛍️ Покупка",
+            rent: "🏷️ Аренда",
+            advertising: "📢 Реклама"
+        };
+        const categoryNames = {
+            transport: "🚗 Транспорт",
+            resources: "⛏️ Ресурсы",
+            houses: "🏠 Дома",
+            accessories: "👕 Аксессуары",
+            businesses: "🏢 Бизнесы",
+            advertising: "📢 Реклама"
+        };
 
         function escapeHtml(str) {
-            if (!str) return '';
+            if (!str) return "";
             return str.replace(/[&<>]/g, function(m) {
                 if (m === '&') return '&amp;';
                 if (m === '<') return '&lt;';
@@ -144,163 +133,145 @@
             });
         }
 
-        function renderProductsByCategory() {
-            const container = document.getElementById('products-container');
-            if (!currentProducts.length) {
-                container.innerHTML = '<div style="text-align: center; padding: 20px;">Нет объявлений. Добавьте первое!</div>';
+        function renderAds(ads) {
+            const container = document.getElementById("adsList");
+            const approved = ads.filter(ad => ad.status === "approved");
+            if (approved.length === 0) {
+                container.innerHTML = '<div class="empty-state">😢 Нет активных объявлений. Будьте первым!</div>';
                 return;
             }
-            const filtered = currentProducts.filter(p => p.category === activeCategory);
-            if (!filtered.length) {
-                container.innerHTML = '<div style="text-align: center; padding: 20px;">В этой категории пока нет объявлений</div>';
-                return;
-            }
-            container.innerHTML = '';
-            filtered.forEach(product => {
-                const productEl = document.createElement('div');
-                productEl.className = 'product';
-                
-                let photoHtml = '';
-                if (product.photoUrl) {
-                    photoHtml = `<img src="${escapeHtml(product.photoUrl)}" alt="${escapeHtml(product.name)}" class="product-image" onerror="this.style.display='none'">`;
-                }
-                
-                productEl.innerHTML = `
-                    <div class="product-content">
-                        ${photoHtml}
-                        <div class="product-info">
-                            <h3>${escapeHtml(product.name)}</h3>
-                            <p>${escapeHtml(product.description)}</p>
-                            ${product.nickname ? `<small class="product-author">👤 ${escapeHtml(product.nickname)}</small>` : ''}
-                        </div>
-                        <div class="product-actions">
-                            <span class="product-price">${product.price} ₽</span>
-                            <button data-id="${product.id}">Купить</button>
-                        </div>
+            container.innerHTML = approved.map(ad => `
+                <div class="ad-card" data-id="${ad.id}">
+                    <div class="ad-title"><i class="fas ${ad.icon || 'fa-tag'}"></i> ${escapeHtml(ad.title)}</div>
+                    <div class="ad-price">${Number(ad.price).toLocaleString()} $</div>
+                    <div class="ad-desc">${escapeHtml(ad.description)}</div>
+                    <div class="ad-meta">
+                        <span class="badge-category">${categoryNames[ad.category] || ad.category}</span>
+                        <span class="badge-type">${typeNames[ad.type] || ad.type}</span>
+                        <span>📅 ${new Date(ad.createdAt).toLocaleDateString()}</span>
                     </div>
-                `;
-                container.appendChild(productEl);
-            });
+                </div>
+            `).join('');
 
-            document.querySelectorAll('.product button').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const productId = parseInt(btn.dataset.id);
-                    const product = currentProducts.find(p => p.id === productId);
-                    if (product) {
-                        const data = {
-                            action: 'purchase',
-                            product: product,
-                            user: tgUser,
-                            timestamp: Date.now()
-                        };
-                        tg.sendData(JSON.stringify(data));
-                        const statusDiv = document.getElementById('status');
-                        statusDiv.textContent = `✅ ${product.name} добавлен в заказ!`;
-                        setTimeout(() => { statusDiv.textContent = ''; }, 3000);
-                    }
+            // Навешиваем обработчики на карточки
+            document.querySelectorAll('.ad-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const adId = card.dataset.id;
+                    const ad = approved.find(a => a.id === adId);
+                    if (ad) showDetails(ad);
                 });
             });
         }
 
-        function loadProducts() {
-            if (!productsRef) {
-                console.error('❌ productsRef не определён');
-                return;
-            }
-            onValue(productsRef, (snapshot) => {
-                const data = snapshot.val();
-                console.log('📦 Получены данные из Firebase:', data);
-                if (data) {
-                    currentProducts = Object.entries(data).map(([id, product]) => ({
-                        id: parseInt(id),
-                        ...product
-                    }));
-                } else {
-                    currentProducts = [];
-                }
-                renderProductsByCategory();
-            }, (error) => {
-                console.error('❌ Ошибка чтения Firebase:', error);
-                document.getElementById('products-container').innerHTML = 
-                    '<div style="text-align: center; padding: 20px; color: red;">Ошибка загрузки данных. Проверьте консоль.</div>';
+        function showDetails(ad) {
+            const modal = document.getElementById("detailsModal");
+            const content = document.getElementById("detailsContent");
+            const userLink = ad.userId ? `tg://user?id=${ad.userId}` : `https://t.me/${ad.username || ''}`;
+            content.innerHTML = `
+                <div class="details-block">
+                    <p><strong>Название:</strong> ${escapeHtml(ad.title)}</p>
+                    <p><strong>Тип:</strong> ${typeNames[ad.type] || ad.type}</p>
+                    <p><strong>Категория:</strong> ${categoryNames[ad.category] || ad.category}</p>
+                    <p><strong>Цена:</strong> ${Number(ad.price).toLocaleString()} $</p>
+                    <p><strong>Описание:</strong><br>${escapeHtml(ad.description)}</p>
+                    <p><strong>Дата:</strong> ${new Date(ad.createdAt).toLocaleString()}</p>
+                    <button id="contactSellerBtn" class="submit-btn" style="margin-top: 16px;">
+                        <i class="fab fa-telegram"></i> Связаться с продавцом
+                    </button>
+                </div>
+            `;
+            modal.style.display = "flex";
+
+            document.getElementById("contactSellerBtn").addEventListener("click", () => {
+                const url = `https://t.me/${ad.username ? ad.username : ''}`;
+                if (url) window.open(url, '_blank');
+                else tg.showPopup({ title: "Ошибка", message: "Не удалось определить контакт продавца", buttons: [{ type: "ok" }] });
             });
         }
 
-        async function addAdvertisement(category, name, price, description, photoUrl, nickname) {
-            if (!productsRef) {
-                alert('Ошибка: база данных не инициализирована');
-                return;
+        async function init() {
+            currentUser = await ensureUserProfile();
+            const adsRef = ref(db, 'ads');
+            onValue(adsRef, (snapshot) => {
+                const data = snapshot.val();
+                allAds = data ? Object.values(data) : [];
+                renderAds(allAds);
+            });
+
+            // Модалка подачи объявления
+            const modal = document.getElementById("adModal");
+            const openBtn = document.getElementById("openModalBtn");
+            const closeBtn = document.getElementById("closeModalBtn");
+
+            if (openBtn && modal) {
+                openBtn.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    modal.style.display = "flex";
+                });
+                closeBtn.addEventListener("click", () => {
+                    modal.style.display = "none";
+                });
+                window.addEventListener("click", (e) => {
+                    if (e.target === modal) modal.style.display = "none";
+                });
             }
-            const newId = Date.now();
-            const finalNickname = nickname.trim() || (tgUser ? `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim() || tgUser.username : 'Аноним');
-            const newProduct = {
-                id: newId,
-                category: category,
-                name: name.trim(),
-                price: parseInt(price),
-                description: description.trim(),
-                photoUrl: photoUrl.trim() || null,
-                nickname: finalNickname,
-                userId: tgUser?.id || null,
-                timestamp: newId
-            };
-            try {
-                await set(ref(db, `products/${newId}`), newProduct);
-                console.log('✅ Объявление добавлено:', newProduct);
-                
-                const data = {
-                    action: 'new_advertisement',
-                    product: newProduct,
-                    user: tgUser,
-                    timestamp: Date.now()
-                };
-                tg.sendData(JSON.stringify(data));
-            } catch (error) {
-                console.error('❌ Ошибка при добавлении объявления:', error);
-                alert('Не удалось добавить объявление. Проверьте консоль.');
-                throw error;
+
+            // Модалка деталей
+            const detailsModal = document.getElementById("detailsModal");
+            const closeDetailsBtn = document.getElementById("closeDetailsBtn");
+            if (closeDetailsBtn && detailsModal) {
+                closeDetailsBtn.addEventListener("click", () => {
+                    detailsModal.style.display = "none";
+                });
+                window.addEventListener("click", (e) => {
+                    if (e.target === detailsModal) detailsModal.style.display = "none";
+                });
             }
         }
 
-        // Модальное окно
-        const modal = document.getElementById('modal');
-        const addBtn = document.getElementById('add-ad-btn');
-        const closeSpan = document.querySelector('.close');
-
-        addBtn.onclick = () => modal.style.display = 'block';
-        closeSpan.onclick = () => modal.style.display = 'none';
-        window.onclick = (event) => {
-            if (event.target == modal) modal.style.display = 'none';
-        };
-
-        const form = document.getElementById('add-form');
-        form.addEventListener('submit', async (e) => {
+        // Обработка формы
+        document.getElementById("adForm").addEventListener("submit", async (e) => {
             e.preventDefault();
-            const nickname = document.getElementById('ad-nickname').value;
-            const category = document.getElementById('ad-category').value;
-            const name = document.getElementById('ad-name').value.trim();
-            const price = document.getElementById('ad-price').value;
-            const desc = document.getElementById('ad-desc').value.trim();
-            const photo = document.getElementById('ad-photo').value;
-            
-            if (!name || !price) {
-                alert('Заполните название и цену');
+            if (!currentUser) {
+                alert("Пользователь не авторизован");
                 return;
             }
-            await addAdvertisement(category, name, price, desc, photo, nickname);
-            modal.style.display = 'none';
-            form.reset();
-            document.getElementById('status').textContent = '✅ Объявление добавлено!';
-            setTimeout(() => { document.getElementById('status').textContent = ''; }, 3000);
+            const title = document.getElementById("title").value.trim();
+            const type = document.getElementById("type").value;
+            const category = document.getElementById("category").value;
+            const price = parseFloat(document.getElementById("price").value);
+            const description = document.getElementById("description").value.trim();
+            const icon = document.getElementById("icon").value.trim() || "fa-tag";
+
+            if (!title || !price || !description) {
+                alert("Заполните все поля");
+                return;
+            }
+
+            try {
+                await createAd({
+                    userId: currentUser.id,
+                    title,
+                    type,
+                    category,
+                    price,
+                    description,
+                    icon,
+                });
+                tg.showPopup({
+                    title: "✅ Отправлено",
+                    message: "Ваше объявление отправлено на модерацию",
+                    buttons: [{ type: "ok" }]
+                });
+                document.getElementById("adForm").reset();
+                document.getElementById("adModal").style.display = "none";
+            } catch (err) {
+                console.error(err);
+                alert("Ошибка при отправке");
+            }
         });
 
-        if (db) {
-            loadProducts();
-        } else {
-            document.getElementById('products-container').innerHTML = 
-                '<div style="text-align: center; padding: 20px; color: red;">Не удалось инициализировать базу данных. Проверьте консоль.</div>';
-        }
-        tg.ready();
+        init();
     </script>
 </body>
 </html>
