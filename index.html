@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Renaissance | Семья в Arizona</title>
+    <title>Renaissance | Telegram Mini App</title>
+    <!-- Font Awesome 6 (бесплатно) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
@@ -15,66 +19,84 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0a0f1e;
-            color: #e0e0e0;
-            padding-bottom: 70px; /* чтобы контент не перекрывался нижним меню */
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            background: #0a0c15;
+            color: #eef2ff;
+            padding-bottom: 80px;
+            line-height: 1.5;
         }
 
-        /* Контейнер для страниц */
+        /* Glassmorphism эффект */
+        .glass {
+            background: rgba(18, 22, 35, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 180, 71, 0.2);
+        }
+
+        /* Страницы */
         .page {
             display: none;
             padding: 20px;
-            max-width: 800px;
+            max-width: 700px;
             margin: 0 auto;
+            animation: fadeIn 0.3s ease;
         }
         .page.active {
             display: block;
         }
 
-        /* Общие стили */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         h2 {
             font-size: 1.8rem;
-            margin-bottom: 20px;
-            border-left: 4px solid #ffb347;
-            padding-left: 15px;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff, #ffb347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
         }
 
         /* Чат */
         .chat-container {
-            background: #11161f;
-            border-radius: 24px;
-            padding: 15px;
-            border: 1px solid #2a2f3f;
+            background: rgba(15, 18, 28, 0.8);
+            border-radius: 28px;
+            padding: 18px;
+            border: 1px solid rgba(255, 180, 71, 0.2);
         }
         .messages {
-            background: #0c1018;
-            height: 400px;
+            background: #0b0e17;
+            border-radius: 24px;
+            height: 380px;
             overflow-y: auto;
-            padding: 15px;
-            border-radius: 20px;
-            margin-bottom: 15px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
             gap: 12px;
+            margin-bottom: 16px;
         }
         .message {
-            background: #1a1f2a;
-            padding: 10px 14px;
-            border-radius: 18px;
+            background: #1a1f2c;
+            padding: 10px 16px;
+            border-radius: 20px;
             max-width: 85%;
             width: fit-content;
             word-break: break-word;
+            transition: 0.1s;
         }
         .message-user {
-            font-weight: bold;
+            font-weight: 700;
             color: #ffb347;
-            margin-right: 8px;
+            margin-right: 6px;
         }
         .message-time {
             font-size: 0.7rem;
-            color: #7a7e8c;
-            margin-left: 10px;
+            color: #8b92a8;
+            margin-left: 8px;
         }
         .message-own {
             align-self: flex-end;
@@ -83,17 +105,18 @@
         .chat-input-area {
             display: flex;
             gap: 12px;
-            margin-top: 10px;
+            margin-top: 8px;
         }
         .chat-input-area input {
             flex: 1;
-            padding: 12px 16px;
-            background: #0c1018;
+            padding: 12px 18px;
+            background: #0b0e17;
             border: 1px solid #2a2f3f;
             border-radius: 40px;
             color: white;
             font-size: 1rem;
             outline: none;
+            transition: 0.2s;
         }
         .chat-input-area input:focus {
             border-color: #ffb347;
@@ -103,24 +126,36 @@
             border: none;
             padding: 0 24px;
             border-radius: 40px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
             transition: 0.2s;
-            color: #0a0f1e;
+            color: #0a0c15;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .chat-input-area button:hover {
+            background: #ffa01e;
+            transform: scale(0.98);
         }
         .nick-row {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 16px;
+            background: #0f1220;
+            padding: 10px 16px;
+            border-radius: 40px;
         }
         .nick-row label {
             font-size: 0.9rem;
+            color: #b9c0d4;
         }
         #nicknameInput {
-            background: #0c1018;
+            background: #0b0e17;
             border: 1px solid #2a2f3f;
-            padding: 8px 12px;
+            padding: 8px 14px;
             border-radius: 40px;
             color: white;
             flex: 1;
@@ -128,37 +163,61 @@
 
         /* Профиль */
         .profile-card {
-            background: #11161f;
-            border-radius: 24px;
-            padding: 20px;
+            background: rgba(15, 18, 28, 0.8);
+            border-radius: 32px;
+            padding: 28px 20px;
             text-align: center;
-            border: 1px solid #2a2f3f;
+            border: 1px solid rgba(255, 180, 71, 0.3);
+            backdrop-filter: blur(12px);
         }
         .avatar {
-            font-size: 4rem;
-            margin-bottom: 15px;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #ffb347, #ff7e05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }
         .profile-nick {
             font-size: 1.8rem;
             font-weight: bold;
-            color: #ffb347;
+            background: linear-gradient(135deg, #fff, #ffb347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .profile-username {
+            color: #b9c0d4;
+            margin-top: 5px;
+            font-size: 0.9rem;
         }
         .profile-status {
             background: #1f2a3a;
             display: inline-block;
-            padding: 5px 15px;
-            border-radius: 30px;
-            margin-top: 10px;
-            font-size: 0.9rem;
+            padding: 6px 18px;
+            border-radius: 40px;
+            margin-top: 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
         }
         .edit-nick-btn {
-            margin-top: 20px;
+            margin-top: 24px;
             background: transparent;
             border: 1px solid #ffb347;
             color: #ffb347;
-            padding: 8px 20px;
+            padding: 8px 24px;
             border-radius: 40px;
             cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .edit-nick-btn:hover {
+            background: rgba(255, 180, 71, 0.1);
         }
 
         /* Новости */
@@ -168,20 +227,21 @@
             gap: 20px;
         }
         .news-item {
-            background: #11161f;
-            border-radius: 20px;
-            padding: 15px;
+            background: rgba(15, 18, 28, 0.7);
+            border-radius: 24px;
+            padding: 18px;
             border-left: 4px solid #ffb347;
+            transition: 0.2s;
         }
         .news-title {
             font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 8px;
+            font-weight: 700;
+            margin-bottom: 6px;
         }
         .news-date {
             font-size: 0.7rem;
-            color: #7a7e8c;
-            margin-bottom: 8px;
+            color: #8b92a8;
+            margin-bottom: 10px;
         }
         .news-text {
             font-size: 0.95rem;
@@ -189,13 +249,13 @@
 
         /* Информация */
         .info-block {
-            background: #11161f;
-            border-radius: 24px;
-            padding: 20px;
-            border: 1px solid #2a2f3f;
+            background: rgba(15, 18, 28, 0.7);
+            border-radius: 28px;
+            padding: 24px;
+            border: 1px solid rgba(255, 180, 71, 0.2);
         }
         .info-block p {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
 
         /* Нижняя навигация */
@@ -204,122 +264,124 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: #0f1322;
+            background: rgba(10, 12, 21, 0.95);
+            backdrop-filter: blur(16px);
             display: flex;
             justify-content: space-around;
-            padding: 12px 0;
-            border-top: 1px solid #2a2f3f;
-            backdrop-filter: blur(10px);
+            padding: 12px 0 20px;
+            border-top: 1px solid rgba(255, 180, 71, 0.2);
             z-index: 100;
         }
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
             background: none;
             border: none;
-            color: #7a7e8c;
-            font-size: 0.75rem;
+            color: #8b92a8;
+            font-size: 0.7rem;
             cursor: pointer;
             transition: 0.2s;
-            padding: 5px 10px;
-            border-radius: 30px;
+            padding: 6px 12px;
+            border-radius: 40px;
+        }
+        .nav-item i {
+            font-size: 1.5rem;
         }
         .nav-item.active {
             color: #ffb347;
-        }
-        .nav-icon {
-            font-size: 1.5rem;
+            background: rgba(255, 180, 71, 0.1);
         }
 
-        /* Адаптив */
-        @media (max-width: 600px) {
+        @media (max-width: 500px) {
             .page {
-                padding: 15px;
+                padding: 16px;
             }
             .messages {
-                height: 350px;
+                height: 320px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Страница Чат -->
+    <!-- Чат -->
     <div id="chatPage" class="page active">
-        <h2>💬 Семейный чат</h2>
+        <h2><i class="fas fa-comments"></i> Семейный чат</h2>
         <div class="chat-container">
             <div class="nick-row">
-                <label>Ваш ник:</label>
-                <input type="text" id="nicknameInput" placeholder="Ваш игровой ник" maxlength="20">
+                <i class="fas fa-user-edit" style="color:#ffb347;"></i>
+                <label>Ваш ник в чате:</label>
+                <input type="text" id="nicknameInput" placeholder="Ваше имя" maxlength="20">
             </div>
             <div id="messagesContainer" class="messages">
-                <div style="text-align:center; opacity:0.6;">Загрузка чата...</div>
+                <div style="text-align:center; opacity:0.6;">Загрузка...</div>
             </div>
             <div class="chat-input-area">
                 <input type="text" id="messageInput" placeholder="Написать сообщение...">
-                <button id="sendBtn">Отправить</button>
+                <button id="sendBtn"><i class="fas fa-paper-plane"></i> Отправить</button>
             </div>
         </div>
     </div>
 
-    <!-- Страница Профиль -->
+    <!-- Профиль -->
     <div id="profilePage" class="page">
-        <h2>👤 Мой профиль</h2>
+        <h2><i class="fas fa-user-circle"></i> Мой профиль</h2>
         <div class="profile-card">
-            <div class="avatar">⚜️</div>
-            <div class="profile-nick" id="profileNick">Не установлен</div>
-            <div class="profile-status">Участник семьи Renaissance</div>
-            <button class="edit-nick-btn" id="editProfileNick">Изменить ник</button>
+            <div class="avatar" id="profileAvatar">
+                <i class="fas fa-user-astronaut"></i>
+            </div>
+            <div class="profile-nick" id="profileNick">Загрузка...</div>
+            <div class="profile-username" id="profileUsername"></div>
+            <div class="profile-status"><i class="fas fa-shield-alt"></i> Участник Renaissance</div>
+            <button class="edit-nick-btn" id="editProfileNick"><i class="fas fa-pen"></i> Изменить ник</button>
         </div>
     </div>
 
-    <!-- Страница Новости -->
+    <!-- Новости -->
     <div id="newsPage" class="page">
-        <h2>📰 Новости семьи</h2>
-        <div class="news-list" id="newsList">
-            <!-- Новости будут добавлены через JS -->
-        </div>
+        <h2><i class="fas fa-newspaper"></i> Новости семьи</h2>
+        <div class="news-list" id="newsList"></div>
     </div>
 
-    <!-- Страница Информация -->
+    <!-- Информация -->
     <div id="infoPage" class="page">
-        <h2>ℹ️ О семье</h2>
+        <h2><i class="fas fa-info-circle"></i> О семье</h2>
         <div class="info-block">
-            <p><strong>Renaissance</strong> — элитное сообщество в Arizona Mobile. Мы ценим честь, взаимопомощь и стремление к победе.</p>
-            <p>✔️ Активный PvP и PvE<br>
-            ✔️ Регулярные ивенты<br>
-            ✔️ Дружелюбная атмосфера<br>
-            ✔️ Помощь новичкам</p>
-            <p><strong>Правила:</strong> уважение к членам семьи, активность в чате, участие в жизни семьи.</p>
-            <p>📞 Связь с лидером: @Renaissance_Leader (Telegram)</p>
-            <p>🔗 Наш Telegram-канал: <a href="#" style="color:#ffb347;">t.me/renaissance_az</a></p>
+            <p><i class="fas fa-crown" style="color:#ffb347;"></i> <strong>Renaissance</strong> — элитное сообщество в Arizona Mobile. Честь, дружба, победа.</p>
+            <p><i class="fas fa-check-circle"></i> Активный PvP/PvE<br>
+            <i class="fas fa-calendar-alt"></i> Регулярные ивенты<br>
+            <i class="fas fa-users"></i> Дружелюбная атмосфера<br>
+            <i class="fas fa-chalkboard-teacher"></i> Помощь новичкам</p>
+            <p><i class="fas fa-gavel"></i> <strong>Правила:</strong> уважение, активность, взаимопомощь.</p>
+            <p><i class="fab fa-telegram"></i> Связь: <a href="#" style="color:#ffb347;">@Renaissance_Leader</a><br>
+            <i class="fab fa-telegram"></i> Канал: <a href="#" style="color:#ffb347;">t.me/renaissance_az</a></p>
         </div>
     </div>
 
     <!-- Нижнее меню -->
     <div class="bottom-nav">
         <button class="nav-item active" data-page="chat">
-            <div class="nav-icon">💬</div>
+            <i class="fas fa-comment-dots"></i>
             <span>Чат</span>
         </button>
         <button class="nav-item" data-page="profile">
-            <div class="nav-icon">👤</div>
+            <i class="fas fa-user"></i>
             <span>Профиль</span>
         </button>
         <button class="nav-item" data-page="news">
-            <div class="nav-icon">📰</div>
+            <i class="fas fa-bullhorn"></i>
             <span>Новости</span>
         </button>
         <button class="nav-item" data-page="info">
-            <div class="nav-icon">ℹ️</div>
-            <span>Информация</span>
+            <i class="fas fa-circle-info"></i>
+            <span>Инфо</span>
         </button>
     </div>
 
     <script>
-        // ========== НАСТРОЙКА FIREBASE (ЗАМЕНИТЬ НА СВОИ ДАННЫЕ) ==========
+        // ------------------- FIREBASE КОНФИГ (ЗАМЕНИТЬ НА СВОЙ) -------------------
         const firebaseConfig = {
             apiKey: "AIzaSyB-ваш-ключ",
             authDomain: "renaissance-chat.firebaseapp.com",
@@ -330,67 +392,103 @@
             appId: "1:123456789012:web:abcdef123456"
         };
 
-        // Инициализация Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const messagesRef = database.ref('messages');
 
-        // DOM элементы чата
-        const messagesDiv = document.getElementById('messagesContainer');
+        // ------------------- TELEGRAM АВТОРИЗАЦИЯ -------------------
+        let tgUser = null;
+        if (window.Telegram && window.Telegram.WebApp) {
+            const webApp = window.Telegram.WebApp;
+            webApp.expand(); // разворачиваем на весь экран
+            tgUser = webApp.initDataUnsafe?.user;
+        }
+
+        // Функция для получения имени из Telegram или заглушки
+        function getTelegramName() {
+            if (tgUser) {
+                let name = tgUser.first_name || '';
+                if (tgUser.last_name) name += ' ' + tgUser.last_name;
+                return name.trim() || tgUser.username || 'Гость';
+            }
+            return null;
+        }
+
+        let defaultNick = getTelegramName() || 'Гость_' + Math.floor(Math.random() * 1000);
+        
+        // Загружаем сохранённый ник, если есть, иначе ставим Telegram имя
+        let currentNick = localStorage.getItem('renaissance_nick');
+        if (!currentNick && defaultNick) {
+            currentNick = defaultNick;
+            localStorage.setItem('renaissance_nick', currentNick);
+        } else if (!currentNick) {
+            currentNick = defaultNick;
+        }
+
+        // DOM элементы
         const nicknameInput = document.getElementById('nicknameInput');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
-
-        // Профиль
+        const messagesDiv = document.getElementById('messagesContainer');
         const profileNickSpan = document.getElementById('profileNick');
+        const profileUsernameSpan = document.getElementById('profileUsername');
+        const profileAvatarDiv = document.getElementById('profileAvatar');
         const editProfileNickBtn = document.getElementById('editProfileNick');
 
-        // Новости (статические для примера, можно потом подключить Firebase)
-        const newsContainer = document.getElementById('newsList');
-
-        // Загрузка ника из localStorage
-        let currentNick = localStorage.getItem('renaissance_nick') || '';
-        if (currentNick) {
-            nicknameInput.value = currentNick;
-            profileNickSpan.textContent = currentNick;
-        } else {
-            nicknameInput.value = 'Гость_' + Math.floor(Math.random() * 1000);
-            profileNickSpan.textContent = nicknameInput.value;
-            localStorage.setItem('renaissance_nick', nicknameInput.value);
+        // Отображение профиля Telegram
+        function updateProfileUI() {
+            if (tgUser) {
+                profileNickSpan.textContent = tgUser.first_name ? `${tgUser.first_name} ${tgUser.last_name || ''}`.trim() : tgUser.username || 'Пользователь';
+                if (tgUser.username) profileUsernameSpan.textContent = '@' + tgUser.username;
+                else profileUsernameSpan.textContent = 'Telegram ID: ' + tgUser.id;
+                // Попробуем показать аватарку (если есть фото профиля)
+                if (tgUser.photo_url) {
+                    profileAvatarDiv.style.backgroundImage = `url(${tgUser.photo_url})`;
+                    profileAvatarDiv.style.backgroundSize = 'cover';
+                    profileAvatarDiv.innerHTML = '';
+                } else {
+                    profileAvatarDiv.innerHTML = '<i class="fas fa-user-astronaut"></i>';
+                }
+            } else {
+                profileNickSpan.textContent = currentNick || 'Не авторизован';
+                profileUsernameSpan.textContent = 'Авторизуйтесь в Telegram';
+                profileAvatarDiv.innerHTML = '<i class="fas fa-user-secret"></i>';
+            }
         }
 
-        // Обновление ника в профиле и localStorage
+        // Обновление ника (синхронизация чата и профиля)
         function updateNick(newNick) {
-            if (newNick.trim() === '') newNick = 'Аноним';
-            currentNick = newNick;
+            if (!newNick || newNick.trim() === '') newNick = 'Аноним';
+            currentNick = newNick.trim();
             localStorage.setItem('renaissance_nick', currentNick);
             nicknameInput.value = currentNick;
             profileNickSpan.textContent = currentNick;
         }
+
+        // Инициализация ника в поле ввода
+        nicknameInput.value = currentNick;
+        updateProfileUI();
 
         nicknameInput.addEventListener('change', () => {
             updateNick(nicknameInput.value);
         });
 
         editProfileNickBtn.addEventListener('click', () => {
-            let newNick = prompt('Введите ваш новый ник:', currentNick);
-            if (newNick && newNick.trim()) {
-                updateNick(newNick.trim());
-            }
+            let newNick = prompt('Введите ваш ник для чата:', currentNick);
+            if (newNick && newNick.trim()) updateNick(newNick.trim());
         });
 
-        // Функция форматирования времени
+        // Функция времени
         function getTime() {
-            const now = new Date();
-            return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
 
-        // Отображение сообщений
+        // Получение сообщений
         messagesRef.on('value', (snapshot) => {
             const data = snapshot.val();
             messagesDiv.innerHTML = '';
             if (!data) {
-                messagesDiv.innerHTML = '<div style="text-align:center; opacity:0.6;">Пока нет сообщений. Напишите первым!</div>';
+                messagesDiv.innerHTML = '<div style="text-align:center; opacity:0.6;">Нет сообщений. Напишите первым!</div>';
                 return;
             }
             const messagesArray = Object.entries(data).map(([id, msg]) => ({ id, ...msg }));
@@ -398,39 +496,29 @@
             messagesArray.forEach(msg => {
                 const msgDiv = document.createElement('div');
                 msgDiv.classList.add('message');
-                if (msg.nick === currentNick) {
-                    msgDiv.classList.add('message-own');
-                }
-                const userSpan = document.createElement('span');
-                userSpan.classList.add('message-user');
-                userSpan.textContent = msg.nick + ': ';
-                const textSpan = document.createElement('span');
-                textSpan.textContent = msg.text;
-                const timeSpan = document.createElement('span');
-                timeSpan.classList.add('message-time');
-                timeSpan.textContent = msg.time;
-                msgDiv.appendChild(userSpan);
-                msgDiv.appendChild(textSpan);
-                msgDiv.appendChild(timeSpan);
+                if (msg.nick === currentNick) msgDiv.classList.add('message-own');
+                msgDiv.innerHTML = `
+                    <span class="message-user">${escapeHtml(msg.nick)}</span>
+                    <span>${escapeHtml(msg.text)}</span>
+                    <span class="message-time">${msg.time}</span>
+                `;
                 messagesDiv.appendChild(msgDiv);
             });
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         });
 
-        // Отправка сообщения
+        // Отправка
         function sendMessage() {
             let nick = nicknameInput.value.trim();
-            if (nick === '') nick = 'Аноним';
+            if (!nick) nick = 'Аноним';
             const text = messageInput.value.trim();
-            if (text === '') return;
-
-            const newMessage = {
+            if (!text) return;
+            messagesRef.push({
                 nick: nick,
                 text: text,
                 time: getTime(),
                 timestamp: Date.now()
-            };
-            messagesRef.push(newMessage);
+            });
             messageInput.value = '';
             messageInput.focus();
         }
@@ -440,55 +528,56 @@
             if (e.key === 'Enter') sendMessage();
         });
 
-        // Заполнение новостей (можно вынести в Firebase позже)
+        // Экранирование HTML
+        function escapeHtml(str) {
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Новости (статика)
         function loadNews() {
-            const newsData = [
-                { title: "🏆 Победа в ивенте", date: "30.03.2026", text: "Наша семья заняла 1 место в еженедельном турнире! Спасибо всем за участие." },
-                { title: "📢 Набор активных игроков", date: "28.03.2026", text: "Открыт набор в боевой отдел. Требования: уровень 50+, активность в чате." },
-                { title: "🎉 День рождения семьи", date: "25.03.2026", text: "Приглашаем всех на празднование в дискорде 1 апреля. Будут конкурсы и подарки." }
+            const news = [
+                { title: "🏆 Победа в ивенте", date: "30.03.2026", text: "Первое место в еженедельном турнире! Спасибо всем за участие." },
+                { title: "📢 Набор в боевой отдел", date: "28.03.2026", text: "Требования: уровень 50+, активность. Обращаться к лидеру." },
+                { title: "🎉 День рождения семьи", date: "25.03.2026", text: "Празднование в Discord 1 апреля. Будут конкурсы и подарки." }
             ];
-            newsContainer.innerHTML = '';
-            newsData.forEach(item => {
-                const newsItem = document.createElement('div');
-                newsItem.className = 'news-item';
-                newsItem.innerHTML = `
+            const container = document.getElementById('newsList');
+            container.innerHTML = '';
+            news.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'news-item';
+                el.innerHTML = `
                     <div class="news-title">${item.title}</div>
-                    <div class="news-date">${item.date}</div>
+                    <div class="news-date"><i class="far fa-calendar-alt"></i> ${item.date}</div>
                     <div class="news-text">${item.text}</div>
                 `;
-                newsContainer.appendChild(newsItem);
+                container.appendChild(el);
             });
         }
         loadNews();
 
-        // ========== Навигация между страницами (нижнее меню) ==========
+        // Навигация
         const pages = {
             chat: document.getElementById('chatPage'),
             profile: document.getElementById('profilePage'),
             news: document.getElementById('newsPage'),
             info: document.getElementById('infoPage')
         };
-        const navButtons = document.querySelectorAll('.nav-item');
-
+        const navBtns = document.querySelectorAll('.nav-item');
         function switchPage(pageId) {
-            // Скрыть все страницы
-            Object.values(pages).forEach(page => page.classList.remove('active'));
-            // Показать выбранную
+            Object.values(pages).forEach(p => p.classList.remove('active'));
             pages[pageId].classList.add('active');
-            // Обновить активный класс в меню
-            navButtons.forEach(btn => {
+            navBtns.forEach(btn => {
                 btn.classList.remove('active');
-                if (btn.getAttribute('data-page') === pageId) {
-                    btn.classList.add('active');
-                }
+                if (btn.getAttribute('data-page') === pageId) btn.classList.add('active');
             });
         }
-
-        navButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const pageId = btn.getAttribute('data-page');
-                switchPage(pageId);
-            });
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', () => switchPage(btn.getAttribute('data-page')));
         });
     </script>
 </body>
