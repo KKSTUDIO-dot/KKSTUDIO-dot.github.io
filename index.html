@@ -3,275 +3,384 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Arizona RP | Маркетплейс</title>
-    <link rel="stylesheet" href="style/main.css">
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script type="importmap">
-        {
-            "imports": {
-                "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
-                "firebase/database": "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"
+    <title>Renaissance | Arizona Family</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0f1e;
+            color: #e0e0e0;
+            line-height: 1.5;
+            padding-bottom: 20px;
+        }
+
+        /* контейнер */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* шапка */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1f2e, #0f1322);
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+        .header h1 {
+            font-size: 2.8rem;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #ffd966, #ffb347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* чат */
+        .chat-section {
+            background: #11161f;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 40px;
+            border: 1px solid #2a2f3f;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .chat-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid #ffb347;
+            padding-left: 15px;
+        }
+        .messages {
+            background: #0c1018;
+            height: 350px;
+            overflow-y: auto;
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .message {
+            background: #1a1f2a;
+            padding: 10px 14px;
+            border-radius: 18px;
+            max-width: 85%;
+            width: fit-content;
+            word-break: break-word;
+        }
+        .message-user {
+            font-weight: bold;
+            color: #ffb347;
+            margin-right: 8px;
+        }
+        .message-time {
+            font-size: 0.7rem;
+            color: #7a7e8c;
+            margin-left: 10px;
+        }
+        .message-own {
+            align-self: flex-end;
+            background: #2a2f3f;
+        }
+        .chat-input-area {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px 16px;
+            background: #0c1018;
+            border: 1px solid #2a2f3f;
+            border-radius: 40px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.2s;
+        }
+        .chat-input-area input:focus {
+            border-color: #ffb347;
+        }
+        .chat-input-area button {
+            background: #ffb347;
+            border: none;
+            padding: 0 24px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #0a0f1e;
+            font-size: 1rem;
+        }
+        .chat-input-area button:hover {
+            background: #ff9f1a;
+            transform: scale(0.98);
+        }
+        .nickname-row {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nickname-row label {
+            font-size: 0.9rem;
+        }
+        #nicknameInput {
+            background: #0c1018;
+            border: 1px solid #2a2f3f;
+            padding: 8px 12px;
+            border-radius: 40px;
+            color: white;
+            width: 180px;
+        }
+
+        /* отделы (footer) */
+        .departments {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            background: #0f1322;
+            border-radius: 30px;
+            padding: 30px 20px;
+            border-top: 1px solid #2a2f3f;
+        }
+        .dept-card {
+            background: #161c28;
+            border-radius: 20px;
+            padding: 20px;
+            width: 220px;
+            text-align: center;
+            transition: transform 0.2s;
+            border: 1px solid #2a2f3f;
+        }
+        .dept-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffb347;
+        }
+        .dept-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .dept-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ffb347;
+            margin-bottom: 8px;
+        }
+        .dept-desc {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 700px) {
+            .container {
+                padding: 12px;
+            }
+            .header h1 {
+                font-size: 2rem;
+            }
+            .dept-card {
+                width: 100%;
+                max-width: 280px;
             }
         }
-    </script>
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header-actions">
-            <h3><i class="fas fa-store"></i> Актуальные предложения</h3>
-            <button id="openModalBtn" class="add-btn"><i class="fas fa-plus-circle"></i> Подать объявление</button>
-        </div>
-        <div id="adsList" class="ads-grid"></div>
+<div class="container">
+    <div class="header">
+        <h1>⚜️ RENAISSANCE ⚜️</h1>
+        <p>Элитное сообщество Arizona Mobile | Честь, Дружба, Победа</p>
     </div>
 
-    <!-- Модальное окно для подачи объявления -->
-    <div id="adModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-plus-circle"></i> Подать объявление</h3>
-                <button class="close-modal" id="closeModalBtn">&times;</button>
-            </div>
-            <form id="adForm">
-                <div class="form-group">
-                    <label>Название товара / услуги</label>
-                    <input type="text" id="title" required>
-                </div>
-                <div class="form-group">
-                    <label>Тип объявления</label>
-                    <select id="type">
-                        <option value="sale">💰 Продажа</option>
-                        <option value="purchase">🛍️ Покупка</option>
-                        <option value="rent">🏷️ Аренда</option>
-                        <option value="advertising">📢 Реклама</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Категория</label>
-                    <select id="category">
-                        <option value="transport">🚗 Транспорт</option>
-                        <option value="resources">⛏️ Ресурсы</option>
-                        <option value="houses">🏠 Дома</option>
-                        <option value="accessories">👕 Аксессуары</option>
-                        <option value="businesses">🏢 Бизнесы</option>
-                        <option value="advertising">📢 Реклама</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Цена ($)</label>
-                    <input type="number" id="price" required>
-                </div>
-                <div class="form-group">
-                    <label>Описание</label>
-                    <textarea id="description" rows="3" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Иконка (Font Awesome class)</label>
-                    <input type="text" id="icon" placeholder="fa-car" value="fa-tag">
-                </div>
-                <button type="submit" class="submit-btn">Отправить на модерацию</button>
-            </form>
+    <!-- Блок чата -->
+    <div class="chat-section">
+        <div class="chat-title">
+            💬 Семейный чат
+        </div>
+        <div class="nickname-row">
+            <label>Ваш ник:</label>
+            <input type="text" id="nicknameInput" placeholder="Renaissance_Member" maxlength="20">
+        </div>
+        <div id="messagesContainer" class="messages">
+            <!-- Сообщения будут загружены сюда -->
+            <div style="text-align:center; opacity:0.6;">Загрузка чата...</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="messageInput" placeholder="Написать сообщение...">
+            <button id="sendBtn">Отправить</button>
+        </div>
+        <p style="font-size:0.7rem; margin-top:8px;">* Все сообщения видны участникам семьи</p>
+    </div>
+
+    <!-- Отделы (footer) -->
+    <div class="departments">
+        <div class="dept-card">
+            <div class="dept-icon">⚔️</div>
+            <div class="dept-name">Боевой</div>
+            <div class="dept-desc">Элитные бойцы, защита и нападение</div>
+        </div>
+        <div class="dept-card">
+            <div class="dept-icon">🔍</div>
+            <div class="dept-name">Разведка</div>
+            <div class="dept-desc">Сбор данных, слежка, аналитика</div>
+        </div>
+        <div class="dept-card">
+            <div class="dept-icon">💰</div>
+            <div class="dept-name">Экономика</div>
+            <div class="dept-desc">Фермы, ресурсы, торги</div>
+        </div>
+        <div class="dept-card">
+            <div class="dept-icon">🎭</div>
+            <div class="dept-name">Дипломатия</div>
+            <div class="dept-desc">Союзы, переговоры, PR</div>
+        </div>
+        <div class="dept-card">
+            <div class="dept-icon">🛠️</div>
+            <div class="dept-name">Техподдержка</div>
+            <div class="dept-desc">Моды, техника, скрипты</div>
         </div>
     </div>
+    <footer>
+        Renaissance Family — Официальный сайт | Присоединяйся к нам в Telegram
+    </footer>
+</div>
 
-    <!-- Модальное окно для деталей объявления -->
-    <div id="detailsModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="detailsTitle">Детали объявления</h3>
-                <button class="close-modal" id="closeDetailsBtn">&times;</button>
-            </div>
-            <div id="detailsContent"></div>
-        </div>
-    </div>
+<script>
+    // ========== НАСТРОЙКА FIREBASE ==========
+    // ВАЖНО: замените на свои данные из консоли Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyB-ваш-ключ",          // Замените на свой apiKey
+        authDomain: "renaissance-chat.firebaseapp.com",
+        databaseURL: "https://renaissance-chat-default-rtdb.firebaseio.com", // замените
+        projectId: "renaissance-chat",
+        storageBucket: "renaissance-chat.appspot.com",
+        messagingSenderId: "123456789012",
+        appId: "1:123456789012:web:abcdef123456"
+    };
 
-    <!-- Нижнее меню -->
-    <div class="bottom-nav">
-        <a href="index.html" class="nav-item active">
-            <i class="fas fa-home"></i>
-            <span>Главная</span>
-        </a>
-        <a href="profile.html" class="nav-item">
-            <i class="fas fa-user"></i>
-            <span>Профиль</span>
-        </a>
-    </div>
+    // Инициализация Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const messagesRef = database.ref('messages');
 
-    <script type="module">
-        import { db } from "./firebase-config.js";
-        import { ensureUserProfile, createAd } from "./utils.js";
-        import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    // DOM элементы
+    const messagesDiv = document.getElementById('messagesContainer');
+    const nicknameInput = document.getElementById('nicknameInput');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
 
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+    // Загружаем сохранённый ник из localStorage
+    let currentNick = localStorage.getItem('renaissance_nick') || '';
+    if (currentNick) {
+        nicknameInput.value = currentNick;
+    } else {
+        nicknameInput.value = 'Гость_' + Math.floor(Math.random() * 1000);
+    }
+    nicknameInput.addEventListener('change', () => {
+        let newNick = nicknameInput.value.trim();
+        if (newNick === '') newNick = 'Аноним';
+        localStorage.setItem('renaissance_nick', newNick);
+        currentNick = newNick;
+    });
 
-        let currentUser = null;
-        let allAds = [];
+    // Функция форматирования времени
+    function getTime() {
+        const now = new Date();
+        return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
 
-        const typeNames = {
-            sale: "💰 Продажа",
-            purchase: "🛍️ Покупка",
-            rent: "🏷️ Аренда",
-            advertising: "📢 Реклама"
-        };
-        const categoryNames = {
-            transport: "🚗 Транспорт",
-            resources: "⛏️ Ресурсы",
-            houses: "🏠 Дома",
-            accessories: "👕 Аксессуары",
-            businesses: "🏢 Бизнесы",
-            advertising: "📢 Реклама"
-        };
-
-        function escapeHtml(str) {
-            if (!str) return "";
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
+    // Отображение сообщений
+    messagesRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        messagesDiv.innerHTML = '';
+        if (!data) {
+            messagesDiv.innerHTML = '<div style="text-align:center; opacity:0.6;">Пока нет сообщений. Напишите первым!</div>';
+            return;
         }
-
-        function renderAds(ads) {
-            const container = document.getElementById("adsList");
-            const approved = ads.filter(ad => ad.status === "approved");
-            if (approved.length === 0) {
-                container.innerHTML = '<div class="empty-state">😢 Нет активных объявлений. Будьте первым!</div>';
-                return;
+        // Преобразуем в массив и сортируем по времени
+        const messagesArray = Object.entries(data).map(([id, msg]) => ({ id, ...msg }));
+        messagesArray.sort((a, b) => a.timestamp - b.timestamp);
+        messagesArray.forEach(msg => {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message');
+            // Если сообщение от текущего пользователя (по нику) можно добавить стиль
+            if (msg.nick === currentNick) {
+                msgDiv.classList.add('message-own');
             }
-            container.innerHTML = approved.map(ad => `
-                <div class="ad-card" data-id="${ad.id}">
-                    <div class="ad-title"><i class="fas ${ad.icon || 'fa-tag'}"></i> ${escapeHtml(ad.title)}</div>
-                    <div class="ad-price">${Number(ad.price).toLocaleString()} $</div>
-                    <div class="ad-desc">${escapeHtml(ad.description)}</div>
-                    <div class="ad-meta">
-                        <span class="badge-category">${categoryNames[ad.category] || ad.category}</span>
-                        <span class="badge-type">${typeNames[ad.type] || ad.type}</span>
-                        <span>📅 ${new Date(ad.createdAt).toLocaleDateString()}</span>
-                    </div>
-                </div>
-            `).join('');
-
-            // Навешиваем обработчики на карточки
-            document.querySelectorAll('.ad-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const adId = card.dataset.id;
-                    const ad = approved.find(a => a.id === adId);
-                    if (ad) showDetails(ad);
-                });
-            });
-        }
-
-        function showDetails(ad) {
-            const modal = document.getElementById("detailsModal");
-            const content = document.getElementById("detailsContent");
-            const userLink = ad.userId ? `tg://user?id=${ad.userId}` : `https://t.me/${ad.username || ''}`;
-            content.innerHTML = `
-                <div class="details-block">
-                    <p><strong>Название:</strong> ${escapeHtml(ad.title)}</p>
-                    <p><strong>Тип:</strong> ${typeNames[ad.type] || ad.type}</p>
-                    <p><strong>Категория:</strong> ${categoryNames[ad.category] || ad.category}</p>
-                    <p><strong>Цена:</strong> ${Number(ad.price).toLocaleString()} $</p>
-                    <p><strong>Описание:</strong><br>${escapeHtml(ad.description)}</p>
-                    <p><strong>Дата:</strong> ${new Date(ad.createdAt).toLocaleString()}</p>
-                    <button id="contactSellerBtn" class="submit-btn" style="margin-top: 16px;">
-                        <i class="fab fa-telegram"></i> Связаться с продавцом
-                    </button>
-                </div>
-            `;
-            modal.style.display = "flex";
-
-            document.getElementById("contactSellerBtn").addEventListener("click", () => {
-                const url = `https://t.me/${ad.username ? ad.username : ''}`;
-                if (url) window.open(url, '_blank');
-                else tg.showPopup({ title: "Ошибка", message: "Не удалось определить контакт продавца", buttons: [{ type: "ok" }] });
-            });
-        }
-
-        async function init() {
-            currentUser = await ensureUserProfile();
-            const adsRef = ref(db, 'ads');
-            onValue(adsRef, (snapshot) => {
-                const data = snapshot.val();
-                allAds = data ? Object.values(data) : [];
-                renderAds(allAds);
-            });
-
-            // Модалка подачи объявления
-            const modal = document.getElementById("adModal");
-            const openBtn = document.getElementById("openModalBtn");
-            const closeBtn = document.getElementById("closeModalBtn");
-
-            if (openBtn && modal) {
-                openBtn.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    modal.style.display = "flex";
-                });
-                closeBtn.addEventListener("click", () => {
-                    modal.style.display = "none";
-                });
-                window.addEventListener("click", (e) => {
-                    if (e.target === modal) modal.style.display = "none";
-                });
-            }
-
-            // Модалка деталей
-            const detailsModal = document.getElementById("detailsModal");
-            const closeDetailsBtn = document.getElementById("closeDetailsBtn");
-            if (closeDetailsBtn && detailsModal) {
-                closeDetailsBtn.addEventListener("click", () => {
-                    detailsModal.style.display = "none";
-                });
-                window.addEventListener("click", (e) => {
-                    if (e.target === detailsModal) detailsModal.style.display = "none";
-                });
-            }
-        }
-
-        // Обработка формы
-        document.getElementById("adForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            if (!currentUser) {
-                alert("Пользователь не авторизован");
-                return;
-            }
-            const title = document.getElementById("title").value.trim();
-            const type = document.getElementById("type").value;
-            const category = document.getElementById("category").value;
-            const price = parseFloat(document.getElementById("price").value);
-            const description = document.getElementById("description").value.trim();
-            const icon = document.getElementById("icon").value.trim() || "fa-tag";
-
-            if (!title || !price || !description) {
-                alert("Заполните все поля");
-                return;
-            }
-
-            try {
-                await createAd({
-                    userId: currentUser.id,
-                    title,
-                    type,
-                    category,
-                    price,
-                    description,
-                    icon,
-                });
-                tg.showPopup({
-                    title: "✅ Отправлено",
-                    message: "Ваше объявление отправлено на модерацию",
-                    buttons: [{ type: "ok" }]
-                });
-                document.getElementById("adForm").reset();
-                document.getElementById("adModal").style.display = "none";
-            } catch (err) {
-                console.error(err);
-                alert("Ошибка при отправке");
-            }
+            const userSpan = document.createElement('span');
+            userSpan.classList.add('message-user');
+            userSpan.textContent = msg.nick + ': ';
+            const textSpan = document.createElement('span');
+            textSpan.textContent = msg.text;
+            const timeSpan = document.createElement('span');
+            timeSpan.classList.add('message-time');
+            timeSpan.textContent = msg.time;
+            msgDiv.appendChild(userSpan);
+            msgDiv.appendChild(textSpan);
+            msgDiv.appendChild(timeSpan);
+            messagesDiv.appendChild(msgDiv);
         });
+        // Прокрутка вниз
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
 
-        init();
-    </script>
+    // Отправка сообщения
+    function sendMessage() {
+        let nick = nicknameInput.value.trim();
+        if (nick === '') nick = 'Аноним';
+        const text = messageInput.value.trim();
+        if (text === '') return;
+
+        const newMessage = {
+            nick: nick,
+            text: text,
+            time: getTime(),
+            timestamp: Date.now()
+        };
+        messagesRef.push(newMessage);
+        messageInput.value = '';
+        messageInput.focus();
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    // Устанавливаем текущий ник при загрузке
+    currentNick = nicknameInput.value;
+</script>
 </body>
 </html>
