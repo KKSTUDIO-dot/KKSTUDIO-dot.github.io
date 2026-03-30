@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Renaissance | Telegram Mini App</title>
-    <!-- Font Awesome 6 (бесплатно) -->
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -26,14 +26,13 @@
             line-height: 1.5;
         }
 
-        /* Glassmorphism эффект */
+        /* Общие стили для тёмных страниц */
         .glass {
             background: rgba(18, 22, 35, 0.7);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 180, 71, 0.2);
         }
 
-        /* Страницы */
         .page {
             display: none;
             padding: 20px;
@@ -86,7 +85,6 @@
             max-width: 85%;
             width: fit-content;
             word-break: break-word;
-            transition: 0.1s;
         }
         .message-user {
             font-weight: 700;
@@ -116,7 +114,6 @@
             color: white;
             font-size: 1rem;
             outline: none;
-            transition: 0.2s;
         }
         .chat-input-area input:focus {
             border-color: #ffb347;
@@ -134,10 +131,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-        .chat-input-area button:hover {
-            background: #ffa01e;
-            transform: scale(0.98);
         }
         .nick-row {
             display: flex;
@@ -216,9 +209,6 @@
             font-weight: 600;
             transition: 0.2s;
         }
-        .edit-nick-btn:hover {
-            background: rgba(255, 180, 71, 0.1);
-        }
 
         /* Новости */
         .news-list {
@@ -231,7 +221,6 @@
             border-radius: 24px;
             padding: 18px;
             border-left: 4px solid #ffb347;
-            transition: 0.2s;
         }
         .news-title {
             font-size: 1.2rem;
@@ -243,9 +232,6 @@
             color: #8b92a8;
             margin-bottom: 10px;
         }
-        .news-text {
-            font-size: 0.95rem;
-        }
 
         /* Информация */
         .info-block {
@@ -256,6 +242,97 @@
         }
         .info-block p {
             margin-bottom: 18px;
+        }
+
+        /* Стили для страницы рангов (белая тема) */
+        #ranksPage {
+            background: #f8f9fc;
+            color: #1e293b;
+            border-radius: 0;
+            padding: 20px;
+            max-width: 800px;
+        }
+        #ranksPage h2 {
+            background: linear-gradient(135deg, #ffb347, #ff7e05);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1.5rem;
+        }
+        .ranks-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .rank-card {
+            background: white;
+            border-radius: 28px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #e9ecef;
+        }
+        .rank-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        .rank-icon {
+            width: 70px;
+            height: 70px;
+            background: #ffb34720;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            color: #ffb347;
+        }
+        .rank-info {
+            flex: 1;
+        }
+        .rank-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .rank-desc {
+            color: #5a6e8a;
+            font-size: 0.9rem;
+        }
+        .apply-btn {
+            background: #ffb347;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        .apply-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            color: #64748b;
+        }
+        .apply-btn:hover:not(:disabled) {
+            background: #ffa01e;
+            transform: scale(0.98);
+        }
+        @media (max-width: 600px) {
+            .rank-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            .rank-icon {
+                margin-bottom: 10px;
+            }
         }
 
         /* Нижняя навигация */
@@ -292,15 +369,6 @@
         .nav-item.active {
             color: #ffb347;
             background: rgba(255, 180, 71, 0.1);
-        }
-
-        @media (max-width: 500px) {
-            .page {
-                padding: 16px;
-            }
-            .messages {
-                height: 320px;
-            }
         }
     </style>
 </head>
@@ -360,6 +428,14 @@
         </div>
     </div>
 
+    <!-- Ранги (новая страница) -->
+    <div id="ranksPage" class="page">
+        <h2><i class="fas fa-ranking-star"></i> Система рангов</h2>
+        <div id="ranksContainer" class="ranks-grid">
+            <!-- динамически загружаются карточки -->
+        </div>
+    </div>
+
     <!-- Нижнее меню -->
     <div class="bottom-nav">
         <button class="nav-item active" data-page="chat">
@@ -378,6 +454,10 @@
             <i class="fas fa-circle-info"></i>
             <span>Инфо</span>
         </button>
+        <button class="nav-item" data-page="ranks">
+            <i class="fas fa-ranking-star"></i>
+            <span>Ранги</span>
+        </button>
     </div>
 
     <script>
@@ -395,16 +475,16 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const messagesRef = database.ref('messages');
+        const rankRequestsRef = database.ref('rank_requests');
 
         // ------------------- TELEGRAM АВТОРИЗАЦИЯ -------------------
         let tgUser = null;
         if (window.Telegram && window.Telegram.WebApp) {
             const webApp = window.Telegram.WebApp;
-            webApp.expand(); // разворачиваем на весь экран
+            webApp.expand();
             tgUser = webApp.initDataUnsafe?.user;
         }
 
-        // Функция для получения имени из Telegram или заглушки
         function getTelegramName() {
             if (tgUser) {
                 let name = tgUser.first_name || '';
@@ -415,8 +495,6 @@
         }
 
         let defaultNick = getTelegramName() || 'Гость_' + Math.floor(Math.random() * 1000);
-        
-        // Загружаем сохранённый ник, если есть, иначе ставим Telegram имя
         let currentNick = localStorage.getItem('renaissance_nick');
         if (!currentNick && defaultNick) {
             currentNick = defaultNick;
@@ -435,13 +513,11 @@
         const profileAvatarDiv = document.getElementById('profileAvatar');
         const editProfileNickBtn = document.getElementById('editProfileNick');
 
-        // Отображение профиля Telegram
         function updateProfileUI() {
             if (tgUser) {
                 profileNickSpan.textContent = tgUser.first_name ? `${tgUser.first_name} ${tgUser.last_name || ''}`.trim() : tgUser.username || 'Пользователь';
                 if (tgUser.username) profileUsernameSpan.textContent = '@' + tgUser.username;
                 else profileUsernameSpan.textContent = 'Telegram ID: ' + tgUser.id;
-                // Попробуем показать аватарку (если есть фото профиля)
                 if (tgUser.photo_url) {
                     profileAvatarDiv.style.backgroundImage = `url(${tgUser.photo_url})`;
                     profileAvatarDiv.style.backgroundSize = 'cover';
@@ -456,7 +532,6 @@
             }
         }
 
-        // Обновление ника (синхронизация чата и профиля)
         function updateNick(newNick) {
             if (!newNick || newNick.trim() === '') newNick = 'Аноним';
             currentNick = newNick.trim();
@@ -465,25 +540,19 @@
             profileNickSpan.textContent = currentNick;
         }
 
-        // Инициализация ника в поле ввода
         nicknameInput.value = currentNick;
         updateProfileUI();
 
-        nicknameInput.addEventListener('change', () => {
-            updateNick(nicknameInput.value);
-        });
-
+        nicknameInput.addEventListener('change', () => updateNick(nicknameInput.value));
         editProfileNickBtn.addEventListener('click', () => {
             let newNick = prompt('Введите ваш ник для чата:', currentNick);
             if (newNick && newNick.trim()) updateNick(newNick.trim());
         });
 
-        // Функция времени
         function getTime() {
             return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
 
-        // Получение сообщений
         messagesRef.on('value', (snapshot) => {
             const data = snapshot.val();
             messagesDiv.innerHTML = '';
@@ -507,7 +576,6 @@
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         });
 
-        // Отправка
         function sendMessage() {
             let nick = nicknameInput.value.trim();
             if (!nick) nick = 'Аноним';
@@ -528,7 +596,6 @@
             if (e.key === 'Enter') sendMessage();
         });
 
-        // Экранирование HTML
         function escapeHtml(str) {
             return str.replace(/[&<>]/g, function(m) {
                 if (m === '&') return '&amp;';
@@ -538,7 +605,7 @@
             });
         }
 
-        // Новости (статика)
+        // Новости
         function loadNews() {
             const news = [
                 { title: "🏆 Победа в ивенте", date: "30.03.2026", text: "Первое место в еженедельном турнире! Спасибо всем за участие." },
@@ -560,12 +627,91 @@
         }
         loadNews();
 
-        // Навигация
+        // ------------------- РАНГИ -------------------
+        const ranks = [
+            { id: 'owner', name: '👑 Владелец семьи', desc: 'Основатель и лидер Renaissance. Принимает ключевые решения.', icon: 'fas fa-crown', canApply: false },
+            { id: 1, name: 'Ранг 1', desc: 'Новичок, проходит испытательный срок.', icon: 'fas fa-seedling', canApply: true },
+            { id: 2, name: 'Ранг 2', desc: 'Активный участник, допущен к основным активностям.', icon: 'fas fa-user-plus', canApply: true },
+            { id: 3, name: 'Ранг 3', desc: 'Проверенный боец, участвует в PvP.', icon: 'fas fa-fist-raised', canApply: true },
+            { id: 4, name: 'Ранг 4', desc: 'Опытный член, может обучать новичков.', icon: 'fas fa-chalkboard-teacher', canApply: true },
+            { id: 5, name: 'Ранг 5', desc: 'Ветеран, помощник в организации ивентов.', icon: 'fas fa-star-of-life', canApply: true },
+            { id: 6, name: 'Ранг 6', desc: 'Заместитель отдела, курирует направление.', icon: 'fas fa-user-tie', canApply: true },
+            { id: 7, name: 'Ранг 7', desc: 'Глава отдела, управляет командой.', icon: 'fas fa-users', canApply: true },
+            { id: 8, name: 'Ранг 8', desc: 'Правая рука лидера, стратег.', icon: 'fas fa-hand-sparkles', canApply: true },
+            { id: 9, name: 'Ранг 9', desc: 'Советник, участвует в управлении семьёй.', icon: 'fas fa-gem', canApply: true }
+        ];
+
+        function renderRanks() {
+            const container = document.getElementById('ranksContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            ranks.forEach(rank => {
+                const card = document.createElement('div');
+                card.className = 'rank-card';
+                card.innerHTML = `
+                    <div class="rank-icon"><i class="${rank.icon}"></i></div>
+                    <div class="rank-info">
+                        <div class="rank-name">${rank.name}</div>
+                        <div class="rank-desc">${rank.desc}</div>
+                    </div>
+                    ${rank.canApply ? `<button class="apply-btn" data-rank="${rank.id}"><i class="fas fa-paper-plane"></i> Подать заявку</button>` : '<button class="apply-btn" disabled><i class="fas fa-lock"></i> Недоступно</button>'}
+                `;
+                container.appendChild(card);
+            });
+
+            // Добавляем обработчики для кнопок "Подать заявку"
+            document.querySelectorAll('.apply-btn[data-rank]').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const rankId = btn.getAttribute('data-rank');
+                    const rankObj = ranks.find(r => r.id == rankId);
+                    if (!rankObj || !rankObj.canApply) return;
+
+                    if (!tgUser) {
+                        alert('Для подачи заявки откройте это приложение в Telegram!');
+                        return;
+                    }
+
+                    // Проверка, не подавал ли уже заявку на этот ранг (необязательно)
+                    // Для простоты пропустим, но можно добавить проверку.
+
+                    const requestData = {
+                        userId: tgUser.id,
+                        username: tgUser.username || '',
+                        firstName: tgUser.first_name || '',
+                        lastName: tgUser.last_name || '',
+                        rankId: rankId,
+                        rankName: rankObj.name,
+                        timestamp: Date.now(),
+                        status: 'pending'
+                    };
+
+                    try {
+                        await rankRequestsRef.push(requestData);
+                        alert(`Заявка на ранг "${rankObj.name}" успешно отправлена! Администратор рассмотрит её.`);
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="fas fa-check"></i> Заявка отправлена';
+                        setTimeout(() => {
+                            btn.disabled = false;
+                            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Подать заявку';
+                        }, 3000);
+                    } catch (err) {
+                        console.error(err);
+                        alert('Ошибка при отправке заявки. Попробуйте позже.');
+                    }
+                });
+            });
+        }
+
+        renderRanks();
+
+        // ------------------- НАВИГАЦИЯ -------------------
         const pages = {
             chat: document.getElementById('chatPage'),
             profile: document.getElementById('profilePage'),
             news: document.getElementById('newsPage'),
-            info: document.getElementById('infoPage')
+            info: document.getElementById('infoPage'),
+            ranks: document.getElementById('ranksPage')
         };
         const navBtns = document.querySelectorAll('.nav-item');
         function switchPage(pageId) {
