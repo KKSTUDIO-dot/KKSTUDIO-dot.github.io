@@ -3,27 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Админ-панель</title>
+    <title>Админ-панель | Соцсеть</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
-            font-family: 'Inter', system-ui;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             background: #0b0e14;
             color: #eef2ff;
-            padding: 20px;
+            min-height: 100vh;
         }
-        .container {
+
+        /* Контейнер */
+        .admin-container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 20px 16px 80px;
         }
-        h1 {
-            margin-bottom: 20px;
+
+        /* Заголовок и кнопка выхода */
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #2d3748;
+        }
+        .admin-header h1 {
+            font-size: 1.8rem;
             display: flex;
             align-items: center;
             gap: 12px;
         }
+        .logout-btn {
+            background: #4a5568;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .logout-btn:hover { background: #ef4444; }
+
+        /* Навигация по вкладкам */
+        .admin-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 28px;
+            background: #141821;
+            padding: 8px;
+            border-radius: 48px;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: #9ca3b5;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        .tab-btn.active {
+            background: #3b82f6;
+            color: white;
+        }
+        .tab-btn i { font-size: 1rem; }
+
+        /* Карточки статистики */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: #141821;
+            border-radius: 28px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .stat-card i {
+            font-size: 32px;
+            color: #3b82f6;
+            margin-bottom: 8px;
+        }
+        .stat-card h3 {
+            font-size: 2rem;
+            margin-bottom: 4px;
+        }
+        .stat-card p {
+            color: #9ca3b5;
+            font-size: 0.85rem;
+        }
+
+        /* Секции с таблицами */
+        .section-card {
+            background: #141821;
+            border-radius: 28px;
+            padding: 20px;
+            margin-bottom: 32px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .section-header h2 {
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .action-btn {
+            background: #2d3748;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+        .action-btn.danger { background: #ef4444; }
+        .action-btn.warning { background: #eab308; color: #0b0e14; }
+        .action-btn:hover { opacity: 0.8; }
+
+        /* Таблицы (адаптивные) */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid #2d3748;
+        }
+        th {
+            color: #9ca3b5;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+        td {
+            font-size: 0.85rem;
+            word-break: break-word;
+        }
+        .badge {
+            background: #3b82f6;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+        .small-btn {
+            background: #4a5568;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            margin-right: 6px;
+            font-size: 0.75rem;
+        }
+        .small-btn.danger { background: #ef4444; }
+
+        /* Индикатор загрузки */
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #2d3748;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Форма входа */
         .login-card {
             max-width: 400px;
             margin: 100px auto;
@@ -51,84 +242,18 @@
             width: 100%;
             cursor: pointer;
         }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-        .stat-card {
-            background: #141821;
-            border-radius: 24px;
-            padding: 20px;
-            text-align: center;
-        }
-        .stat-card i {
-            font-size: 32px;
-            margin-bottom: 8px;
-            color: #3b82f6;
-        }
-        .stat-card h3 {
-            font-size: 28px;
-        }
-        .section {
-            background: #141821;
-            border-radius: 28px;
-            padding: 20px;
-            margin-bottom: 32px;
-        }
-        .section h2 {
-            margin-bottom: 16px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            overflow-x: auto;
-            display: block;
-        }
-        th, td {
-            text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid #2d3748;
-        }
-        th {
-            color: #9ca3b5;
-            font-weight: 500;
-        }
-        .badge {
-            background: #3b82f6;
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-size: 12px;
-        }
-        button.small-btn {
-            background: #4a5568;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 20px;
-            color: white;
-            cursor: pointer;
-            margin-right: 6px;
-        }
-        button.danger {
-            background: #ef4444;
-        }
-        .loading {
-            text-align: center;
-            padding: 40px;
-        }
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid #2d3748;
-            border-top-color: #3b82f6;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Адаптив */
         @media (max-width: 768px) {
-            th, td { font-size: 12px; padding: 8px; }
+            .admin-container { padding: 12px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .section-header { flex-direction: column; align-items: stretch; }
+            .action-buttons { justify-content: flex-start; }
+            th, td { padding: 8px 6px; font-size: 0.75rem; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .tab-btn { padding: 6px 12px; font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -137,26 +262,17 @@
 
 <script>
     (function() {
-        // Конфиг Supabase (ваши данные)
         const SUPABASE_URL = 'https://dkzhqfdfjzovzephxaxe.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRremhxZmRmanpvdnplcGh4YXhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTQ4OTAsImV4cCI6MjA5NTUzMDg5MH0.dmLLQe9QF1hlshT_DtbdQe4Z0h-bLGTRv3TFwJgtpk8';
         
         let supabase;
-        let currentUser = null;
         let isAdmin = false;
+        let currentTab = 'dashboard';
 
-        // Простая авторизация админа (по паролю)
-        // Если хотите использовать роль из БД, закомментируйте этот блок
-        const ADMIN_PASSWORD = 'admin123'; // смените на свой
+        const ADMIN_PASSWORD = 'admin123'; // измените при необходимости
 
         async function init() {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            // Проверяем авторизацию в Supabase (если пользователь залогинен, получим его)
-            const { data: { user } } = await supabase.auth.getUser();
-            currentUser = user;
-            
-            // Проверяем админские права (сначала через пароль, потом через role)
-            // Для простоты показываем форму ввода пароля
             const storedAuth = sessionStorage.getItem('admin_auth');
             if (storedAuth === 'true') {
                 isAdmin = true;
@@ -170,12 +286,12 @@
             document.getElementById('app').innerHTML = `
                 <div class="login-card">
                     <i class="fas fa-shield-alt" style="font-size: 48px; margin-bottom: 16px; color: #3b82f6;"></i>
-                    <h2>Вход в админ-панель</h2>
-                    <input type="password" id="adminPassword" placeholder="Пароль администратора">
-                    <button id="loginAdminBtn">Войти</button>
+                    <h2>Админ-панель</h2>
+                    <input type="password" id="adminPassword" placeholder="Пароль">
+                    <button id="loginBtn">Войти</button>
                 </div>
             `;
-            document.getElementById('loginAdminBtn').onclick = () => {
+            document.getElementById('loginBtn').onclick = () => {
                 const pwd = document.getElementById('adminPassword').value;
                 if (pwd === ADMIN_PASSWORD) {
                     sessionStorage.setItem('admin_auth', 'true');
@@ -188,108 +304,221 @@
         }
 
         async function loadAdminPanel() {
-            const app = document.getElementById('app');
-            app.innerHTML = `<div class="container"><div class="loading"><div class="spinner"></div><p>Загрузка данных...</p></div></div>`;
-            
-            // Получаем данные из БД
-            const [users, posts, profiles] = await Promise.all([
+            showLoading();
+            // Загружаем данные параллельно
+            const [usersRes, postsRes, profilesRes] = await Promise.all([
                 supabase.from('profiles').select('*').order('created_at', { ascending: false }),
                 supabase.from('posts').select('*, profiles(username)').order('created_at', { ascending: false }),
                 supabase.from('profiles').select('*')
             ]);
-            
-            const usersData = users.data || [];
-            const postsData = posts.data || [];
+            const users = usersRes.data || [];
+            const posts = postsRes.data || [];
             
             const stats = {
-                users: usersData.length,
-                posts: postsData.length,
-                feedPosts: postsData.filter(p => p.type === 'feed').length,
-                entityPosts: postsData.filter(p => p.type === 'entity').length,
-                totalLikes: postsData.reduce((sum, p) => sum + (p.likes || 0), 0)
+                users: users.length,
+                posts: posts.length,
+                feed: posts.filter(p => p.type === 'feed').length,
+                entity: posts.filter(p => p.type === 'entity').length,
+                likes: posts.reduce((sum, p) => sum + (p.likes || 0), 0)
+            };
+
+            const html = `
+                <div class="admin-container">
+                    <div class="admin-header">
+                        <h1><i class="fas fa-user-shield"></i> Админ-панель</h1>
+                        <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+                    </div>
+                    
+                    <div class="admin-tabs">
+                        <button class="tab-btn ${currentTab === 'dashboard' ? 'active' : ''}" data-tab="dashboard"><i class="fas fa-chart-line"></i> Дашборд</button>
+                        <button class="tab-btn ${currentTab === 'users' ? 'active' : ''}" data-tab="users"><i class="fas fa-users"></i> Пользователи</button>
+                        <button class="tab-btn ${currentTab === 'posts' ? 'active' : ''}" data-tab="posts"><i class="fas fa-newspaper"></i> Посты</button>
+                        <button class="tab-btn ${currentTab === 'tools' ? 'active' : ''}" data-tab="tools"><i class="fas fa-tools"></i> Массовые операции</button>
+                    </div>
+                    
+                    <div id="tabContent"></div>
+                </div>
+            `;
+            document.getElementById('app').innerHTML = html;
+            
+            // Навигация
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentTab = btn.dataset.tab;
+                    renderTabContent(users, posts, stats);
+                    // обновить активный класс
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+            
+            document.getElementById('logoutBtn').onclick = () => {
+                sessionStorage.removeItem('admin_auth');
+                isAdmin = false;
+                showLoginForm();
             };
             
-            const html = `
-                <div class="container">
-                    <h1><i class="fas fa-user-shield"></i> Админ-панель</h1>
-                    
+            renderTabContent(users, posts, stats);
+        }
+        
+        function renderTabContent(users, posts, stats) {
+            const container = document.getElementById('tabContent');
+            if (currentTab === 'dashboard') {
+                container.innerHTML = `
                     <div class="stats-grid">
                         <div class="stat-card"><i class="fas fa-users"></i><h3>${stats.users}</h3><p>Пользователей</p></div>
                         <div class="stat-card"><i class="fas fa-newspaper"></i><h3>${stats.posts}</h3><p>Всего постов</p></div>
-                        <div class="stat-card"><i class="fas fa-heart"></i><h3>${stats.totalLikes}</h3><p>Лайков</p></div>
-                        <div class="stat-card"><i class="fas fa-shapes"></i><h3>${stats.entityPosts}</h3><p>Постов в Сущности</p></div>
+                        <div class="stat-card"><i class="fas fa-heart"></i><h3>${stats.likes}</h3><p>Лайков</p></div>
+                        <div class="stat-card"><i class="fas fa-shapes"></i><h3>${stats.entity}</h3><p>Постов в Сущности</p></div>
+                        <div class="stat-card"><i class="fas fa-rss"></i><h3>${stats.feed}</h3><p>Постов в Ленте</p></div>
                     </div>
-                    
-                    <div class="section">
-                        <h2><i class="fas fa-users"></i> Пользователи (${usersData.length})</h2>
-                        <div style="overflow-x: auto;">
+                    <div class="section-card">
+                        <div class="section-header"><h2><i class="fas fa-info-circle"></i> Системная информация</h2></div>
+                        <p>База данных: Supabase (PostgreSQL)</p>
+                        <p>Последнее обновление: ${new Date().toLocaleString()}</p>
+                    </div>
+                `;
+            } 
+            else if (currentTab === 'users') {
+                container.innerHTML = `
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h2><i class="fas fa-users"></i> Пользователи (${users.length})</h2>
+                            <div class="action-buttons">
+                                <button class="action-btn warning" id="clearAllUsersBtn"><i class="fas fa-trash-alt"></i> Удалить всех</button>
+                            </div>
+                        </div>
+                        <div class="table-wrapper">
                             <table>
-                                <thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Подписчики</th><th>Подписки</th><th>Действия</th></tr></thead>
+                                <thead><tr><th>ID</th><th>Имя</th><th>Email</th><th>Подписчики</th><th>Подписки</th><th>Действия</th></tr></thead>
                                 <tbody>
-                                    ${usersData.map(u => `
+                                    ${users.map(u => `
                                         <tr>
                                             <td>${u.id.substring(0,8)}...</td>
                                             <td>${escapeHtml(u.username || '—')}</td>
                                             <td>—</td>
                                             <td>${u.followers || 0}</td>
                                             <td>${u.following || 0}</td>
-                                            <td><button class="small-btn danger" onclick="window.deleteUser('${u.id}')">Удалить</button></td>
+                                            <td><button class="small-btn danger" data-user-id="${u.id}">Удалить</button></td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    
-                    <div class="section">
-                        <h2><i class="fas fa-feather-alt"></i> Все посты (${postsData.length})</h2>
-                        <div style="overflow-x: auto;">
+                `;
+                // Одиночное удаление
+                document.querySelectorAll('[data-user-id]').forEach(btn => {
+                    btn.onclick = async (e) => {
+                        const userId = btn.dataset.userId;
+                        if (confirm('Удалить пользователя и все его посты?')) {
+                            await supabase.from('profiles').delete().eq('id', userId);
+                            loadAdminPanel();
+                        }
+                    };
+                });
+                document.getElementById('clearAllUsersBtn').onclick = async () => {
+                    if (confirm('Удалить ВСЕХ пользователей? Это действие необратимо!')) {
+                        await supabase.from('profiles').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                        loadAdminPanel();
+                    }
+                };
+            }
+            else if (currentTab === 'posts') {
+                container.innerHTML = `
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h2><i class="fas fa-newspaper"></i> Все посты (${posts.length})</h2>
+                            <div class="action-buttons">
+                                <button class="action-btn warning" id="clearFeedPostsBtn"><i class="fas fa-trash-alt"></i> Удалить все из Ленты</button>
+                                <button class="action-btn warning" id="clearEntityPostsBtn"><i class="fas fa-trash-alt"></i> Удалить все из Сущности</button>
+                                <button class="action-btn danger" id="clearAllPostsBtn"><i class="fas fa-skull-crosswalk"></i> Удалить ВСЕ посты</button>
+                            </div>
+                        </div>
+                        <div class="table-wrapper">
                             <table>
                                 <thead><tr><th>ID</th><th>Автор</th><th>Тип</th><th>Текст</th><th>Лайки</th><th>Дата</th><th>Действия</th></tr></thead>
                                 <tbody>
-                                    ${postsData.map(p => `
+                                    ${posts.map(p => `
                                         <tr>
                                             <td>${p.id}</td>
                                             <td>${escapeHtml(p.profiles?.username || 'anon')}</td>
                                             <td><span class="badge">${p.type === 'feed' ? 'Лента' : 'Сущность'}</span></td>
-                                            <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(p.content?.substring(0, 60))}${p.content?.length > 60 ? '…' : ''}</td>
+                                            <td style="max-width:250px; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(p.content?.substring(0, 50))}${p.content?.length > 50 ? '…' : ''}</td>
                                             <td>${p.likes || 0}</td>
                                             <td>${new Date(p.created_at).toLocaleDateString()}</td>
-                                            <td><button class="small-btn danger" onclick="window.deletePost('${p.id}')">Удалить</button></td>
+                                            <td><button class="small-btn danger" data-post-id="${p.id}">Удалить</button></td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button id="logoutAdminBtn" style="background: #4a5568; padding: 10px 20px; border: none; border-radius: 40px; cursor: pointer;">Выйти</button>
+                `;
+                // Одиночное удаление поста
+                document.querySelectorAll('[data-post-id]').forEach(btn => {
+                    btn.onclick = async (e) => {
+                        const postId = btn.dataset.postId;
+                        if (confirm('Удалить этот пост?')) {
+                            await supabase.from('posts').delete().eq('id', postId);
+                            loadAdminPanel();
+                        }
+                    };
+                });
+                // Массовые операции
+                document.getElementById('clearFeedPostsBtn').onclick = async () => {
+                    if (confirm('Удалить все посты из Ленты?')) {
+                        await supabase.from('posts').delete().eq('type', 'feed');
+                        loadAdminPanel();
+                    }
+                };
+                document.getElementById('clearEntityPostsBtn').onclick = async () => {
+                    if (confirm('Удалить все посты из Сущности?')) {
+                        await supabase.from('posts').delete().eq('type', 'entity');
+                        loadAdminPanel();
+                    }
+                };
+                document.getElementById('clearAllPostsBtn').onclick = async () => {
+                    if (confirm('УДАЛИТЬ ВСЕ ПОСТЫ? Это необратимо!')) {
+                        await supabase.from('posts').delete().neq('id', 0);
+                        loadAdminPanel();
+                    }
+                };
+            }
+            else if (currentTab === 'tools') {
+                container.innerHTML = `
+                    <div class="section-card">
+                        <div class="section-header"><h2><i class="fas fa-tools"></i> Массовые операции</h2></div>
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <div><button class="action-btn warning" id="deleteAllUsersTool"><i class="fas fa-user-slash"></i> Удалить всех пользователей (кроме текущего?)</button> <span style="color:#9ca3b5; margin-left:8px;">Осторожно, потеряете всё!</span></div>
+                            <div><button class="action-btn warning" id="deleteAllPostsTool"><i class="fas fa-trash-alt"></i> Удалить все посты</button></div>
+                            <div><button class="action-btn warning" id="resetLikesTool"><i class="fas fa-heart-broken"></i> Сбросить все лайки (обнулить)</button></div>
+                        </div>
                     </div>
-                </div>
-            `;
-            app.innerHTML = html;
-            
-            // Глобальные функции для удаления
-            window.deletePost = async (postId) => {
-                if (!confirm('Удалить этот пост?')) return;
-                const { error } = await supabase.from('posts').delete().eq('id', postId);
-                if (error) alert('Ошибка: ' + error.message);
-                else loadAdminPanel();
-            };
-            
-            window.deleteUser = async (userId) => {
-                if (!confirm('Удалить пользователя? Все его посты также будут удалены (ON DELETE CASCADE).')) return;
-                const { error } = await supabase.from('profiles').delete().eq('id', userId);
-                if (error) alert('Ошибка: ' + error.message);
-                else loadAdminPanel();
-            };
-            
-            document.getElementById('logoutAdminBtn').onclick = () => {
-                sessionStorage.removeItem('admin_auth');
-                isAdmin = false;
-                showLoginForm();
-            };
+                `;
+                document.getElementById('deleteAllUsersTool').onclick = async () => {
+                    if (confirm('Удалить ВСЕХ пользователей? Это действие навсегда удалит все профили и посты.')) {
+                        await supabase.from('profiles').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                        loadAdminPanel();
+                    }
+                };
+                document.getElementById('deleteAllPostsTool').onclick = async () => {
+                    if (confirm('Удалить ВСЕ посты?')) {
+                        await supabase.from('posts').delete().neq('id', 0);
+                        loadAdminPanel();
+                    }
+                };
+                document.getElementById('resetLikesTool').onclick = async () => {
+                    if (confirm('Сбросить лайки на всех постах?')) {
+                        await supabase.from('posts').update({ likes: 0 }).neq('id', 0);
+                        loadAdminPanel();
+                    }
+                };
+            }
+        }
+        
+        function showLoading() {
+            document.getElementById('app').innerHTML = `<div class="loading"><div class="spinner"></div><p>Загрузка...</p></div>`;
         }
         
         function escapeHtml(str) { return str?.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]) || ''; }
