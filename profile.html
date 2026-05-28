@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Профиль</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', system-ui; background: #0b0e14; color: #eef2ff; padding-bottom: 80px; }
+        .profile-container { max-width: 700px; margin: 20px auto; padding: 0 16px; }
+        .profile-header { text-align: center; margin-bottom: 24px; }
+        .avatar { width: 100px; height: 100px; background: #2d3748; border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 64px; overflow: hidden; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-name { font-size: 24px; font-weight: 600; }
+        .profile-username { color: #9ca3b5; margin: 4px 0 12px; }
+        .edit-btn { background: #2d3748; border: none; padding: 8px 24px; border-radius: 40px; color: white; font-weight: 500; cursor: pointer; margin-bottom: 20px; }
+        .stats { display: flex; justify-content: space-around; background: #141821; padding: 16px; border-radius: 28px; margin-bottom: 28px; }
+        .stats div { text-align: center; }
+        .stats span { display: block; font-size: 22px; font-weight: bold; }
+        .stats label { font-size: 13px; color: #9ca3b5; }
+        .posts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+        .grid-post { aspect-ratio: 1 / 1; background: #141821; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .grid-post img { width: 100%; height: 100%; object-fit: cover; }
+        .grid-post i { font-size: 32px; color: #4a5568; }
+        .no-image { text-align: center; padding: 12px; font-size: 12px; color: #9ca3b5; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(18,22,32,0.96); backdrop-filter: blur(24px); border-top: 1px solid rgba(255,255,255,0.08); padding: 8px 20px 14px; z-index: 1000; }
+        .nav-container { display: flex; align-items: flex-end; justify-content: center; gap: 4px; max-width: 580px; margin: 0 auto; }
+        .nav-item { flex: 1; background: none; border: none; color: #9ca3b5; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; cursor: pointer; padding: 8px 4px; border-radius: 28px; }
+        .nav-item.active { color: #3b82f6; }
+        .icon-photo { font-size: 26px; }
+        .nav-plus { margin: 0 4px; position: relative; top: -10px; }
+        .plus-button { background: linear-gradient(135deg, #3b82f6, #8b5cf6); width: 58px; height: 58px; border-radius: 36px; border: none; color: white; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(59,130,246,0.4); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-content { background: #141821; border-radius: 28px; padding: 24px; width: 90%; max-width: 400px; }
+        .modal-content input, .modal-content textarea { width: 100%; background: #0f131c; border: 1px solid #2d3748; border-radius: 20px; padding: 12px; margin: 8px 0; color: white; }
+        .modal-content button { background: #3b82f6; border: none; padding: 12px; border-radius: 40px; color: white; font-weight: bold; width: 100%; margin-top: 12px; }
+        @media (max-width: 480px) { .icon-photo { font-size: 24px; } .plus-button { width: 52px; height: 52px; font-size: 24px; } }
+    </style>
+</head>
+<body>
+<div class="profile-container" id="profileContainer"></div>
+<div class="bottom-nav">
+    <div class="nav-container">
+        <button class="nav-item" data-page="entity"><div class="icon-photo"><i class="fas fa-shapes"></i></div><span>Сущность</span></button>
+        <button class="nav-item" data-page="feed"><div class="icon-photo"><i class="fas fa-newspaper"></i></div><span>Лента</span></button>
+        <div class="nav-plus"><button class="plus-button" id="plusBtn"><i class="fas fa-plus"></i></button></div>
+        <button class="nav-item" data-page="chats"><div class="icon-photo"><i class="fas fa-comments"></i></div><span>Чаты</span></button>
+        <button class="nav-item active" data-page="profile"><div class="icon-photo"><i class="fas fa-user-circle"></i></div><span>Профиль</span></button>
+    </div>
+</div>
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <h3>Редактировать профиль</h3>
+        <input type="text" id="editName" placeholder="Имя">
+        <input type="text" id="editUsername" placeholder="@username">
+        <textarea id="editBio" rows="2" placeholder="О себе"></textarea>
+        <input type="text" id="editAvatarUrl" placeholder="Ссылка на аватар (URL)">
+        <button id="saveProfileBtn">Сохранить</button>
+        <button id="closeModalBtn" style="background:#4a5568;">Отмена</button>
+    </div>
+</div>
+<script>
+    (function() {
+        const SUPABASE_URL = 'https://dkzhqfdfjzovzephxaxe.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRremhxZmRmanpvdnplcGh4YXhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTQ4OTAsImV4cCI6MjA5NTUzMDg5MH0.dmLLQe9QF1hlshT_DtbdQe4Z0h-bLGTRv3TFwJgtpk8';
+        
+        if (!window._supabaseClient) window._supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = window._supabaseClient;
+
+        let currentUser = null;
+        let profileData = null;
+
+        async function loadUser() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) { window.location.href = 'index.html'; return; }
+            currentUser = user;
+            await loadProfile();
+            renderProfile();
+        }
+
+        async function loadProfile() {
+            let { data: profile, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+            if (error && error.code === 'PGRST116') {
+                const { data: newProfile, error: insertError } = await supabase
+                    .from('profiles')
+                    .insert([{ id: currentUser.id, username: currentUser.email?.split('@')[0] || 'user', avatar: null, bio: '' }])
+                    .select().single();
+                if (insertError) console.error(insertError);
+                else profileData = newProfile;
+            } else { profileData = profile; }
+        }
+
+        async function getUserPosts() {
+            const { data, error } = await supabase.from('posts').select('*').eq('user_id', currentUser.id).eq('type', 'feed').order('created_at', { ascending: false });
+            if (error) return [];
+            return data;
+        }
+
+        async function renderProfile() {
+            if (!profileData) return;
+            const posts = await getUserPosts();
+            const postsCount = posts.length;
+            let avatarHtml = profileData.avatar ? `<img src="${profileData.avatar}">` : '<i class="fas fa-user-circle"></i>';
+            const statsHtml = `<div class="stats"><div><span>${postsCount}</span><label>публикаций</label></div><div><span>${profileData.followers || 0}</span><label>подписчиков</label></div><div><span>${profileData.following || 0}</span><label>подписок</label></div></div>`;
+            let gridHtml = `<div class="posts-grid">`;
+            if (posts.length === 0) gridHtml += `<div class="grid-post" style="grid-column:span 3; background:none;"><i class="fas fa-camera"></i> Нет публикаций</div>`;
+            else posts.forEach(post => {
+                if (post.image) gridHtml += `<div class="grid-post"><img src="${post.image}" alt="post"></div>`;
+                else gridHtml += `<div class="grid-post"><div class="no-image"><i class="fas fa-file-alt"></i><br>${escapeHtml(post.content.substring(0,20))}...</div></div>`;
+            });
+            gridHtml += `</div>`;
+            const fullHtml = `<div class="profile-header"><div class="avatar">${avatarHtml}</div><div class="profile-name">${escapeHtml(profileData.username || 'Пользователь')}</div><div class="profile-username">@${escapeHtml(profileData.username || 'user')}</div><button class="edit-btn" id="editProfileBtn"><i class="fas fa-pen"></i> Редактировать</button></div>${statsHtml}<h3 style="margin:16px 0 8px;">Мои публикации</h3>${gridHtml}`;
+            document.getElementById('profileContainer').innerHTML = fullHtml;
+            document.getElementById('editProfileBtn').addEventListener('click', () => {
+                document.getElementById('editModal').style.display = 'flex';
+                document.getElementById('editName').value = profileData.username || '';
+                document.getElementById('editUsername').value = profileData.username || '';
+                document.getElementById('editBio').value = profileData.bio || '';
+                document.getElementById('editAvatarUrl').value = profileData.avatar || '';
+            });
+        }
+
+        async function saveProfile() {
+            const newName = document.getElementById('editName').value.trim();
+            const newUsername = document.getElementById('editUsername').value.trim();
+            const newBio = document.getElementById('editBio').value.trim();
+            const newAvatar = document.getElementById('editAvatarUrl').value.trim();
+            const updates = {};
+            if (newName) updates.username = newName;
+            if (newUsername) updates.username = newUsername;
+            if (newBio) updates.bio = newBio;
+            if (newAvatar) updates.avatar = newAvatar;
+            const { error } = await supabase.from('profiles').update(updates).eq('id', currentUser.id);
+            if (error) alert('Ошибка: ' + error.message);
+            else {
+                Object.assign(profileData, updates);
+                document.getElementById('editModal').style.display = 'none';
+                renderProfile();
+            }
+        }
+
+        function escapeHtml(str) { return str?.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' })[m]) || ''; }
+
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const page = btn.dataset.page;
+                if (page === 'feed') window.location.href = 'index.html';
+                else if (page === 'entity') window.location.href = 'index.html';
+                else if (page === 'chats') window.location.href = 'index.html';
+            });
+        });
+        document.getElementById('plusBtn').addEventListener('click', () => { window.location.href = 'post.html'; });
+        document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
+        document.getElementById('closeModalBtn').addEventListener('click', () => { document.getElementById('editModal').style.display = 'none'; });
+        window.addEventListener('click', (e) => { if (e.target === document.getElementById('editModal')) document.getElementById('editModal').style.display = 'none'; });
+        loadUser();
+    })();
+</script>
+</body>
+</html>
